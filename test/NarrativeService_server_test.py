@@ -73,9 +73,58 @@ class NarrativeServiceTest(unittest.TestCase):
 
     # NOTE: According to Python unittest naming rules test method names should start from 'test'. # noqa
     def test_list_object_with_sets(self):
+        t1 = time.time()
         ret = self.getImpl().list_objects_with_sets(self.getContext(), 
                                                     {"ws_name": "KBasePublicGenomesV5"})[0]["data"]
-        print("Return size: " + str(len(ret)))
+        t1 = time.time() - t1
+        print("Return size: " + str(len(ret)) + ", time=" + str(t1))
         self.assertTrue(len(ret) > 0)
         for item in ret:
             self.assertTrue("object_info" in item)
+
+    def test_copy_narrative(self):
+        ws = self.getWsClient()
+        with open("/kb/module/test/data/narrative1.json", "r") as f1:
+            nar_obj_data = json.load(f1)
+        user_id = self.getContext()['user_id']
+        ws_name = self.getWsName()
+        nar_obj_data['metadata']['creator'] = user_id
+        nar_obj_data['metadata']['ws_name'] = ws_name
+        nar_obj_data['metadata']['kbase']['creator'] = user_id
+        nar_obj_data['metadata']['kbase']['ws_name'] = ws_name
+        nar_obj_name = "Narrative." + str(int(round(time.time() * 1000))) 
+        nar_obj_type = "KBaseNarrative.Narrative-4.0"
+        job_info = json.dumps({"queue_time": 0, "running": 0, "completed": 0, 
+                               "run_time": 0, "error": 0})
+        nar_obj_meta = {"description": "", 
+                        "format": "ipynb", 
+                        "creator": user_id, 
+                        "job_info": job_info, 
+                        "data_dependencies": "[]", 
+                        "jupyter.markdown": "1", 
+                        "ws_name": ws_name, 
+                        "type": "KBaseNarrative.Narrative", 
+                        "name": "NarrativeCopyTest"}
+        ws.save_objects({'workspace': ws_name, 'objects': 
+                         [{'type': nar_obj_type,
+                           'data': nar_obj_data,
+                           'name': nar_obj_name,
+                           'meta': nar_obj_meta}]})
+        copy_nar_name = "NarrativeCopyTest - Copy"
+        ret = self.getImpl().copy_narrative(self.getContext(), 
+                                            {'workspaceRef': ws_name + '/' + nar_obj_name,
+                                             'newName': copy_nar_name})[0]
+        copy_ws_id = ret['newWsId']
+        copy_nar_id = ret['newNarId']
+        try:
+            copy_nar = ws.get_objects([{'ref': str(copy_ws_id) + '/' + str(copy_nar_id)}])[0]
+            #print("Copy object: " + json.dumps(copy_nar, indent=4, sort_keys=True))
+            copy_nar_data = copy_nar['data']
+            # This is weird, so ws_name is the same as for old narrative:
+            self.assertEqual(ws_name, copy_nar_data['metadata']['kbase']['ws_name'])
+            # And here is proper new ws_name:
+            self.assertNotEqual(ws_name, copy_nar_data['metadata']['ws_name'])
+            self.assertEqual(copy_nar_name, copy_nar_data['metadata']['name'])
+        finally:
+            # Cleaning up new created workspace
+            ws.delete_workspace({'id': copy_ws_id})

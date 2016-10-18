@@ -179,6 +179,23 @@ public class NarrativeServiceClient {
         return res.get(0);
     }
 
+    /**
+     * <p>Original spec-file function name: copy_narrative</p>
+     * <pre>
+     * </pre>
+     * @param   params   instance of type {@link us.kbase.narrativeservice.CopyNarrativeParams CopyNarrativeParams}
+     * @return   instance of type {@link us.kbase.narrativeservice.CopyNarrativeOutput CopyNarrativeOutput}
+     * @throws IOException if an IO exception occurs
+     * @throws JsonClientException if a JSON RPC exception occurs
+     */
+    public CopyNarrativeOutput copyNarrative(CopyNarrativeParams params, RpcContext... jsonRpcContext) throws IOException, JsonClientException {
+        List<Object> args = new ArrayList<Object>();
+        args.add(params);
+        TypeReference<List<CopyNarrativeOutput>> retType = new TypeReference<List<CopyNarrativeOutput>>() {};
+        List<CopyNarrativeOutput> res = caller.jsonrpcCall("NarrativeService.copy_narrative", args, retType, true, true, jsonRpcContext, this.serviceVersion);
+        return res.get(0);
+    }
+
     public Map<String, Object> status(RpcContext... jsonRpcContext) throws IOException, JsonClientException {
         List<Object> args = new ArrayList<Object>();
         TypeReference<List<Map<String, Object>>> retType = new TypeReference<List<Map<String, Object>>>() {};
