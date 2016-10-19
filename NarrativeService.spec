@@ -74,4 +74,22 @@ module NarrativeService {
     funcdef list_objects_with_sets(ListObjectsWithSetsParams params)
         returns (ListObjectsWithSetsOutput) authentication required;
 
+    /*
+        workspaceId - optional workspace ID, if not specified then 
+            property from workspaceRef object info is used.
+    */
+    typedef structure {
+        string workspaceRef;
+        int workspaceId;
+        string newName;
+    } CopyNarrativeParams;
+
+    typedef structure {
+        int newWsId;
+        int newNarId;
+    } CopyNarrativeOutput;
+
+    funcdef copy_narrative(CopyNarrativeParams params)
+        returns (CopyNarrativeOutput) authentication required;
+
 };

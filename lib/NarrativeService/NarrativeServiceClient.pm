@@ -235,6 +235,102 @@ SetItems is a reference to a hash where the following keys are defined:
     }
 }
  
+
+
+=head2 copy_narrative
+
+  $return = $obj->copy_narrative($params)
+
+=over 4
+
+=item Parameter and return types
+
+=begin html
+
+<pre>
+$params is a NarrativeService.CopyNarrativeParams
+$return is a NarrativeService.CopyNarrativeOutput
+CopyNarrativeParams is a reference to a hash where the following keys are defined:
+	workspaceRef has a value which is a string
+	workspaceId has a value which is an int
+	newName has a value which is a string
+CopyNarrativeOutput is a reference to a hash where the following keys are defined:
+	newWsId has a value which is an int
+	newNarId has a value which is an int
+
+</pre>
+
+=end html
+
+=begin text
+
+$params is a NarrativeService.CopyNarrativeParams
+$return is a NarrativeService.CopyNarrativeOutput
+CopyNarrativeParams is a reference to a hash where the following keys are defined:
+	workspaceRef has a value which is a string
+	workspaceId has a value which is an int
+	newName has a value which is a string
+CopyNarrativeOutput is a reference to a hash where the following keys are defined:
+	newWsId has a value which is an int
+	newNarId has a value which is an int
+
+
+=end text
+
+=item Description
+
+
+
+=back
+
+=cut
+
+ sub copy_narrative
+{
+    my($self, @args) = @_;
+
+# Authentication: required
+
+    if ((my $n = @args) != 1)
+    {
+	Bio::KBase::Exceptions::ArgumentValidationError->throw(error =>
+							       "Invalid argument count for function copy_narrative (received $n, expecting 1)");
+    }
+    {
+	my($params) = @args;
+
+	my @_bad_arguments;
+        (ref($params) eq 'HASH') or push(@_bad_arguments, "Invalid type for argument 1 \"params\" (value was \"$params\")");
+        if (@_bad_arguments) {
+	    my $msg = "Invalid arguments passed to copy_narrative:\n" . join("", map { "\t$_\n" } @_bad_arguments);
+	    Bio::KBase::Exceptions::ArgumentValidationError->throw(error => $msg,
+								   method_name => 'copy_narrative');
+	}
+    }
+
+    my $url = $self->{url};
+    my $result = $self->{client}->call($url, $self->{headers}, {
+	    method => "NarrativeService.copy_narrative",
+	    params => \@args,
+    });
+    if ($result) {
+	if ($result->is_error) {
+	    Bio::KBase::Exceptions::JSONRPC->throw(error => $result->error_message,
+					       code => $result->content->{error}->{code},
+					       method_name => 'copy_narrative',
+					       data => $result->content->{error}->{error} # JSON::RPC::ReturnObject only supports JSONRPC 1.1 or 1.O
+					      );
+	} else {
+	    return wantarray ? @{$result->result} : $result->result->[0];
+	}
+    } else {
+        Bio::KBase::Exceptions::HTTP->throw(error => "Error invoking method copy_narrative",
+					    status_line => $self->{client}->status_line,
+					    method_name => 'copy_narrative',
+				       );
+    }
+}
+ 
   
 sub status
 {
@@ -278,16 +374,16 @@ sub version {
             Bio::KBase::Exceptions::JSONRPC->throw(
                 error => $result->error_message,
                 code => $result->content->{code},
-                method_name => 'list_objects_with_sets',
+                method_name => 'copy_narrative',
             );
         } else {
             return wantarray ? @{$result->result} : $result->result->[0];
         }
     } else {
         Bio::KBase::Exceptions::HTTP->throw(
-            error => "Error invoking method list_objects_with_sets",
+            error => "Error invoking method copy_narrative",
             status_line => $self->{client}->status_line,
-            method_name => 'list_objects_with_sets',
+            method_name => 'copy_narrative',
         );
     }
 }
@@ -618,6 +714,78 @@ data has a value which is a reference to a list where each element is a Narrativ
 
 a reference to a hash where the following keys are defined:
 data has a value which is a reference to a list where each element is a NarrativeService.ListItem
+
+
+=end text
+
+=back
+
+
+
+=head2 CopyNarrativeParams
+
+=over 4
+
+
+
+=item Description
+
+workspaceId - optional workspace ID, if not specified then 
+    property from workspaceRef object info is used.
+
+
+=item Definition
+
+=begin html
+
+<pre>
+a reference to a hash where the following keys are defined:
+workspaceRef has a value which is a string
+workspaceId has a value which is an int
+newName has a value which is a string
+
+</pre>
+
+=end html
+
+=begin text
+
+a reference to a hash where the following keys are defined:
+workspaceRef has a value which is a string
+workspaceId has a value which is an int
+newName has a value which is a string
+
+
+=end text
+
+=back
+
+
+
+=head2 CopyNarrativeOutput
+
+=over 4
+
+
+
+=item Definition
+
+=begin html
+
+<pre>
+a reference to a hash where the following keys are defined:
+newWsId has a value which is an int
+newNarId has a value which is an int
+
+</pre>
+
+=end html
+
+=begin text
+
+a reference to a hash where the following keys are defined:
+newWsId has a value which is an int
+newNarId has a value which is an int
 
 
 =end text

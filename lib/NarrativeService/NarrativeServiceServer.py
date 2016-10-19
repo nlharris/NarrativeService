@@ -333,6 +333,10 @@ class Application(object):
                              name='NarrativeService.list_objects_with_sets',
                              types=[dict])
         self.method_authentication['NarrativeService.list_objects_with_sets'] = 'required' # noqa
+        self.rpc_service.add(impl_NarrativeService.copy_narrative,
+                             name='NarrativeService.copy_narrative',
+                             types=[dict])
+        self.method_authentication['NarrativeService.copy_narrative'] = 'required' # noqa
         self.rpc_service.add(impl_NarrativeService.status,
                              name='NarrativeService.status',
                              types=[dict])

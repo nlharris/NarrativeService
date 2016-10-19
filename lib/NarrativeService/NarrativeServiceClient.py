@@ -89,6 +89,20 @@ class NarrativeService(object):
             'NarrativeService.list_objects_with_sets',
             [params], self._service_ver, context)
 
+    def copy_narrative(self, params, context=None):
+        """
+        :param params: instance of type "CopyNarrativeParams" (workspaceId -
+           optional workspace ID, if not specified then property from
+           workspaceRef object info is used.) -> structure: parameter
+           "workspaceRef" of String, parameter "workspaceId" of Long,
+           parameter "newName" of String
+        :returns: instance of type "CopyNarrativeOutput" -> structure:
+           parameter "newWsId" of Long, parameter "newNarId" of Long
+        """
+        return self._client.call_method(
+            'NarrativeService.copy_narrative',
+            [params], self._service_ver, context)
+
     def status(self, context=None):
         return self._client.call_method('NarrativeService.status',
                                         [], self._service_ver, context)
