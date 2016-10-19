@@ -16,6 +16,7 @@ from pprint import pprint  # noqa: F401
 from biokbase.workspace.client import Workspace as workspaceService
 from NarrativeService.NarrativeServiceImpl import NarrativeService
 from NarrativeService.NarrativeServiceServer import MethodContext
+from SetAPI.SetAPIClient import SetAPI
 
 
 class NarrativeServiceTest(unittest.TestCase):
@@ -44,6 +45,7 @@ class NarrativeServiceTest(unittest.TestCase):
         for nameval in config.items('NarrativeService'):
             cls.cfg[nameval[0]] = nameval[1]
         cls.wsURL = cls.cfg['workspace-url']
+        cls.serviceWizardURL = cls.cfg['service-wizard']
         cls.wsClient = workspaceService(cls.wsURL, token=token)
         cls.serviceImpl = NarrativeService(cls.cfg)
 
@@ -73,14 +75,27 @@ class NarrativeServiceTest(unittest.TestCase):
 
     # NOTE: According to Python unittest naming rules test method names should start from 'test'. # noqa
     def test_list_object_with_sets(self):
-        t1 = time.time()
+        #t1 = time.time()
+        #ret = self.getImpl().list_objects_with_sets(self.getContext(), 
+        #                                            {"ws_name": "KBasePublicGenomesV5"})[0]["data"]
+        #t1 = time.time() - t1
+        #print("Return size: " + str(len(ret)) + ", time=" + str(t1))
+        reads_obj_ref = "KBaseExampleData/rhodobacter.art.q50.SE.reads"
+        set_obj_name = "MyReadsSet.1"
+        sapi = SetAPI(self.__class__.serviceWizardURL, token=self.getContext()['token'])
+        sapi.save_reads_set_v1({'workspace': self.getWsName(), 'output_object_name': set_obj_name,
+                                'data': {'description': '', 'items': [{'ref': reads_obj_ref}]}})
         ret = self.getImpl().list_objects_with_sets(self.getContext(), 
-                                                    {"ws_name": "KBasePublicGenomesV5"})[0]["data"]
-        t1 = time.time() - t1
-        print("Return size: " + str(len(ret)) + ", time=" + str(t1))
+                                                    {"ws_name": self.getWsName()})[0]["data"]
         self.assertTrue(len(ret) > 0)
+        set_count = 0
         for item in ret:
             self.assertTrue("object_info" in item)
+            if "set_items" in item:
+                set_count += 1
+                set_items = item["set_items"]["set_items_info"]
+                self.assertEqual(1, len(set_items))
+        self.assertEqual(1, set_count)
 
     def test_copy_narrative(self):
         ws = self.getWsClient()

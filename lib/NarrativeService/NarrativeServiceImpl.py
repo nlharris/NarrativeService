@@ -3,6 +3,7 @@
 import time
 import json
 from biokbase.workspace.client import Workspace as workspaceService
+from SetAPI.SetAPIClient import SetAPI
 #END_HEADER
 
 
@@ -33,6 +34,7 @@ class NarrativeService:
     def __init__(self, config):
         #BEGIN_CONSTRUCTOR
         self.workspaceURL = config['workspace-url']
+        self.serviceWizardURL = config['service-wizard']
         #END_CONSTRUCTOR
         pass
 
@@ -96,7 +98,15 @@ class NarrativeService:
         ws_name = params.get("ws_name", None)
         token = ctx["token"]
         ws = workspaceService(self.workspaceURL, token=token)
-        max_obj_count = ws.get_workspace_info({"id": ws_id, "workspace": ws_name})[4]
+        ws_info = ws.get_workspace_info({"id": ws_id, "workspace": ws_name})
+        if not ws_name:
+            ws_name = ws_info[7]
+        sapi = SetAPI(self.serviceWizardURL, token=token)
+        sets = sapi.list_sets({'workspace': ws_name, 'include_set_item_info': 1})['sets']
+        ref_to_set = {}
+        for set_info in sets:
+            ref_to_set[set_info['ref']] = set_info
+        max_obj_count = ws_info[4]
         ws_names = None
         ws_ids = None
         if "ws_id" in params:
@@ -111,7 +121,15 @@ class NarrativeService:
                                     "minObjectID": min_obj_id,
                                     "maxObjectID": max_obj_id})
             for info in part:
-                data.append({"object_info": info})
+                item = {"object_info": info}
+                item_ref = str(info[6]) + '/' + str(info[0]) + '/' + str(info[4])
+                if item_ref in ref_to_set:
+                    set_info = ref_to_set[item_ref]
+                    target_set_items = []
+                    for set_item in set_info['items']:
+                        target_set_items.append(set_item['info'])
+                    item['set_items'] = {'set_items_info': target_set_items}
+                data.append(item)
             min_obj_id += 10000
         returnVal = {"data": data}
         #END list_objects_with_sets
