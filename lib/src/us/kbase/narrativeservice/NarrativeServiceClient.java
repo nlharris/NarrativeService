@@ -196,6 +196,23 @@ public class NarrativeServiceClient {
         return res.get(0);
     }
 
+    /**
+     * <p>Original spec-file function name: create_new_narrative</p>
+     * <pre>
+     * </pre>
+     * @param   params   instance of type {@link us.kbase.narrativeservice.CreateNewNarrativeParams CreateNewNarrativeParams}
+     * @return   instance of type {@link us.kbase.narrativeservice.CreateNewNarrativeOutput CreateNewNarrativeOutput}
+     * @throws IOException if an IO exception occurs
+     * @throws JsonClientException if a JSON RPC exception occurs
+     */
+    public CreateNewNarrativeOutput createNewNarrative(CreateNewNarrativeParams params, RpcContext... jsonRpcContext) throws IOException, JsonClientException {
+        List<Object> args = new ArrayList<Object>();
+        args.add(params);
+        TypeReference<List<CreateNewNarrativeOutput>> retType = new TypeReference<List<CreateNewNarrativeOutput>>() {};
+        List<CreateNewNarrativeOutput> res = caller.jsonrpcCall("NarrativeService.create_new_narrative", args, retType, true, true, jsonRpcContext, this.serviceVersion);
+        return res.get(0);
+    }
+
     public Map<String, Object> status(RpcContext... jsonRpcContext) throws IOException, JsonClientException {
         List<Object> args = new ArrayList<Object>();
         TypeReference<List<Map<String, Object>>> retType = new TypeReference<List<Map<String, Object>>>() {};
