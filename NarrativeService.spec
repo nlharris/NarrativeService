@@ -92,4 +92,98 @@ module NarrativeService {
     funcdef copy_narrative(CopyNarrativeParams params)
         returns (CopyNarrativeOutput) authentication required;
 
+
+    /* Restructured workspace object info 'data' tuple:
+        id: data[0],
+        name: data[1],
+        type: data[2],
+        save_date: data[3],
+        version: data[4],
+        saved_by: data[5],
+        wsid: data[6],
+        ws: data[7],
+        checksum: data[8],
+        size: data[9],
+        metadata: data[10],
+        ref: data[6] + '/' + data[0] + '/' + data[4],
+        obj_id: 'ws.' + data[6] + '.obj.' + data[0],
+        typeModule: type[0],
+        typeName: type[1],
+        typeMajorVersion: type[2],
+        typeMinorVersion: type[3],
+        saveDateNoTZ: no_timezone(data[3])
+    */
+    typedef structure {
+        int id;
+        string name;
+        string type;
+        string save_date;
+        int version;
+        string saved_by;
+        int wsid;
+        string ws;
+        string checksum;
+        int size;
+        mapping<string,string> metadata;
+        string ref;
+        string obj_id;
+        string typeModule;
+        string typeName;
+        string typeMajorVersion;
+        string typeMinorVersion;
+        string saveDateNoTZ;
+    } ObjectInfo;
+
+    /* Restructured workspace info 'wsInfo' tuple:
+        id: wsInfo[0],
+        name: wsInfo[1],
+        owner: wsInfo[2],
+        moddate: wsInfo[3],
+        object_count: wsInfo[4],
+        user_permission: wsInfo[5],
+        globalread: wsInfo[6],
+        lockstat: wsInfo[7],
+        metadata: wsInfo[8],
+        modDate: no_timezone(wsInfo[3])
+    */
+    typedef structure {
+        int id;
+        string name;
+        string owner;
+        timestamp moddate;
+        int object_count;
+        permission user_permission;
+        permission globalread;
+        lock_status lockstat;
+        mapping<string,string> metadata;
+        string modDate;
+    } WorkspaceInfo;
+
+    typedef tuple<int step_pos, string key, string value> AppParam;
+
+    /*
+        app - name of app (optional, either app or method may be defined)
+        method - name of method (optional, either app or method may be defined)
+        appparam - paramters of app/method packed into string in format:
+            "step_pos,param_name,param_value(;...)*" (alternative to appData)
+        appData - parameters of app/method in unpacked form (alternative to appparam)
+        markdown - markdown text for cell of 'markdown' type (optional)
+        copydata - packed inport data in format "import(;...)*"
+    */
+    typedef structure {
+        string app;
+        string method;
+        string appparam;
+        list<AppParam> appData;
+        string markdown;
+        string copydata;
+    } CreateNewNarrativeParams;
+    
+    typedef structure {
+        WorkspaceInfo workspaceInfo;
+        ObjectInfo objectInfo;
+    } CreateNewNarrativeOutput;
+    
+    funcdef create_new_narrative(CreateNewNarrativeParams params)
+        returns (CreateNewNarrativeOutput) authentication required;
 };

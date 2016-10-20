@@ -48,6 +48,7 @@ class NarrativeServiceTest(unittest.TestCase):
         cls.serviceWizardURL = cls.cfg['service-wizard']
         cls.wsClient = workspaceService(cls.wsURL, token=token)
         cls.serviceImpl = NarrativeService(cls.cfg)
+        cls.SetAPI_version= cls.cfg['setapi-version']
 
     @classmethod
     def tearDownClass(cls):
@@ -82,7 +83,8 @@ class NarrativeServiceTest(unittest.TestCase):
         #print("Return size: " + str(len(ret)) + ", time=" + str(t1))
         reads_obj_ref = "KBaseExampleData/rhodobacter.art.q50.SE.reads"
         set_obj_name = "MyReadsSet.1"
-        sapi = SetAPI(self.__class__.serviceWizardURL, token=self.getContext()['token'])
+        sapi = SetAPI(self.__class__.serviceWizardURL, token=self.getContext()['token'],
+                      service_ver = self.__class__.SetAPI_version)
         sapi.save_reads_set_v1({'workspace': self.getWsName(), 'output_object_name': set_obj_name,
                                 'data': {'description': '', 'items': [{'ref': reads_obj_ref}]}})
         ret = self.getImpl().list_objects_with_sets(self.getContext(), 
@@ -96,6 +98,10 @@ class NarrativeServiceTest(unittest.TestCase):
                 set_items = item["set_items"]["set_items_info"]
                 self.assertEqual(1, len(set_items))
         self.assertEqual(1, set_count)
+        ws_id = self.getWsClient().get_workspace_info({"workspace": self.getWsName()})[0]
+        ret2 = self.getImpl().list_objects_with_sets(self.getContext(),
+                                                    {"ws_id": ws_id})[0]["data"]
+        self.assertEqual(len(ret), len(ret2))
 
     def test_copy_narrative(self):
         ws = self.getWsClient()
