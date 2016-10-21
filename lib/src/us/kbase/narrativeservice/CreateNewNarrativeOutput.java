@@ -37,7 +37,7 @@ public class CreateNewNarrativeOutput {
      * globalread: wsInfo[6],
      * lockstat: wsInfo[7],
      * metadata: wsInfo[8],
-     * modDate: no_timezone(wsInfo[3])
+     * modDateMs: ServiceUtils.iso8601ToMillisSinceEpoch(wsInfo[3])
      * </pre>
      * 
      */
@@ -64,7 +64,7 @@ public class CreateNewNarrativeOutput {
      * typeName: type[1],
      * typeMajorVersion: type[2],
      * typeMinorVersion: type[3],
-     * saveDateNoTZ: no_timezone(data[3])
+     * saveDateMs: ServiceUtils.iso8601ToMillisSinceEpoch(data[3])
      * </pre>
      * 
      */
@@ -85,7 +85,7 @@ public class CreateNewNarrativeOutput {
      * globalread: wsInfo[6],
      * lockstat: wsInfo[7],
      * metadata: wsInfo[8],
-     * modDate: no_timezone(wsInfo[3])
+     * modDateMs: ServiceUtils.iso8601ToMillisSinceEpoch(wsInfo[3])
      * </pre>
      * 
      */
@@ -107,7 +107,7 @@ public class CreateNewNarrativeOutput {
      * globalread: wsInfo[6],
      * lockstat: wsInfo[7],
      * metadata: wsInfo[8],
-     * modDate: no_timezone(wsInfo[3])
+     * modDateMs: ServiceUtils.iso8601ToMillisSinceEpoch(wsInfo[3])
      * </pre>
      * 
      */
@@ -142,7 +142,7 @@ public class CreateNewNarrativeOutput {
      * typeName: type[1],
      * typeMajorVersion: type[2],
      * typeMinorVersion: type[3],
-     * saveDateNoTZ: no_timezone(data[3])
+     * saveDateMs: ServiceUtils.iso8601ToMillisSinceEpoch(data[3])
      * </pre>
      * 
      */
@@ -172,7 +172,7 @@ public class CreateNewNarrativeOutput {
      * typeName: type[1],
      * typeMajorVersion: type[2],
      * typeMinorVersion: type[3],
-     * saveDateNoTZ: no_timezone(data[3])
+     * saveDateMs: ServiceUtils.iso8601ToMillisSinceEpoch(data[3])
      * </pre>
      * 
      */

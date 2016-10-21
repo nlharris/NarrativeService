@@ -22,7 +22,8 @@ import us.kbase.common.service.Tuple3;
  *     "step_pos,param_name,param_value(;...)*" (alternative to appData)
  * appData - parameters of app/method in unpacked form (alternative to appparam)
  * markdown - markdown text for cell of 'markdown' type (optional)
- * copydata - packed inport data in format "import(;...)*"
+ * copydata - packed inport data in format "import(;...)*" (alternative to importData)
+ * importData - import data in unpacked form (alternative to copydata)
  * </pre>
  * 
  */
@@ -34,7 +35,8 @@ import us.kbase.common.service.Tuple3;
     "appparam",
     "appData",
     "markdown",
-    "copydata"
+    "copydata",
+    "importData"
 })
 public class CreateNewNarrativeParams {
 
@@ -45,11 +47,13 @@ public class CreateNewNarrativeParams {
     @JsonProperty("appparam")
     private java.lang.String appparam;
     @JsonProperty("appData")
-    private List<Tuple3 <String, String, String>> appData;
+    private List<Tuple3 <Long, String, String>> appData;
     @JsonProperty("markdown")
     private java.lang.String markdown;
     @JsonProperty("copydata")
     private java.lang.String copydata;
+    @JsonProperty("importData")
+    private List<String> importData;
     private Map<java.lang.String, Object> additionalProperties = new HashMap<java.lang.String, Object>();
 
     @JsonProperty("app")
@@ -98,16 +102,16 @@ public class CreateNewNarrativeParams {
     }
 
     @JsonProperty("appData")
-    public List<Tuple3 <String, String, String>> getAppData() {
+    public List<Tuple3 <Long, String, String>> getAppData() {
         return appData;
     }
 
     @JsonProperty("appData")
-    public void setAppData(List<Tuple3 <String, String, String>> appData) {
+    public void setAppData(List<Tuple3 <Long, String, String>> appData) {
         this.appData = appData;
     }
 
-    public CreateNewNarrativeParams withAppData(List<Tuple3 <String, String, String>> appData) {
+    public CreateNewNarrativeParams withAppData(List<Tuple3 <Long, String, String>> appData) {
         this.appData = appData;
         return this;
     }
@@ -142,6 +146,21 @@ public class CreateNewNarrativeParams {
         return this;
     }
 
+    @JsonProperty("importData")
+    public List<String> getImportData() {
+        return importData;
+    }
+
+    @JsonProperty("importData")
+    public void setImportData(List<String> importData) {
+        this.importData = importData;
+    }
+
+    public CreateNewNarrativeParams withImportData(List<String> importData) {
+        this.importData = importData;
+        return this;
+    }
+
     @JsonAnyGetter
     public Map<java.lang.String, Object> getAdditionalProperties() {
         return this.additionalProperties;
@@ -154,7 +173,7 @@ public class CreateNewNarrativeParams {
 
     @Override
     public java.lang.String toString() {
-        return ((((((((((((((("CreateNewNarrativeParams"+" [app=")+ app)+", method=")+ method)+", appparam=")+ appparam)+", appData=")+ appData)+", markdown=")+ markdown)+", copydata=")+ copydata)+", additionalProperties=")+ additionalProperties)+"]");
+        return ((((((((((((((((("CreateNewNarrativeParams"+" [app=")+ app)+", method=")+ method)+", appparam=")+ appparam)+", appData=")+ appData)+", markdown=")+ markdown)+", copydata=")+ copydata)+", importData=")+ importData)+", additionalProperties=")+ additionalProperties)+"]");
     }
 
 }

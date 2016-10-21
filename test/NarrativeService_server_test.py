@@ -162,3 +162,10 @@ class NarrativeServiceTest(unittest.TestCase):
         finally:
             new_ws_id = ret['workspaceInfo']['id']
             ws.delete_workspace({'id': new_ws_id})
+
+    def test_copy_object(self):
+        import_ws = "KBaseExampleData"
+        import_obj = "rhodobacter.art.q50.SE.reads"
+        ret = self.getImpl().copy_object(self.getContext(), {'ref': import_ws + '/' + import_obj, 
+                                                             'target_ws_name': self.getWsName()})
+        self.assertEqual(import_obj, ret[0]['info']['name'])

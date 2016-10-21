@@ -24,7 +24,7 @@ import com.fasterxml.jackson.annotation.JsonPropertyOrder;
  * globalread: wsInfo[6],
  * lockstat: wsInfo[7],
  * metadata: wsInfo[8],
- * modDate: no_timezone(wsInfo[3])
+ * modDateMs: ServiceUtils.iso8601ToMillisSinceEpoch(wsInfo[3])
  * </pre>
  * 
  */
@@ -40,7 +40,7 @@ import com.fasterxml.jackson.annotation.JsonPropertyOrder;
     "globalread",
     "lockstat",
     "metadata",
-    "modDate"
+    "modDateMs"
 })
 public class WorkspaceInfo {
 
@@ -62,8 +62,8 @@ public class WorkspaceInfo {
     private java.lang.String lockstat;
     @JsonProperty("metadata")
     private Map<String, String> metadata;
-    @JsonProperty("modDate")
-    private java.lang.String modDate;
+    @JsonProperty("modDateMs")
+    private Long modDateMs;
     private Map<java.lang.String, Object> additionalProperties = new HashMap<java.lang.String, Object>();
 
     @JsonProperty("id")
@@ -201,18 +201,18 @@ public class WorkspaceInfo {
         return this;
     }
 
-    @JsonProperty("modDate")
-    public java.lang.String getModDate() {
-        return modDate;
+    @JsonProperty("modDateMs")
+    public Long getModDateMs() {
+        return modDateMs;
     }
 
-    @JsonProperty("modDate")
-    public void setModDate(java.lang.String modDate) {
-        this.modDate = modDate;
+    @JsonProperty("modDateMs")
+    public void setModDateMs(Long modDateMs) {
+        this.modDateMs = modDateMs;
     }
 
-    public WorkspaceInfo withModDate(java.lang.String modDate) {
-        this.modDate = modDate;
+    public WorkspaceInfo withModDateMs(Long modDateMs) {
+        this.modDateMs = modDateMs;
         return this;
     }
 
@@ -228,7 +228,7 @@ public class WorkspaceInfo {
 
     @Override
     public java.lang.String toString() {
-        return ((((((((((((((((((((((("WorkspaceInfo"+" [id=")+ id)+", name=")+ name)+", owner=")+ owner)+", moddate=")+ moddate)+", objectCount=")+ objectCount)+", userPermission=")+ userPermission)+", globalread=")+ globalread)+", lockstat=")+ lockstat)+", metadata=")+ metadata)+", modDate=")+ modDate)+", additionalProperties=")+ additionalProperties)+"]");
+        return ((((((((((((((((((((((("WorkspaceInfo"+" [id=")+ id)+", name=")+ name)+", owner=")+ owner)+", moddate=")+ moddate)+", objectCount=")+ objectCount)+", userPermission=")+ userPermission)+", globalread=")+ globalread)+", lockstat=")+ lockstat)+", metadata=")+ metadata)+", modDateMs=")+ modDateMs)+", additionalProperties=")+ additionalProperties)+"]");
     }
 
 }

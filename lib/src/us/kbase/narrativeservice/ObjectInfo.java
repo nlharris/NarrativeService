@@ -32,7 +32,7 @@ import com.fasterxml.jackson.annotation.JsonPropertyOrder;
  * typeName: type[1],
  * typeMajorVersion: type[2],
  * typeMinorVersion: type[3],
- * saveDateNoTZ: no_timezone(data[3])
+ * saveDateMs: ServiceUtils.iso8601ToMillisSinceEpoch(data[3])
  * </pre>
  * 
  */
@@ -56,7 +56,7 @@ import com.fasterxml.jackson.annotation.JsonPropertyOrder;
     "typeName",
     "typeMajorVersion",
     "typeMinorVersion",
-    "saveDateNoTZ"
+    "saveDateMs"
 })
 public class ObjectInfo {
 
@@ -94,8 +94,8 @@ public class ObjectInfo {
     private java.lang.String typeMajorVersion;
     @JsonProperty("typeMinorVersion")
     private java.lang.String typeMinorVersion;
-    @JsonProperty("saveDateNoTZ")
-    private java.lang.String saveDateNoTZ;
+    @JsonProperty("saveDateMs")
+    private Long saveDateMs;
     private Map<java.lang.String, Object> additionalProperties = new HashMap<java.lang.String, Object>();
 
     @JsonProperty("id")
@@ -353,18 +353,18 @@ public class ObjectInfo {
         return this;
     }
 
-    @JsonProperty("saveDateNoTZ")
-    public java.lang.String getSaveDateNoTZ() {
-        return saveDateNoTZ;
+    @JsonProperty("saveDateMs")
+    public Long getSaveDateMs() {
+        return saveDateMs;
     }
 
-    @JsonProperty("saveDateNoTZ")
-    public void setSaveDateNoTZ(java.lang.String saveDateNoTZ) {
-        this.saveDateNoTZ = saveDateNoTZ;
+    @JsonProperty("saveDateMs")
+    public void setSaveDateMs(Long saveDateMs) {
+        this.saveDateMs = saveDateMs;
     }
 
-    public ObjectInfo withSaveDateNoTZ(java.lang.String saveDateNoTZ) {
-        this.saveDateNoTZ = saveDateNoTZ;
+    public ObjectInfo withSaveDateMs(Long saveDateMs) {
+        this.saveDateMs = saveDateMs;
         return this;
     }
 
@@ -380,7 +380,7 @@ public class ObjectInfo {
 
     @Override
     public java.lang.String toString() {
-        return ((((((((((((((((((((((((((((((((((((((("ObjectInfo"+" [id=")+ id)+", name=")+ name)+", type=")+ type)+", saveDate=")+ saveDate)+", version=")+ version)+", savedBy=")+ savedBy)+", wsid=")+ wsid)+", ws=")+ ws)+", checksum=")+ checksum)+", size=")+ size)+", metadata=")+ metadata)+", ref=")+ ref)+", objId=")+ objId)+", typeModule=")+ typeModule)+", typeName=")+ typeName)+", typeMajorVersion=")+ typeMajorVersion)+", typeMinorVersion=")+ typeMinorVersion)+", saveDateNoTZ=")+ saveDateNoTZ)+", additionalProperties=")+ additionalProperties)+"]");
+        return ((((((((((((((((((((((((((((((((((((((("ObjectInfo"+" [id=")+ id)+", name=")+ name)+", type=")+ type)+", saveDate=")+ saveDate)+", version=")+ version)+", savedBy=")+ savedBy)+", wsid=")+ wsid)+", ws=")+ ws)+", checksum=")+ checksum)+", size=")+ size)+", metadata=")+ metadata)+", ref=")+ ref)+", objId=")+ objId)+", typeModule=")+ typeModule)+", typeName=")+ typeName)+", typeMajorVersion=")+ typeMajorVersion)+", typeMinorVersion=")+ typeMinorVersion)+", saveDateMs=")+ saveDateMs)+", additionalProperties=")+ additionalProperties)+"]");
     }
 
 }
