@@ -353,8 +353,9 @@ CreateNewNarrativeParams is a reference to a hash where the following keys are d
 	appData has a value which is a reference to a list where each element is a NarrativeService.AppParam
 	markdown has a value which is a string
 	copydata has a value which is a string
+	importData has a value which is a reference to a list where each element is a string
 AppParam is a reference to a list containing 3 items:
-	0: (step_pos) a string
+	0: (step_pos) an int
 	1: (key) a string
 	2: (value) a string
 CreateNewNarrativeOutput is a reference to a hash where the following keys are defined:
@@ -370,7 +371,7 @@ WorkspaceInfo is a reference to a hash where the following keys are defined:
 	globalread has a value which is a NarrativeService.permission
 	lockstat has a value which is a NarrativeService.lock_status
 	metadata has a value which is a reference to a hash where the key is a string and the value is a string
-	modDate has a value which is a string
+	modDateMs has a value which is an int
 timestamp is a string
 permission is a string
 lock_status is a string
@@ -392,7 +393,7 @@ ObjectInfo is a reference to a hash where the following keys are defined:
 	typeName has a value which is a string
 	typeMajorVersion has a value which is a string
 	typeMinorVersion has a value which is a string
-	saveDateNoTZ has a value which is a string
+	saveDateMs has a value which is an int
 
 </pre>
 
@@ -409,8 +410,9 @@ CreateNewNarrativeParams is a reference to a hash where the following keys are d
 	appData has a value which is a reference to a list where each element is a NarrativeService.AppParam
 	markdown has a value which is a string
 	copydata has a value which is a string
+	importData has a value which is a reference to a list where each element is a string
 AppParam is a reference to a list containing 3 items:
-	0: (step_pos) a string
+	0: (step_pos) an int
 	1: (key) a string
 	2: (value) a string
 CreateNewNarrativeOutput is a reference to a hash where the following keys are defined:
@@ -426,7 +428,7 @@ WorkspaceInfo is a reference to a hash where the following keys are defined:
 	globalread has a value which is a NarrativeService.permission
 	lockstat has a value which is a NarrativeService.lock_status
 	metadata has a value which is a reference to a hash where the key is a string and the value is a string
-	modDate has a value which is a string
+	modDateMs has a value which is an int
 timestamp is a string
 permission is a string
 lock_status is a string
@@ -448,7 +450,7 @@ ObjectInfo is a reference to a hash where the following keys are defined:
 	typeName has a value which is a string
 	typeMajorVersion has a value which is a string
 	typeMinorVersion has a value which is a string
-	saveDateNoTZ has a value which is a string
+	saveDateMs has a value which is an int
 
 
 =end text
@@ -507,6 +509,140 @@ ObjectInfo is a reference to a hash where the following keys are defined:
     }
 }
  
+
+
+=head2 copy_object
+
+  $return = $obj->copy_object($params)
+
+=over 4
+
+=item Parameter and return types
+
+=begin html
+
+<pre>
+$params is a NarrativeService.CopyObjectParams
+$return is a NarrativeService.CopyObjectOutput
+CopyObjectParams is a reference to a hash where the following keys are defined:
+	ref has a value which is a string
+	target_ws_id has a value which is an int
+	target_ws_name has a value which is a string
+	target_name has a value which is a string
+CopyObjectOutput is a reference to a hash where the following keys are defined:
+	info has a value which is a NarrativeService.ObjectInfo
+ObjectInfo is a reference to a hash where the following keys are defined:
+	id has a value which is an int
+	name has a value which is a string
+	type has a value which is a string
+	save_date has a value which is a string
+	version has a value which is an int
+	saved_by has a value which is a string
+	wsid has a value which is an int
+	ws has a value which is a string
+	checksum has a value which is a string
+	size has a value which is an int
+	metadata has a value which is a reference to a hash where the key is a string and the value is a string
+	ref has a value which is a string
+	obj_id has a value which is a string
+	typeModule has a value which is a string
+	typeName has a value which is a string
+	typeMajorVersion has a value which is a string
+	typeMinorVersion has a value which is a string
+	saveDateMs has a value which is an int
+
+</pre>
+
+=end html
+
+=begin text
+
+$params is a NarrativeService.CopyObjectParams
+$return is a NarrativeService.CopyObjectOutput
+CopyObjectParams is a reference to a hash where the following keys are defined:
+	ref has a value which is a string
+	target_ws_id has a value which is an int
+	target_ws_name has a value which is a string
+	target_name has a value which is a string
+CopyObjectOutput is a reference to a hash where the following keys are defined:
+	info has a value which is a NarrativeService.ObjectInfo
+ObjectInfo is a reference to a hash where the following keys are defined:
+	id has a value which is an int
+	name has a value which is a string
+	type has a value which is a string
+	save_date has a value which is a string
+	version has a value which is an int
+	saved_by has a value which is a string
+	wsid has a value which is an int
+	ws has a value which is a string
+	checksum has a value which is a string
+	size has a value which is an int
+	metadata has a value which is a reference to a hash where the key is a string and the value is a string
+	ref has a value which is a string
+	obj_id has a value which is a string
+	typeModule has a value which is a string
+	typeName has a value which is a string
+	typeMajorVersion has a value which is a string
+	typeMinorVersion has a value which is a string
+	saveDateMs has a value which is an int
+
+
+=end text
+
+=item Description
+
+
+
+=back
+
+=cut
+
+ sub copy_object
+{
+    my($self, @args) = @_;
+
+# Authentication: required
+
+    if ((my $n = @args) != 1)
+    {
+	Bio::KBase::Exceptions::ArgumentValidationError->throw(error =>
+							       "Invalid argument count for function copy_object (received $n, expecting 1)");
+    }
+    {
+	my($params) = @args;
+
+	my @_bad_arguments;
+        (ref($params) eq 'HASH') or push(@_bad_arguments, "Invalid type for argument 1 \"params\" (value was \"$params\")");
+        if (@_bad_arguments) {
+	    my $msg = "Invalid arguments passed to copy_object:\n" . join("", map { "\t$_\n" } @_bad_arguments);
+	    Bio::KBase::Exceptions::ArgumentValidationError->throw(error => $msg,
+								   method_name => 'copy_object');
+	}
+    }
+
+    my $url = $self->{url};
+    my $result = $self->{client}->call($url, $self->{headers}, {
+	    method => "NarrativeService.copy_object",
+	    params => \@args,
+    });
+    if ($result) {
+	if ($result->is_error) {
+	    Bio::KBase::Exceptions::JSONRPC->throw(error => $result->error_message,
+					       code => $result->content->{error}->{code},
+					       method_name => 'copy_object',
+					       data => $result->content->{error}->{error} # JSON::RPC::ReturnObject only supports JSONRPC 1.1 or 1.O
+					      );
+	} else {
+	    return wantarray ? @{$result->result} : $result->result->[0];
+	}
+    } else {
+        Bio::KBase::Exceptions::HTTP->throw(error => "Error invoking method copy_object",
+					    status_line => $self->{client}->status_line,
+					    method_name => 'copy_object',
+				       );
+    }
+}
+ 
   
 sub status
 {
@@ -550,16 +686,16 @@ sub version {
             Bio::KBase::Exceptions::JSONRPC->throw(
                 error => $result->error_message,
                 code => $result->content->{code},
-                method_name => 'create_new_narrative',
+                method_name => 'copy_object',
             );
         } else {
             return wantarray ? @{$result->result} : $result->result->[0];
         }
     } else {
         Bio::KBase::Exceptions::HTTP->throw(
-            error => "Error invoking method create_new_narrative",
+            error => "Error invoking method copy_object",
             status_line => $self->{client}->status_line,
-            method_name => 'create_new_narrative',
+            method_name => 'copy_object',
         );
     }
 }
@@ -996,7 +1132,7 @@ typeModule: type[0],
 typeName: type[1],
 typeMajorVersion: type[2],
 typeMinorVersion: type[3],
-saveDateNoTZ: no_timezone(data[3])
+saveDateMs: ServiceUtils.iso8601ToMillisSinceEpoch(data[3])
 
 
 =item Definition
@@ -1022,7 +1158,7 @@ typeModule has a value which is a string
 typeName has a value which is a string
 typeMajorVersion has a value which is a string
 typeMinorVersion has a value which is a string
-saveDateNoTZ has a value which is a string
+saveDateMs has a value which is an int
 
 </pre>
 
@@ -1048,7 +1184,7 @@ typeModule has a value which is a string
 typeName has a value which is a string
 typeMajorVersion has a value which is a string
 typeMinorVersion has a value which is a string
-saveDateNoTZ has a value which is a string
+saveDateMs has a value which is an int
 
 
 =end text
@@ -1075,7 +1211,7 @@ user_permission: wsInfo[5],
 globalread: wsInfo[6],
 lockstat: wsInfo[7],
 metadata: wsInfo[8],
-modDate: no_timezone(wsInfo[3])
+modDateMs: ServiceUtils.iso8601ToMillisSinceEpoch(wsInfo[3])
 
 
 =item Definition
@@ -1093,7 +1229,7 @@ user_permission has a value which is a NarrativeService.permission
 globalread has a value which is a NarrativeService.permission
 lockstat has a value which is a NarrativeService.lock_status
 metadata has a value which is a reference to a hash where the key is a string and the value is a string
-modDate has a value which is a string
+modDateMs has a value which is an int
 
 </pre>
 
@@ -1111,7 +1247,7 @@ user_permission has a value which is a NarrativeService.permission
 globalread has a value which is a NarrativeService.permission
 lockstat has a value which is a NarrativeService.lock_status
 metadata has a value which is a reference to a hash where the key is a string and the value is a string
-modDate has a value which is a string
+modDateMs has a value which is an int
 
 
 =end text
@@ -1132,7 +1268,7 @@ modDate has a value which is a string
 
 <pre>
 a reference to a list containing 3 items:
-0: (step_pos) a string
+0: (step_pos) an int
 1: (key) a string
 2: (value) a string
 
@@ -1143,7 +1279,7 @@ a reference to a list containing 3 items:
 =begin text
 
 a reference to a list containing 3 items:
-0: (step_pos) a string
+0: (step_pos) an int
 1: (key) a string
 2: (value) a string
 
@@ -1168,7 +1304,8 @@ appparam - paramters of app/method packed into string in format:
     "step_pos,param_name,param_value(;...)*" (alternative to appData)
 appData - parameters of app/method in unpacked form (alternative to appparam)
 markdown - markdown text for cell of 'markdown' type (optional)
-copydata - packed inport data in format "import(;...)*"
+copydata - packed inport data in format "import(;...)*" (alternative to importData)
+importData - import data in unpacked form (alternative to copydata)
 
 
 =item Definition
@@ -1183,6 +1320,7 @@ appparam has a value which is a string
 appData has a value which is a reference to a list where each element is a NarrativeService.AppParam
 markdown has a value which is a string
 copydata has a value which is a string
+importData has a value which is a reference to a list where each element is a string
 
 </pre>
 
@@ -1197,6 +1335,7 @@ appparam has a value which is a string
 appData has a value which is a reference to a list where each element is a NarrativeService.AppParam
 markdown has a value which is a string
 copydata has a value which is a string
+importData has a value which is a reference to a list where each element is a string
 
 
 =end text
@@ -1229,6 +1368,85 @@ objectInfo has a value which is a NarrativeService.ObjectInfo
 a reference to a hash where the following keys are defined:
 workspaceInfo has a value which is a NarrativeService.WorkspaceInfo
 objectInfo has a value which is a NarrativeService.ObjectInfo
+
+
+=end text
+
+=back
+
+
+
+=head2 CopyObjectParams
+
+=over 4
+
+
+
+=item Description
+
+ref - workspace reference to source object,
+target_ws_id/target_ws_name - alternative ways to define target workspace,
+target_name - optional target object name (if not set then source object
+    name is used).
+
+
+=item Definition
+
+=begin html
+
+<pre>
+a reference to a hash where the following keys are defined:
+ref has a value which is a string
+target_ws_id has a value which is an int
+target_ws_name has a value which is a string
+target_name has a value which is a string
+
+</pre>
+
+=end html
+
+=begin text
+
+a reference to a hash where the following keys are defined:
+ref has a value which is a string
+target_ws_id has a value which is an int
+target_ws_name has a value which is a string
+target_name has a value which is a string
+
+
+=end text
+
+=back
+
+
+
+=head2 CopyObjectOutput
+
+=over 4
+
+
+
+=item Description
+
+info - workspace info of created object
+
+
+=item Definition
+
+=begin html
+
+<pre>
+a reference to a hash where the following keys are defined:
+info has a value which is a NarrativeService.ObjectInfo
+
+</pre>
+
+=end html
+
+=begin text
+
+a reference to a hash where the following keys are defined:
+info has a value which is a NarrativeService.ObjectInfo
 
 
 =end text

@@ -341,6 +341,10 @@ class Application(object):
                              name='NarrativeService.create_new_narrative',
                              types=[dict])
         self.method_authentication['NarrativeService.create_new_narrative'] = 'required' # noqa
+        self.rpc_service.add(impl_NarrativeService.copy_object,
+                             name='NarrativeService.copy_object',
+                             types=[dict])
+        self.method_authentication['NarrativeService.copy_object'] = 'required' # noqa
         self.rpc_service.add(impl_NarrativeService.status,
                              name='NarrativeService.status',
                              types=[dict])

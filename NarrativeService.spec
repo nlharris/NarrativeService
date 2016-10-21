@@ -188,4 +188,28 @@ module NarrativeService {
     
     funcdef create_new_narrative(CreateNewNarrativeParams params)
         returns (CreateNewNarrativeOutput) authentication required;
+
+
+    /*
+        ref - workspace reference to source object,
+        target_ws_id/target_ws_name - alternative ways to define target workspace,
+        target_name - optional target object name (if not set then source object
+            name is used).
+    */
+    typedef structure {
+        string ref;
+        int target_ws_id;
+        string target_ws_name;
+        string target_name;
+    } CopyObjectParams;
+
+    /*
+        info - workspace info of created object
+    */
+    typedef structure {
+        ObjectInfo info;
+    } CopyObjectOutput;
+
+    funcdef copy_object(CopyObjectParams params) 
+        returns (CopyObjectOutput) authentication required;
 };
