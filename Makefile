@@ -64,4 +64,7 @@ test:
 
 clean:
 	rm -rfv $(LBIN_DIR)
-	
+
+install-core-clients:
+	kb-sdk install -c https://raw.githubusercontent.com/kbase/workspace_deluxe/master/workspace.spec
+	kb-sdk install -c https://raw.githubusercontent.com/kbase/narrative_method_store/develop/NarrativeMethodStore.spec

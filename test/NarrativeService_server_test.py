@@ -13,7 +13,7 @@ except:
 
 from pprint import pprint  # noqa: F401
 
-from biokbase.workspace.client import Workspace as workspaceService
+from Workspace.WorkspaceClient import Workspace
 from NarrativeService.NarrativeServiceImpl import NarrativeService
 from NarrativeService.NarrativeServiceServer import MethodContext
 from SetAPI.SetAPIClient import SetAPI
@@ -46,7 +46,7 @@ class NarrativeServiceTest(unittest.TestCase):
             cls.cfg[nameval[0]] = nameval[1]
         cls.wsURL = cls.cfg['workspace-url']
         cls.serviceWizardURL = cls.cfg['service-wizard']
-        cls.wsClient = workspaceService(cls.wsURL, token=token)
+        cls.wsClient = Workspace(cls.wsURL, token=token)
         cls.serviceImpl = NarrativeService(cls.cfg)
         cls.SetAPI_version= cls.cfg['setapi-version']
 
@@ -149,3 +149,16 @@ class NarrativeServiceTest(unittest.TestCase):
         finally:
             # Cleaning up new created workspace
             ws.delete_workspace({'id': copy_ws_id})
+
+    def test_create_new_narrative(self):
+        import_ref = "KBaseExampleData/rhodobacter.art.q50.SE.reads"
+        ws = self.getWsClient()
+        ret = self.getImpl().create_new_narrative(self.getContext(), 
+                                                  {"method": "AssemblyUtil/import_assembly_fasta_ftp",
+                                                   "appparam": "0,param1,value1;0,param2,value2",
+                                                   "copydata": import_ref})[0]
+        try:
+            self.assertTrue('narrativeInfo' in ret)
+        finally:
+            new_ws_id = ret['workspaceInfo']['id']
+            ws.delete_workspace({'id': new_ws_id})

@@ -2,8 +2,9 @@
 #BEGIN_HEADER
 import time
 import json
-from biokbase.workspace.client import Workspace as workspaceService
+from Workspace.WorkspaceClient import Workspace
 from SetAPI.SetAPIClient import SetAPI
+from NarrativeService.NarrativeManager import NarrativeManager
 #END_HEADER
 
 
@@ -35,6 +36,7 @@ class NarrativeService:
         #BEGIN_CONSTRUCTOR
         self.workspaceURL = config['workspace-url']
         self.serviceWizardURL = config['service-wizard']
+        self.narrativeMethodStoreURL = config['narrative-method-store']
         self.SetAPI_version = config['setapi-version']
         #END_CONSTRUCTOR
         pass
@@ -98,7 +100,7 @@ class NarrativeService:
         ws_id = params.get("ws_id", None)
         ws_name = params.get("ws_name", None)
         token = ctx["token"]
-        ws = workspaceService(self.workspaceURL, token=token)
+        ws = Workspace(self.workspaceURL, token=token)
         ws_info = ws.get_workspace_info({"id": ws_id, "workspace": ws_name})
         if not ws_name:
             ws_name = ws_info[1]
@@ -163,7 +165,7 @@ class NarrativeService:
         # add the 'narrative' field to newWsMeta later.
         newWsMeta = {"is_temporary": "false", "narrative_nice_name": newName}
         token = ctx["token"]
-        ws = workspaceService(self.workspaceURL, token=token)
+        ws = Workspace(self.workspaceURL, token=token)
         
         # start with getting the existing narrative object.
         currentNarrative = ws.get_objects([{'ref': workspaceRef}])[0]
@@ -274,25 +276,41 @@ class NarrativeService:
         # ctx is the context object
         # return variables are: returnVal
         #BEGIN create_new_narrative
-        raise ValueError("Method is not supported yet")
-        app = params.get('app', None)
-        method = params.get('method', None)
-        appparam = params.get('appparam', None)
-        appData = params.get('appData', None)
-        markdown = params.get('markdown', None)
-        copydata = params.get('copydata', None)
+        app = params.get('app')
+        method = params.get('method')
+        appparam = params.get('appparam')
+        appData = params.get('appData')
+        markdown = params.get('markdown')
+        copydata = params.get('copydata')
+        importData = params.get('importData')
         
         if app and method:
             raise ValueError("Must provide no more than one of the app or method params")
+        
+        if (not importData) and copydata:
+            importData = copydata.split(';')
+        
         if (not appData) and appparam:
             appData = []
-            for tmpItem in appparam.split(';'):
-                tmpTuple = tmpItem.split(',')
+            for tmp_item in appparam.split(';'):
+                tmp_tuple = tmp_item.split(',')
                 step_pos = None
-                if tmpItem[0]:
-                    step_pos = int(tmpItem[0])
-        # In progress...
-        returnVal = None
+                if tmp_tuple[0]:
+                    try:
+                        step_pos = int(tmp_tuple[0])
+                    except ValueError:
+                        pass
+                appData.append([step_pos, tmp_tuple[1], tmp_tuple[2]])
+        cells = None
+        if app:
+            cells = [{"app": app}]
+        elif method:
+            cells = [{"method": method}]
+        elif markdown:
+            cells = [{"markdown": markdown}]
+        nm = NarrativeManager(self.workspaceURL, self.narrativeMethodStoreURL, 
+                              ctx['token'], ctx['user_id'])
+        returnVal = nm.create_temp_narrative(cells, appData, importData)
         #END create_new_narrative
 
         # At some point might do deeper type checking...
