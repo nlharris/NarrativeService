@@ -111,7 +111,7 @@ module NarrativeService {
         typeName: type[1],
         typeMajorVersion: type[2],
         typeMinorVersion: type[3],
-        saveDateNoTZ: no_timezone(data[3])
+        saveDateMs: ServiceUtils.iso8601ToMillisSinceEpoch(data[3])
     */
     typedef structure {
         int id;
@@ -131,7 +131,7 @@ module NarrativeService {
         string typeName;
         string typeMajorVersion;
         string typeMinorVersion;
-        string saveDateNoTZ;
+        int saveDateMs;
     } ObjectInfo;
 
     /* Restructured workspace info 'wsInfo' tuple:
@@ -144,7 +144,7 @@ module NarrativeService {
         globalread: wsInfo[6],
         lockstat: wsInfo[7],
         metadata: wsInfo[8],
-        modDate: no_timezone(wsInfo[3])
+        modDateMs: ServiceUtils.iso8601ToMillisSinceEpoch(wsInfo[3])
     */
     typedef structure {
         int id;
@@ -156,7 +156,7 @@ module NarrativeService {
         permission globalread;
         lock_status lockstat;
         mapping<string,string> metadata;
-        string modDate;
+        int modDateMs;
     } WorkspaceInfo;
 
     typedef tuple<int step_pos, string key, string value> AppParam;
@@ -168,7 +168,8 @@ module NarrativeService {
             "step_pos,param_name,param_value(;...)*" (alternative to appData)
         appData - parameters of app/method in unpacked form (alternative to appparam)
         markdown - markdown text for cell of 'markdown' type (optional)
-        copydata - packed inport data in format "import(;...)*"
+        copydata - packed inport data in format "import(;...)*" (alternative to importData)
+        importData - import data in unpacked form (alternative to copydata)
     */
     typedef structure {
         string app;
@@ -177,6 +178,7 @@ module NarrativeService {
         list<AppParam> appData;
         string markdown;
         string copydata;
+        list<string> importData;
     } CreateNewNarrativeParams;
     
     typedef structure {
