@@ -164,8 +164,26 @@ class NarrativeServiceTest(unittest.TestCase):
             ws.delete_workspace({'id': new_ws_id})
 
     def test_copy_object(self):
-        import_ws = "KBaseExampleData"
-        import_obj = "rhodobacter.art.q50.SE.reads"
-        ret = self.getImpl().copy_object(self.getContext(), {'ref': import_ws + '/' + import_obj, 
+        # Reads
+        example_ws = "KBaseExampleData"
+        import_ref = example_ws + "/rhodobacter.art.q50.SE.reads"
+        ret = self.getImpl().copy_object(self.getContext(), {'ref': import_ref, 
                                                              'target_ws_name': self.getWsName()})
-        self.assertEqual(import_obj, ret[0]['info']['name'])
+        self.assertEqual(example_ws, ret[0]['info']['ws'])
+        # Let's check that we see reads copy in list_objects_with_sets
+        ret = self.getImpl().list_objects_with_sets(self.getContext(), 
+                                                    {"ws_name": self.getWsName()})[0]["data"]
+        found = False
+        for item in ret:
+            obj_info = item["object_info"]
+            if obj_info[7] == example_ws:
+                self.assertTrue('dp_info' in item)
+                found = True
+        self.assertTrue(found)
+        # Genome
+        import_ref = example_ws + "/Rhodobacter_CACIA_14H1"
+        target_name = "MyGenome.1"
+        ret = self.getImpl().copy_object(self.getContext(), {'ref': import_ref, 
+                                                             'target_ws_name': self.getWsName(),
+                                                             'target_name': target_name})
+        self.assertEqual(target_name, ret[0]['info']['name'])

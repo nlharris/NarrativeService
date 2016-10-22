@@ -53,13 +53,21 @@ module NarrativeService {
         list<object_info> set_items_info;
     } SetItems;
 
+    typedef structure {
+        string meta;
+        string src_nar;
+    } DataPaletteInfo;
+
     /*
         object_info - workspace info for object (including set object),
-        set_items - optional property listing info for items of set object
+        set_items - optional property listing info for items of set object,
+        dp_info - optional data-palette info (defined for items stored in
+            DataPalette object).
     */
     typedef structure {
         object_info object_info;
         SetItems set_items;
+        DataPaletteInfo dp_info;
     } ListItem;
 
     typedef structure {
