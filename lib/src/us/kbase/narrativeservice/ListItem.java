@@ -16,7 +16,9 @@ import us.kbase.common.service.Tuple11;
  * <p>Original spec-file type: ListItem</p>
  * <pre>
  * object_info - workspace info for object (including set object),
- * set_items - optional property listing info for items of set object
+ * set_items - optional property listing info for items of set object,
+ * dp_info - optional data-palette info (defined for items stored in
+ *     DataPalette object).
  * </pre>
  * 
  */
@@ -24,7 +26,8 @@ import us.kbase.common.service.Tuple11;
 @Generated("com.googlecode.jsonschema2pojo")
 @JsonPropertyOrder({
     "object_info",
-    "set_items"
+    "set_items",
+    "dp_info"
 })
 public class ListItem {
 
@@ -37,6 +40,13 @@ public class ListItem {
      */
     @JsonProperty("set_items")
     private SetItems setItems;
+    /**
+     * <p>Original spec-file type: DataPaletteInfo</p>
+     * 
+     * 
+     */
+    @JsonProperty("dp_info")
+    private DataPaletteInfo dpInfo;
     private Map<java.lang.String, Object> additionalProperties = new HashMap<java.lang.String, Object>();
 
     @JsonProperty("object_info")
@@ -79,6 +89,31 @@ public class ListItem {
         return this;
     }
 
+    /**
+     * <p>Original spec-file type: DataPaletteInfo</p>
+     * 
+     * 
+     */
+    @JsonProperty("dp_info")
+    public DataPaletteInfo getDpInfo() {
+        return dpInfo;
+    }
+
+    /**
+     * <p>Original spec-file type: DataPaletteInfo</p>
+     * 
+     * 
+     */
+    @JsonProperty("dp_info")
+    public void setDpInfo(DataPaletteInfo dpInfo) {
+        this.dpInfo = dpInfo;
+    }
+
+    public ListItem withDpInfo(DataPaletteInfo dpInfo) {
+        this.dpInfo = dpInfo;
+        return this;
+    }
+
     @JsonAnyGetter
     public Map<java.lang.String, Object> getAdditionalProperties() {
         return this.additionalProperties;
@@ -91,7 +126,7 @@ public class ListItem {
 
     @Override
     public java.lang.String toString() {
-        return ((((((("ListItem"+" [objectInfo=")+ objectInfo)+", setItems=")+ setItems)+", additionalProperties=")+ additionalProperties)+"]");
+        return ((((((((("ListItem"+" [objectInfo=")+ objectInfo)+", setItems=")+ setItems)+", dpInfo=")+ dpInfo)+", additionalProperties=")+ additionalProperties)+"]");
     }
 
 }

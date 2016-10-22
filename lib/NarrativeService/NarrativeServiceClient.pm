@@ -130,6 +130,7 @@ ListObjectsWithSetsOutput is a reference to a hash where the following keys are 
 ListItem is a reference to a hash where the following keys are defined:
 	object_info has a value which is a NarrativeService.object_info
 	set_items has a value which is a NarrativeService.SetItems
+	dp_info has a value which is a NarrativeService.DataPaletteInfo
 object_info is a reference to a list containing 11 items:
 	0: (objid) an int
 	1: (name) a string
@@ -145,6 +146,9 @@ object_info is a reference to a list containing 11 items:
 timestamp is a string
 SetItems is a reference to a hash where the following keys are defined:
 	set_items_info has a value which is a reference to a list where each element is a NarrativeService.object_info
+DataPaletteInfo is a reference to a hash where the following keys are defined:
+	meta has a value which is a string
+	src_nar has a value which is a string
 
 </pre>
 
@@ -162,6 +166,7 @@ ListObjectsWithSetsOutput is a reference to a hash where the following keys are 
 ListItem is a reference to a hash where the following keys are defined:
 	object_info has a value which is a NarrativeService.object_info
 	set_items has a value which is a NarrativeService.SetItems
+	dp_info has a value which is a NarrativeService.DataPaletteInfo
 object_info is a reference to a list containing 11 items:
 	0: (objid) an int
 	1: (name) a string
@@ -177,6 +182,9 @@ object_info is a reference to a list containing 11 items:
 timestamp is a string
 SetItems is a reference to a hash where the following keys are defined:
 	set_items_info has a value which is a reference to a list where each element is a NarrativeService.object_info
+DataPaletteInfo is a reference to a hash where the following keys are defined:
+	meta has a value which is a string
+	src_nar has a value which is a string
 
 
 =end text
@@ -934,6 +942,38 @@ set_items_info has a value which is a reference to a list where each element is 
 
 
 
+=head2 DataPaletteInfo
+
+=over 4
+
+
+
+=item Definition
+
+=begin html
+
+<pre>
+a reference to a hash where the following keys are defined:
+meta has a value which is a string
+src_nar has a value which is a string
+
+</pre>
+
+=end html
+
+=begin text
+
+a reference to a hash where the following keys are defined:
+meta has a value which is a string
+src_nar has a value which is a string
+
+
+=end text
+
+=back
+
+
+
 =head2 ListItem
 
 =over 4
@@ -943,7 +983,9 @@ set_items_info has a value which is a reference to a list where each element is 
 =item Description
 
 object_info - workspace info for object (including set object),
-set_items - optional property listing info for items of set object
+set_items - optional property listing info for items of set object,
+dp_info - optional data-palette info (defined for items stored in
+    DataPalette object).
 
 
 =item Definition
@@ -954,6 +996,7 @@ set_items - optional property listing info for items of set object
 a reference to a hash where the following keys are defined:
 object_info has a value which is a NarrativeService.object_info
 set_items has a value which is a NarrativeService.SetItems
+dp_info has a value which is a NarrativeService.DataPaletteInfo
 
 </pre>
 
@@ -964,6 +1007,7 @@ set_items has a value which is a NarrativeService.SetItems
 a reference to a hash where the following keys are defined:
 object_info has a value which is a NarrativeService.object_info
 set_items has a value which is a NarrativeService.SetItems
+dp_info has a value which is a NarrativeService.DataPaletteInfo
 
 
 =end text
