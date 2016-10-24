@@ -91,10 +91,35 @@ class NarrativeManager:
         currentNarrative = self.ws.get_objects([{'ref': workspaceRef}])[0]
         if not workspaceId:
             workspaceId = currentNarrative['info'][6]
-        # clone the workspace EXCEPT for currentNarrative object:
+        # Let's prepare exceptions for clone the workspace. 
+        # 1) currentNarrative object:
+        exclude_list = [{'objid': currentNarrative['info'][0]}]
+        # 2) let's exclude objects of types under DataPalette handling:
+        dp_types = self.DATA_PALETTES_TYPES.keys()
+        ws_info = self.ws.get_workspace_info({"id": workspaceId})
+        max_obj_count = ws_info[4]
+        add_to_palette_list = []
+        for dp_type in dp_types:
+            min_obj_id = 1
+            while min_obj_id <= max_obj_count:
+                max_obj_id = min_obj_id + 10000 - 1
+                part = self.ws.list_objects({"ids": [workspaceId],
+                                             "type": dp_type, 
+                                             "minObjectID": min_obj_id,
+                                             "maxObjectID": max_obj_id})
+                for info in part:
+                    add_to_palette_list.append({'ref': str(info[6]) + '/' + str(info[0]) + '/' +
+                                                str(info[4])})
+                    exclude_list.append({'objid': info[0]})
+                min_obj_id += 10000
+        # clone the workspace EXCEPT for currentNarrative object + obejcts of DataPalette types:
         newWsId = self.ws.clone_workspace({'wsi': {'id': workspaceId}, 'workspace': newWsName,
-                                           'meta': newWsMeta,
-                                           'exclude': [{'objid': currentNarrative['info'][0]}]})[0]
+                                           'meta': newWsMeta, 'exclude': exclude_list})[0]
+        if len(add_to_palette_list) > 0:
+            dps = DataPaletteService(self.serviceWizardURL, token=self.token, 
+                                     service_ver=self.DataPaletteService_version)
+            dps.add_to_palette({'workspace': str(newWsId), 'new_refs': add_to_palette_list})
+
         try:
             # update the ref inside the narrative object and the new workspace metadata.
             newNarMetadata = currentNarrative['info'][10]
@@ -348,11 +373,12 @@ class NarrativeManager:
             target_ws_name_or_id = self._get_workspace_name_or_id(target_ws_id, target_ws_name)
             dps.add_to_palette({'workspace': target_ws_name_or_id, 'new_refs': [{'ref': ref}]})
             return {'info': src_info}
-        if not target_name:
-            target_name = src_info['name']
-        obj_info_tuple = self.ws.copy_object({'from': {'ref': ref},
-                                              'to': {'wsid': target_ws_id,
-                                                     'workspace': target_ws_name,
-                                                     'name': target_name}})
-        obj_info = ServiceUtils.objectInfoToObject(obj_info_tuple)
-        return {'info': obj_info}
+        else:
+            if not target_name:
+                target_name = src_info['name']
+            obj_info_tuple = self.ws.copy_object({'from': {'ref': ref},
+                                                  'to': {'wsid': target_ws_id,
+                                                         'workspace': target_ws_name,
+                                                         'name': target_name}})
+            obj_info = ServiceUtils.objectInfoToObject(obj_info_tuple)
+            return {'info': obj_info}

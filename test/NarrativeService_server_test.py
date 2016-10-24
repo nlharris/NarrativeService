@@ -131,6 +131,12 @@ class NarrativeServiceTest(unittest.TestCase):
                            'data': nar_obj_data,
                            'name': nar_obj_name,
                            'meta': nar_obj_meta}]})
+        # Adding DP object:
+        reads_ref = "KBaseExampleData/rhodobacter.art.q50.SE.reads"
+        target_reads_name = "MyReads.copy.1"
+        reads_info = ws.copy_object({'from': {'ref': reads_ref},
+                                     'to': {'workspace': self.getWsName(),
+                                            'name': target_reads_name}})
         copy_nar_name = "NarrativeCopyTest - Copy"
         ret = self.getImpl().copy_narrative(self.getContext(), 
                                             {'workspaceRef': ws_name + '/' + nar_obj_name,
@@ -146,6 +152,22 @@ class NarrativeServiceTest(unittest.TestCase):
             # And here is proper new ws_name:
             self.assertNotEqual(ws_name, copy_nar_data['metadata']['ws_name'])
             self.assertEqual(copy_nar_name, copy_nar_data['metadata']['name'])
+            ret = self.getImpl().list_objects_with_sets(self.getContext(), 
+                                                        {"ws_id": copy_ws_id})[0]["data"]
+            dp_found = False
+            for item in ret:
+                obj_info = item["object_info"]
+                if obj_info[7] == self.getWsName():
+                    self.assertEqual(target_reads_name, obj_info[1])
+                    self.assertTrue('dp_info' in item)
+                    self.assertEqual(reads_info[6], obj_info[6])
+                    self.assertEqual(reads_info[0], obj_info[0])
+                    dp_found = True
+                else:
+                    object_type = obj_info[2].split('-')[0]
+                    self.assertTrue(object_type != "KBaseFile.SingleEndLibrary", 
+                                    "Unexpected type: " + object_type)
+            self.assertTrue(dp_found)
         finally:
             # Cleaning up new created workspace
             ws.delete_workspace({'id': copy_ws_id})
