@@ -186,7 +186,6 @@ class NarrativeServiceTest(unittest.TestCase):
             dp_found = False
             for item in ret:
                 obj_info = item["object_info"]
-                print("Listed objects: " + json.dumps(obj_info))
                 if obj_info[7] == reads_ws_name:
                     self.assertTrue('dp_info' in item)
                     self.assertEqual(reads_obj_name, obj_info[1])
