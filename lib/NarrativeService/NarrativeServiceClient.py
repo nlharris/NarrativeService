@@ -85,8 +85,8 @@ class NarrativeService(object):
            String, parameter "wsid" of Long, parameter "workspace" of String,
            parameter "chsum" of String, parameter "size" of Long, parameter
            "meta" of mapping from String to String, parameter "dp_info" of
-           type "DataPaletteInfo" -> structure: parameter "meta" of String,
-           parameter "src_nar" of String
+           type "DataPaletteInfo" (This structure is reserved for future
+           use.) -> structure:
         """
         return self._client.call_method(
             'NarrativeService.list_objects_with_sets',

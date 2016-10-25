@@ -21,7 +21,7 @@ class NarrativeService:
     ######################################### noqa
     VERSION = "0.0.1"
     GIT_URL = "https://github.com/rsutormin/NarrativeService"
-    GIT_COMMIT_HASH = "cfc21b850cfaae25cf3627dee6bea97d29f43329"
+    GIT_COMMIT_HASH = "d3f146154ceb12f5ce1193cf664ecfae40afeabc"
 
     #BEGIN_CLASS_HEADER
     #END_CLASS_HEADER
@@ -91,8 +91,8 @@ class NarrativeService:
            String, parameter "wsid" of Long, parameter "workspace" of String,
            parameter "chsum" of String, parameter "size" of Long, parameter
            "meta" of mapping from String to String, parameter "dp_info" of
-           type "DataPaletteInfo" -> structure: parameter "meta" of String,
-           parameter "src_nar" of String
+           type "DataPaletteInfo" (This structure is reserved for future
+           use.) -> structure:
         """
         # ctx is the context object
         # return variables are: returnVal

@@ -57,21 +57,11 @@ class NarrativeManager:
         dps = DataPaletteService(self.serviceWizardURL, token=self.token, 
                                  service_ver=self.DataPaletteService_version)
         dp_ret = dps.list_data({'workspaces': [self._get_workspace_name_or_id(ws_id, ws_name)]})
-        list_objects_input = []
-        dp_ref_to_info = {}
         for item in dp_ret['data']:
             ref = item['ref']
             if ref not in processed_set_refs:
-                list_objects_input.append({'ref': ref})
-                dp_ref_to_info[ref] = item
-        if len(list_objects_input) > 0:
-            infoList = self.ws.get_object_info_new({'objects': list_objects_input, 
-                                                    'includeMetadata': 0})
-            for info in infoList:
-                ref = str(info[6]) + '/' + str(info[0]) + '/' + str(info[4])
-                dp_info = dp_ref_to_info[ref]
-                data.append({'object_info': info, 'dp_info': {'meta': dp_info.get('meta'),
-                                                              'src_nar': dp_info.get('src_nar')}})
+                info = item['info']
+                data.append({'object_info': info, 'dp_info': {}})
         return {"data": data}
 
     def copy_narrative(self, newName, workspaceRef, workspaceId):

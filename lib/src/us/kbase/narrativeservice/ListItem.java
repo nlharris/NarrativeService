@@ -42,7 +42,9 @@ public class ListItem {
     private SetItems setItems;
     /**
      * <p>Original spec-file type: DataPaletteInfo</p>
-     * 
+     * <pre>
+     * This structure is reserved for future use.
+     * </pre>
      * 
      */
     @JsonProperty("dp_info")
@@ -91,7 +93,9 @@ public class ListItem {
 
     /**
      * <p>Original spec-file type: DataPaletteInfo</p>
-     * 
+     * <pre>
+     * This structure is reserved for future use.
+     * </pre>
      * 
      */
     @JsonProperty("dp_info")
@@ -101,7 +105,9 @@ public class ListItem {
 
     /**
      * <p>Original spec-file type: DataPaletteInfo</p>
-     * 
+     * <pre>
+     * This structure is reserved for future use.
+     * </pre>
      * 
      */
     @JsonProperty("dp_info")

@@ -53,9 +53,10 @@ module NarrativeService {
         list<object_info> set_items_info;
     } SetItems;
 
+    /*
+        This structure is reserved for future use.
+    */
     typedef structure {
-        string meta;
-        string src_nar;
     } DataPaletteInfo;
 
     /*
