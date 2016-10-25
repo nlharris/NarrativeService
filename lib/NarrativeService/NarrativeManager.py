@@ -64,13 +64,14 @@ class NarrativeManager:
             if ref not in processed_set_refs:
                 list_objects_input.append({'ref': ref})
                 dp_ref_to_info[ref] = item
-        infoList = self.ws.get_object_info_new({'objects': list_objects_input, 
-                                                'includeMetadata': 0})
-        for info in infoList:
-            ref = str(info[6]) + '/' + str(info[0]) + '/' + str(info[4])
-            dp_info = dp_ref_to_info[ref]
-            data.append({'object_info': info, 'dp_info': {'meta': dp_info.get('meta'),
-                                                          'src_nar': dp_info.get('src_nar')}})
+        if len(list_objects_input) > 0:
+            infoList = self.ws.get_object_info_new({'objects': list_objects_input, 
+                                                    'includeMetadata': 0})
+            for info in infoList:
+                ref = str(info[6]) + '/' + str(info[0]) + '/' + str(info[4])
+                dp_info = dp_ref_to_info[ref]
+                data.append({'object_info': info, 'dp_info': {'meta': dp_info.get('meta'),
+                                                              'src_nar': dp_info.get('src_nar')}})
         return {"data": data}
 
     def copy_narrative(self, newName, workspaceRef, workspaceId):
