@@ -146,9 +146,7 @@ object_info is a reference to a list containing 11 items:
 timestamp is a string
 SetItems is a reference to a hash where the following keys are defined:
 	set_items_info has a value which is a reference to a list where each element is a NarrativeService.object_info
-DataPaletteInfo is a reference to a hash where the following keys are defined:
-	meta has a value which is a string
-	src_nar has a value which is a string
+DataPaletteInfo is a reference to a hash where the following keys are defined
 
 </pre>
 
@@ -182,9 +180,7 @@ object_info is a reference to a list containing 11 items:
 timestamp is a string
 SetItems is a reference to a hash where the following keys are defined:
 	set_items_info has a value which is a reference to a list where each element is a NarrativeService.object_info
-DataPaletteInfo is a reference to a hash where the following keys are defined:
-	meta has a value which is a string
-	src_nar has a value which is a string
+DataPaletteInfo is a reference to a hash where the following keys are defined
 
 
 =end text
@@ -948,25 +944,24 @@ set_items_info has a value which is a reference to a list where each element is 
 
 
 
+=item Description
+
+This structure is reserved for future use.
+
+
 =item Definition
 
 =begin html
 
 <pre>
-a reference to a hash where the following keys are defined:
-meta has a value which is a string
-src_nar has a value which is a string
-
+a reference to a hash where the following keys are defined
 </pre>
 
 =end html
 
 =begin text
 
-a reference to a hash where the following keys are defined:
-meta has a value which is a string
-src_nar has a value which is a string
-
+a reference to a hash where the following keys are defined
 
 =end text
 
