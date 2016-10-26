@@ -105,9 +105,10 @@ class NarrativeService:
         ws_id = params.get("ws_id")
         ws_name = params.get("ws_name")
         workspaces = params.get("workspaces")
+        types = params.get("types")
         nm = NarrativeManager(self.config, ctx)
         returnVal = nm.list_objects_with_sets(ws_id=ws_id, ws_name=ws_name,
-                                              workspaces=workspaces)
+                                              workspaces=workspaces, types=types)
         #END list_objects_with_sets
 
         # At some point might do deeper type checking...

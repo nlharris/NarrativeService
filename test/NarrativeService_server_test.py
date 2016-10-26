@@ -98,6 +98,15 @@ class NarrativeServiceTest(unittest.TestCase):
         ret2 = self.getImpl().list_objects_with_sets(self.getContext(),
                                                     {"ws_id": ws_id})[0]["data"]
         self.assertEqual(len(ret), len(ret2))
+        type_filter = "KBaseSets.ReadsSet"
+        ret3 = self.getImpl().list_objects_with_sets(self.getContext(),
+                                                    {"types": [type_filter],
+                                                     "workspaces": [str(ws_id)]})[0]["data"]
+        self.assertTrue(len(ret3) > 0)
+        for item in ret3:
+            info = item['object_info']
+            obj_type = info[2].split('-')[0]
+            self.assertEqual(type_filter, obj_type)
 
     def test_copy_narrative(self):
         ws = self.getWsClient()
