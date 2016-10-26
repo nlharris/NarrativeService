@@ -34,10 +34,10 @@ class NarrativeManager:
         self.user_id = ctx["user_id"]
         self.ws = Workspace(self.workspaceURL, token=self.token)
 
-    def list_objects_with_sets(self, ws_id=None, ws_name=None, workspaces=None):
+    def list_objects_with_sets(self, ws_id=None, ws_name=None, workspaces=None, types=None):
         ret = None
         if ws_id or ws_name:
-            ret = self._list_objects_with_sets(ws_id, ws_name)
+            ret = self._list_objects_with_sets(ws_id, ws_name, types)
         elif workspaces:
             data = []
             ret = {'data': data}
@@ -49,7 +49,7 @@ class NarrativeManager:
                     ws_id = int(ws)
                 else:
                     ws_name = str(ws)
-                part = self._list_objects_with_sets(ws_id, ws_name)['data']
+                part = self._list_objects_with_sets(ws_id, ws_name, types)['data']
                 for item in part:
                     info = item['object_info']
                     ref = str(info[6]) + '/' + str(info[0]) + '/' + str(info[4])
@@ -62,7 +62,10 @@ class NarrativeManager:
         return ret
             
 
-    def _list_objects_with_sets(self, ws_id, ws_name):
+    def _list_objects_with_sets(self, ws_id, ws_name, types):
+        type_map = None
+        if types is not None:
+            type_map = {key: True for key in types}
         ws_info = self.ws.get_workspace_info({"id": ws_id, "workspace": ws_name})
         if not ws_name:
             ws_name = ws_info[1]
@@ -75,22 +78,28 @@ class NarrativeManager:
             target_set_items = []
             for set_item in set_info['items']:
                 target_set_items.append(set_item['info'])
-            data.append({'object_info': set_info['info'], 
-                         'set_items': {'set_items_info': target_set_items}})
+            if self._check_info_type(set_info['info'], type_map):
+                data.append({'object_info': set_info['info'], 
+                             'set_items': {'set_items_info': target_set_items}})
             processed_set_refs[set_info['ref']] = True
         for info in WorkspaceListObjectsIterator(self.ws, ws_info=ws_info):
             item_ref = str(info[6]) + '/' + str(info[0]) + '/' + str(info[4])
-            if item_ref not in processed_set_refs:
+            if item_ref not in processed_set_refs and self._check_info_type(info, type_map):
                 data.append({'object_info': info})
         dps = DataPaletteService(self.serviceWizardURL, token=self.token, 
                                  service_ver=self.DataPaletteService_version)
         dp_ret = dps.list_data({'workspaces': [self._get_workspace_name_or_id(ws_id, ws_name)]})
         for item in dp_ret['data']:
             ref = item['ref']
-            if ref not in processed_set_refs:
-                info = item['info']
-                data.append({'object_info': info, 'dp_info': {}})
+            if ref not in processed_set_refs and self._check_info_type(item['info'], type_map):
+                data.append({'object_info': item['info'], 'dp_info': {}})
         return {"data": data}
+    
+    def _check_info_type(self, info, type_map):
+        if type_map is None:
+            return True
+        obj_type = info[2].split('-')[0]
+        return type_map.get(obj_type, False)
 
     def copy_narrative(self, newName, workspaceRef, workspaceId):
         time_ms = int(round(time.time() * 1000))
