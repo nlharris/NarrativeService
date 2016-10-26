@@ -21,7 +21,7 @@ class NarrativeService:
     ######################################### noqa
     VERSION = "0.0.1"
     GIT_URL = "https://github.com/rsutormin/NarrativeService"
-    GIT_COMMIT_HASH = "d3f146154ceb12f5ce1193cf664ecfae40afeabc"
+    GIT_COMMIT_HASH = "0110cc90874816c5fb6a1e8027fc97afa9d744e2"
 
     #BEGIN_CLASS_HEADER
     #END_CLASS_HEADER
@@ -41,8 +41,13 @@ class NarrativeService:
 
     def list_objects_with_sets(self, ctx, params):
         """
-        :param params: instance of type "ListObjectsWithSetsParams" ->
-           structure: parameter "ws_name" of String, parameter "ws_id" of Long
+        :param params: instance of type "ListObjectsWithSetsParams"
+           (ws_name/ws_id/workspaces - alternative way of defining workspaces
+           (in case of 'workspaces' each string could be workspace name or ID
+           converted into string). types - optional filter field, limiting
+           output list to set of types.) -> structure: parameter "ws_name" of
+           String, parameter "ws_id" of Long, parameter "workspaces" of list
+           of String, parameter "types" of list of String
         :returns: instance of type "ListObjectsWithSetsOutput" -> structure:
            parameter "data" of list of type "ListItem" (object_info -
            workspace info for object (including set object), set_items -
@@ -97,9 +102,12 @@ class NarrativeService:
         # ctx is the context object
         # return variables are: returnVal
         #BEGIN list_objects_with_sets
-        ws_id = params.get("ws_id", None)
-        ws_name = params.get("ws_name", None)
-        returnVal = NarrativeManager(self.config, ctx).list_objects_with_sets(ws_id, ws_name)
+        ws_id = params.get("ws_id")
+        ws_name = params.get("ws_name")
+        workspaces = params.get("workspaces")
+        nm = NarrativeManager(self.config, ctx)
+        returnVal = nm.list_objects_with_sets(ws_id=ws_id, ws_name=ws_name,
+                                              workspaces=workspaces)
         #END list_objects_with_sets
 
         # At some point might do deeper type checking...
@@ -265,6 +273,28 @@ class NarrativeService:
         # At some point might do deeper type checking...
         if not isinstance(returnVal, dict):
             raise ValueError('Method copy_object return value ' +
+                             'returnVal is not type dict as required.')
+        # return the results
+        return [returnVal]
+
+    def list_available_types(self, ctx, params):
+        """
+        :param params: instance of type "ListAvailableTypesParams"
+           (workspaces - list of items where each one is workspace name of
+           textual ID.) -> structure: parameter "workspaces" of list of String
+        :returns: instance of type "ListAvailableTypesOutput" -> structure:
+           parameter "types" of list of String
+        """
+        # ctx is the context object
+        # return variables are: returnVal
+        #BEGIN list_available_types
+        workspaces = params.get("workspaces")
+        returnVal = NarrativeManager(self.config, ctx).list_available_types(workspaces)
+        #END list_available_types
+
+        # At some point might do deeper type checking...
+        if not isinstance(returnVal, dict):
+            raise ValueError('Method list_available_types return value ' +
                              'returnVal is not type dict as required.')
         # return the results
         return [returnVal]

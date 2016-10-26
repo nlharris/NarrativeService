@@ -125,6 +125,8 @@ $return is a NarrativeService.ListObjectsWithSetsOutput
 ListObjectsWithSetsParams is a reference to a hash where the following keys are defined:
 	ws_name has a value which is a string
 	ws_id has a value which is an int
+	workspaces has a value which is a reference to a list where each element is a string
+	types has a value which is a reference to a list where each element is a string
 ListObjectsWithSetsOutput is a reference to a hash where the following keys are defined:
 	data has a value which is a reference to a list where each element is a NarrativeService.ListItem
 ListItem is a reference to a hash where the following keys are defined:
@@ -159,6 +161,8 @@ $return is a NarrativeService.ListObjectsWithSetsOutput
 ListObjectsWithSetsParams is a reference to a hash where the following keys are defined:
 	ws_name has a value which is a string
 	ws_id has a value which is an int
+	workspaces has a value which is a reference to a list where each element is a string
+	types has a value which is a reference to a list where each element is a string
 ListObjectsWithSetsOutput is a reference to a hash where the following keys are defined:
 	data has a value which is a reference to a list where each element is a NarrativeService.ListItem
 ListItem is a reference to a hash where the following keys are defined:
@@ -647,6 +651,96 @@ ObjectInfo is a reference to a hash where the following keys are defined:
     }
 }
  
+
+
+=head2 list_available_types
+
+  $return = $obj->list_available_types($params)
+
+=over 4
+
+=item Parameter and return types
+
+=begin html
+
+<pre>
+$params is a NarrativeService.ListAvailableTypesParams
+$return is a NarrativeService.ListAvailableTypesOutput
+ListAvailableTypesParams is a reference to a hash where the following keys are defined:
+	workspaces has a value which is a reference to a list where each element is a string
+ListAvailableTypesOutput is a reference to a hash where the following keys are defined:
+	types has a value which is a reference to a list where each element is a string
+
+</pre>
+
+=end html
+
+=begin text
+
+$params is a NarrativeService.ListAvailableTypesParams
+$return is a NarrativeService.ListAvailableTypesOutput
+ListAvailableTypesParams is a reference to a hash where the following keys are defined:
+	workspaces has a value which is a reference to a list where each element is a string
+ListAvailableTypesOutput is a reference to a hash where the following keys are defined:
+	types has a value which is a reference to a list where each element is a string
+
+
+=end text
+
+=item Description
+
+
+
+=back
+
+=cut
+
+ sub list_available_types
+{
+    my($self, @args) = @_;
+
+# Authentication: required
+
+    if ((my $n = @args) != 1)
+    {
+	Bio::KBase::Exceptions::ArgumentValidationError->throw(error =>
+							       "Invalid argument count for function list_available_types (received $n, expecting 1)");
+    }
+    {
+	my($params) = @args;
+
+	my @_bad_arguments;
+        (ref($params) eq 'HASH') or push(@_bad_arguments, "Invalid type for argument 1 \"params\" (value was \"$params\")");
+        if (@_bad_arguments) {
+	    my $msg = "Invalid arguments passed to list_available_types:\n" . join("", map { "\t$_\n" } @_bad_arguments);
+	    Bio::KBase::Exceptions::ArgumentValidationError->throw(error => $msg,
+								   method_name => 'list_available_types');
+	}
+    }
+
+    my $url = $self->{url};
+    my $result = $self->{client}->call($url, $self->{headers}, {
+	    method => "NarrativeService.list_available_types",
+	    params => \@args,
+    });
+    if ($result) {
+	if ($result->is_error) {
+	    Bio::KBase::Exceptions::JSONRPC->throw(error => $result->error_message,
+					       code => $result->content->{error}->{code},
+					       method_name => 'list_available_types',
+					       data => $result->content->{error}->{error} # JSON::RPC::ReturnObject only supports JSONRPC 1.1 or 1.O
+					      );
+	} else {
+	    return wantarray ? @{$result->result} : $result->result->[0];
+	}
+    } else {
+        Bio::KBase::Exceptions::HTTP->throw(error => "Error invoking method list_available_types",
+					    status_line => $self->{client}->status_line,
+					    method_name => 'list_available_types',
+				       );
+    }
+}
+ 
   
 sub status
 {
@@ -690,16 +784,16 @@ sub version {
             Bio::KBase::Exceptions::JSONRPC->throw(
                 error => $result->error_message,
                 code => $result->content->{code},
-                method_name => 'copy_object',
+                method_name => 'list_available_types',
             );
         } else {
             return wantarray ? @{$result->result} : $result->result->[0];
         }
     } else {
         Bio::KBase::Exceptions::HTTP->throw(
-            error => "Error invoking method copy_object",
+            error => "Error invoking method list_available_types",
             status_line => $self->{client}->status_line,
-            method_name => 'copy_object',
+            method_name => 'list_available_types',
         );
     }
 }
@@ -1017,6 +1111,14 @@ dp_info has a value which is a NarrativeService.DataPaletteInfo
 
 
 
+=item Description
+
+ws_name/ws_id/workspaces - alternative way of defining workspaces (in
+    case of 'workspaces' each string could be workspace name or ID
+    converted into string).
+types - optional filter field, limiting output list to set of types.
+
+
 =item Definition
 
 =begin html
@@ -1025,6 +1127,8 @@ dp_info has a value which is a NarrativeService.DataPaletteInfo
 a reference to a hash where the following keys are defined:
 ws_name has a value which is a string
 ws_id has a value which is an int
+workspaces has a value which is a reference to a list where each element is a string
+types has a value which is a reference to a list where each element is a string
 
 </pre>
 
@@ -1035,6 +1139,8 @@ ws_id has a value which is an int
 a reference to a hash where the following keys are defined:
 ws_name has a value which is a string
 ws_id has a value which is an int
+workspaces has a value which is a reference to a list where each element is a string
+types has a value which is a reference to a list where each element is a string
 
 
 =end text
@@ -1486,6 +1592,71 @@ info has a value which is a NarrativeService.ObjectInfo
 
 a reference to a hash where the following keys are defined:
 info has a value which is a NarrativeService.ObjectInfo
+
+
+=end text
+
+=back
+
+
+
+=head2 ListAvailableTypesParams
+
+=over 4
+
+
+
+=item Description
+
+workspaces - list of items where each one is workspace name of textual ID.
+
+
+=item Definition
+
+=begin html
+
+<pre>
+a reference to a hash where the following keys are defined:
+workspaces has a value which is a reference to a list where each element is a string
+
+</pre>
+
+=end html
+
+=begin text
+
+a reference to a hash where the following keys are defined:
+workspaces has a value which is a reference to a list where each element is a string
+
+
+=end text
+
+=back
+
+
+
+=head2 ListAvailableTypesOutput
+
+=over 4
+
+
+
+=item Definition
+
+=begin html
+
+<pre>
+a reference to a hash where the following keys are defined:
+types has a value which is a reference to a list where each element is a string
+
+</pre>
+
+=end html
+
+=begin text
+
+a reference to a hash where the following keys are defined:
+types has a value which is a reference to a list where each element is a string
 
 
 =end text

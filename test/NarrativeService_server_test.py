@@ -256,3 +256,10 @@ class NarrativeServiceTest(unittest.TestCase):
             self.assertEqual(11, len(info))
             obj_count2 += 1
         self.assertEqual(obj_count, obj_count2)
+
+    def test_list_available_types(self):
+        ws_name = "KBaseExampleData"
+        type_stat = self.getImpl().list_available_types(self.getContext(),
+                                                        {"workspaces": [ws_name]})[0]['type_stat']
+        self.assertTrue("KBaseGenomes.Genome" in type_stat)
+        self.assertTrue("KBaseFile.SingleEndLibrary" in type_stat)
