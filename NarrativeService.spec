@@ -71,9 +71,17 @@ module NarrativeService {
         DataPaletteInfo dp_info;
     } ListItem;
 
+    /*
+        ws_name/ws_id/workspaces - alternative way of defining workspaces (in
+            case of 'workspaces' each string could be workspace name or ID
+            converted into string).
+        types - optional filter field, limiting output list to set of types.
+    */
     typedef structure {
         string ws_name;
         int ws_id;
+        list<string> workspaces;
+        list<string> types;
     } ListObjectsWithSetsParams;
 
     typedef structure {
@@ -221,4 +229,22 @@ module NarrativeService {
 
     funcdef copy_object(CopyObjectParams params) 
         returns (CopyObjectOutput) authentication required;
+
+
+    /*
+        workspaces - list of items where each one is workspace name of textual ID.
+    */
+    typedef structure {
+        list<string> workspaces;
+    } ListAvailableTypesParams;
+
+    /*
+        type_stat - number of objects by type
+    */
+    typedef structure {
+        mapping<string, int> type_stat;
+    } ListAvailableTypesOutput;
+
+    funcdef list_available_types(ListAvailableTypesParams params)
+        returns (ListAvailableTypesOutput) authentication required;
 };

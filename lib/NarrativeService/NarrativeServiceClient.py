@@ -35,8 +35,13 @@ class NarrativeService(object):
 
     def list_objects_with_sets(self, params, context=None):
         """
-        :param params: instance of type "ListObjectsWithSetsParams" ->
-           structure: parameter "ws_name" of String, parameter "ws_id" of Long
+        :param params: instance of type "ListObjectsWithSetsParams"
+           (ws_name/ws_id/workspaces - alternative way of defining workspaces
+           (in case of 'workspaces' each string could be workspace name or ID
+           converted into string). types - optional filter field, limiting
+           output list to set of types.) -> structure: parameter "ws_name" of
+           String, parameter "ws_id" of Long, parameter "workspaces" of list
+           of String, parameter "types" of list of String
         :returns: instance of type "ListObjectsWithSetsOutput" -> structure:
            parameter "data" of list of type "ListItem" (object_info -
            workspace info for object (including set object), set_items -
@@ -204,6 +209,18 @@ class NarrativeService(object):
         """
         return self._client.call_method(
             'NarrativeService.copy_object',
+            [params], self._service_ver, context)
+
+    def list_available_types(self, params, context=None):
+        """
+        :param params: instance of type "ListAvailableTypesParams"
+           (workspaces - list of items where each one is workspace name of
+           textual ID.) -> structure: parameter "workspaces" of list of String
+        :returns: instance of type "ListAvailableTypesOutput" -> structure:
+           parameter "types" of list of String
+        """
+        return self._client.call_method(
+            'NarrativeService.list_available_types',
             [params], self._service_ver, context)
 
     def status(self, context=None):

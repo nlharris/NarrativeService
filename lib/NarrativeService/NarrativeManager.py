@@ -34,7 +34,35 @@ class NarrativeManager:
         self.user_id = ctx["user_id"]
         self.ws = Workspace(self.workspaceURL, token=self.token)
 
-    def list_objects_with_sets(self, ws_id, ws_name):
+    def list_objects_with_sets(self, ws_id=None, ws_name=None, workspaces=None):
+        ret = None
+        if ws_id or ws_name:
+            ret = self._list_objects_with_sets(ws_id, ws_name)
+        elif workspaces:
+            data = []
+            ret = {'data': data}
+            processed_refs = {}
+            for ws in workspaces:
+                ws_id = None
+                ws_name = None
+                if str(ws).isdigit():
+                    ws_id = int(ws)
+                else:
+                    ws_name = str(ws)
+                part = self._list_objects_with_sets(ws_id, ws_name)['data']
+                for item in part:
+                    info = item['object_info']
+                    ref = str(info[6]) + '/' + str(info[0]) + '/' + str(info[4])
+                    if ref not in processed_refs:
+                        data.append(item)
+                        processed_refs[ref] = True
+        else:
+            raise ValueError("One and only one of 'ws_id', 'ws_name', 'workspaces' " + 
+                             "parameters should be set")
+        return ret
+            
+
+    def _list_objects_with_sets(self, ws_id, ws_name):
         ws_info = self.ws.get_workspace_info({"id": ws_id, "workspace": ws_name})
         if not ws_name:
             ws_name = ws_info[1]
@@ -370,3 +398,16 @@ class NarrativeManager:
                                                          'name': target_name}})
             obj_info = ServiceUtils.objectInfoToObject(obj_info_tuple)
             return {'info': obj_info}
+
+
+    def list_available_types(self, workspaces):
+        data = self.list_objects_with_sets(workspaces=workspaces)['data']
+        type_stat = {}
+        for item in data:
+            info = item['object_info']
+            obj_type = info[2].split('-')[0]
+            if obj_type in type_stat:
+                type_stat[obj_type] += 1
+            else:
+                type_stat[obj_type] = 1
+        return {'type_stat': type_stat}
