@@ -6,6 +6,7 @@ import time
 import requests
 
 from os import environ
+from NarrativeService.NarrativeManager import NarrativeManager
 try:
     from ConfigParser import ConfigParser  # py2
 except:
@@ -260,7 +261,7 @@ class NarrativeServiceTest(unittest.TestCase):
             obj_count += len(part)
             min_obj_id += 10000
         obj_count2 = 0
-        for info in WorkspaceListObjectsIterator(self.getWsClient(), ws_info=ws_info,
+        for info in WorkspaceListObjectsIterator(self.getWsClient(), ws_info_list=[ws_info],
                                                  part_size=part_size):
             self.assertEqual(11, len(info))
             obj_count2 += 1
@@ -272,3 +273,20 @@ class NarrativeServiceTest(unittest.TestCase):
                                                         {"workspaces": [ws_name]})[0]['type_stat']
         self.assertTrue("KBaseGenomes.Genome" in type_stat)
         self.assertTrue("KBaseFile.SingleEndLibrary" in type_stat)
+
+    def test_custom(self):
+        NarrativeManager.DEBUG = True
+        try:
+            ids = []
+            for ws_info in self.getWsClient().list_workspace_info({'perm': 'r'}):
+                if ws_info[4] < 1000:
+                    ids.append(str(ws_info[0]))
+                    if len(ids) >= 100:
+                        break
+            #ids = [5691,6628,13055,11027,1391,11035,9203,10278,11038,669,12599,12596,5721,12593,12590,904,10276,670,1021,11041,12587,12584,12581,1377,11044,676,12164,675,12158,12157,12153,12152,12150,12149,9368,11047,444,445,447,448,450,451,453,454,456,457,459,460,462,463,465,466,468,469,471,472,474,475,11050,517,518,520,521,523,524,526,527,530,531,533,534,11055,11058,11062,11066,11074,11071,11507,11077,11505,11504,11502,11157,11500,11498,7125,11495,11493,11488,11486,7117,11485,1423,1424,1429,1430,1431,11483,1797,11482,2539,2540,11241,11480,3059,2888,2889,2935,2936,2937,2938,2950,2954,2952,2953,2955,2956,2959,2960,2961,2962,2963,2964,2965,2966,2967,2985,2986,2987,2988,2989,2990,2994,2995,2996,2997,2998,3010,3060,3061,3062,3063,3064,3065,3066,3067,3068,3069,3070,3071,3072,3073,3074,3101,3102,3103,3104,3106,3109,3217,3220,3223,3225,3230,3235,3236,3238,3325,3353,3354,3355,3360,3361,11479,4092,4094,11477,11476,11474,11463,11461,11460,11458,11457,4850,11454,11452,4851,4852,4853,4854,4855,4857,4858,4862,4863,4865,4866,4867,4868,4871]
+            #ids = [str(i) for i in ids]
+            print("Before custom test: " + str(len(ids)))
+            ret = self.getImpl().list_objects_with_sets(self.getContext(), {'workspaces': ids})[0]["data"]
+            print("After custom test: " + str(len(ret))) # 210869
+        finally:
+            NarrativeManager.DEBUG = False
