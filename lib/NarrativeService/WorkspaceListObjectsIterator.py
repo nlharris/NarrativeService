@@ -11,7 +11,7 @@ class WorkspaceListObjectsIterator:
     #    as 'type' or 'before', 'after', 'showHidden', 'includeMetadata' and so on,
     #    wherein there is no need to set 'ids' or 'workspaces' or 'min/maxObjectID'.
     def __init__(self, ws_client, ws_info_list = None, ws_id = None, ws_name = None, 
-                 list_objects_params = {}, part_size = 10000):
+                 list_objects_params = {}, part_size = 10000, global_limit = 100000):
         self.ws = ws_client
         if not ws_info_list:
             if (not ws_id) and (not ws_name):
@@ -38,6 +38,8 @@ class WorkspaceListObjectsIterator:
         self.min_obj_id = -1
         self.max_obj_count = -1
         self.part_size = part_size
+        self.global_limit = global_limit
+        self.total_counter = 0
         self.part_iter = self._load_next_part()
         pass
 
@@ -48,6 +50,9 @@ class WorkspaceListObjectsIterator:
     def next(self):
         while self.part_iter is not None:
             try:
+                self.total_counter += 1
+                if self.total_counter > self.global_limit:
+                    raise StopIteration
                 return self.part_iter.next()
             except StopIteration:
                 self.part_iter = self._load_next_part()
