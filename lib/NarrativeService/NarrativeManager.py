@@ -22,6 +22,8 @@ class NarrativeManager:
     KB_CODE_CELL = 'kb_code'
     KB_STATE = 'widget_state'
     
+    DEBUG = False
+    
     DATA_PALETTES_TYPES = DataPaletteTypes()
     
     def __init__(self, config, ctx):
@@ -35,44 +37,26 @@ class NarrativeManager:
         self.ws = Workspace(self.workspaceURL, token=self.token)
 
     def list_objects_with_sets(self, ws_id=None, ws_name=None, workspaces=None, types=None):
-        ret = None
-        if ws_id or ws_name:
-            ret = self._list_objects_with_sets(ws_id, ws_name, types)
-        elif workspaces:
-            data = []
-            ret = {'data': data}
-            processed_refs = {}
-            for ws in workspaces:
-                ws_id = None
-                ws_name = None
-                if str(ws).isdigit():
-                    ws_id = int(ws)
-                else:
-                    ws_name = str(ws)
-                part = self._list_objects_with_sets(ws_id, ws_name, types)['data']
-                for item in part:
-                    info = item['object_info']
-                    ref = str(info[6]) + '/' + str(info[0]) + '/' + str(info[4])
-                    if ref not in processed_refs:
-                        data.append(item)
-                        processed_refs[ref] = True
-        else:
-            raise ValueError("One and only one of 'ws_id', 'ws_name', 'workspaces' " + 
-                             "parameters should be set")
-        return ret
+        if not workspaces:
+            if (not ws_id) and (not ws_name):
+                raise ValueError("One and only one of 'ws_id', 'ws_name', 'workspaces' " + 
+                                 "parameters should be set")
+            workspaces = [self._get_workspace_name_or_id(ws_id, ws_name)]
+        return self._list_objects_with_sets(workspaces, types)
             
 
-    def _list_objects_with_sets(self, ws_id, ws_name, types):
+    def _list_objects_with_sets(self, workspaces, types):
         type_map = None
         if types is not None:
             type_map = {key: True for key in types}
-        ws_info = self.ws.get_workspace_info({"id": ws_id, "workspace": ws_name})
-        if not ws_name:
-            ws_name = ws_info[1]
+
+        processed_refs = {}
         data = []
+        if self.DEBUG:
+            print("NarrativeManager._list_objects_with_sets: processing sets")
+        t1 = time.time()
         sapi = SetAPI(self.serviceWizardURL, token=self.token, service_ver=self.SetAPI_version)
-        sets = sapi.list_sets({'workspace': ws_name, 'include_set_item_info': 1})['sets']
-        processed_set_refs = {}
+        sets = sapi.list_sets({'workspaces': workspaces, 'include_set_item_info': 1})['sets']
         for set_info in sets:
             # Process
             target_set_items = []
@@ -81,18 +65,55 @@ class NarrativeManager:
             if self._check_info_type(set_info['info'], type_map):
                 data.append({'object_info': set_info['info'], 
                              'set_items': {'set_items_info': target_set_items}})
-            processed_set_refs[set_info['ref']] = True
-        for info in WorkspaceListObjectsIterator(self.ws, ws_info=ws_info):
+            processed_refs[set_info['ref']] = True
+        if self.DEBUG:
+            print("    (time=" + str(time.time() - t1) + ")")
+
+        if self.DEBUG:
+            print("NarrativeManager._list_objects_with_sets: loading ws_info")
+        t2 = time.time()
+        ws_info_list = []
+        #for ws in workspaces:
+        if len(workspaces) == 1:
+            ws = workspaces[0]
+            ws_id = None
+            ws_name = None
+            if str(ws).isdigit():
+                ws_id = int(ws)
+            else:
+                ws_name = str(ws)
+            ws_info_list.append(self.ws.get_workspace_info({"id": ws_id, "workspace": ws_name}))
+        else:
+            ws_map = {key: True for key in workspaces}
+            for ws_info in self.ws.list_workspace_info({'perm': 'r'}):
+                if ws_info[1] in ws_map or str(ws_info[0]) in ws_map:
+                    ws_info_list.append(ws_info)
+        if self.DEBUG:
+            print("    (time=" + str(time.time() - t2) + ")")
+            
+        if self.DEBUG:
+            print("NarrativeManager._list_objects_with_sets: loading workspace objects")
+        t3 = time.time()
+        for info in WorkspaceListObjectsIterator(self.ws, ws_info_list=ws_info_list):
             item_ref = str(info[6]) + '/' + str(info[0]) + '/' + str(info[4])
-            if item_ref not in processed_set_refs and self._check_info_type(info, type_map):
+            if item_ref not in processed_refs and self._check_info_type(info, type_map):
                 data.append({'object_info': info})
+                processed_refs[item_ref] = True
+        if self.DEBUG:
+            print("    (time=" + str(time.time() - t3) + ")")
+
+        if self.DEBUG:
+            print("NarrativeManager._list_objects_with_sets: processing DataPalettes")
+        t5 = time.time()
         dps = DataPaletteService(self.serviceWizardURL, token=self.token, 
                                  service_ver=self.DataPaletteService_version)
-        dp_ret = dps.list_data({'workspaces': [self._get_workspace_name_or_id(ws_id, ws_name)]})
+        dp_ret = dps.list_data({'workspaces': workspaces})
         for item in dp_ret['data']:
             ref = item['ref']
-            if ref not in processed_set_refs and self._check_info_type(item['info'], type_map):
+            if ref not in processed_refs and self._check_info_type(item['info'], type_map):
                 data.append({'object_info': item['info'], 'dp_info': {}})
+        if self.DEBUG:
+            print("    (time=" + str(time.time() - t5) + ")")
         return {"data": data}
     
     def _check_info_type(self, info, type_map):
