@@ -51,9 +51,12 @@ class NarrativeManager:
         if self.DEBUG:
             print("NarrativeManager._list_objects_with_sets: processing sets")
         t1 = time.time()
-        sets = self.set_api_cache.call_method("list_sets", [{'workspaces': workspaces, 
-                                                             'include_set_item_info': 1}],
-                                              self.token)['sets']
+        set_ret = self.set_api_cache.call_method("list_sets", [{'workspaces': workspaces, 
+                                                                'include_set_item_info': 1,
+                                                                'include_raw_data_palettes': 1}],
+                                                 self.token)
+        sets = set_ret['sets']
+        dp_data = set_ret.get('raw_data_palettes')
         for set_info in sets:
             # Process
             target_set_items = []
@@ -102,9 +105,11 @@ class NarrativeManager:
         if self.DEBUG:
             print("NarrativeManager._list_objects_with_sets: processing DataPalettes")
         t5 = time.time()
-        dps = self.dps_cache
-        dp_ret = dps.call_method("list_data", [{'workspaces': workspaces}], self.token)
-        for item in dp_ret['data']:
+        if dp_data is None:
+            dps = self.dps_cache
+            dp_ret = dps.call_method("list_data", [{'workspaces': workspaces}], self.token)
+            dp_data = dp_ret['data']
+        for item in dp_data:
             ref = item['ref']
             if ref not in processed_refs and self._check_info_type(item['info'], type_map):
                 data.append({'object_info': item['info'], 'dp_info': {}})
