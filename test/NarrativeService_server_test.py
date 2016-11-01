@@ -52,6 +52,7 @@ class NarrativeServiceTest(unittest.TestCase):
         cls.serviceImpl = NarrativeService(cls.cfg)
         cls.SetAPI_version= cls.cfg['setapi-version']
 
+
     @classmethod
     def tearDownClass(cls):
         if hasattr(cls, 'wsName'):
@@ -275,7 +276,6 @@ class NarrativeServiceTest(unittest.TestCase):
         self.assertTrue("KBaseFile.SingleEndLibrary" in type_stat)
 
     def test_bulk_list(self):
-        NarrativeManager.DEBUG = False  #True
         try:
             ids = []
             for ws_info in self.getWsClient().list_workspace_info({'perm': 'r', 'excludeGlobal': 1}):
@@ -284,6 +284,9 @@ class NarrativeServiceTest(unittest.TestCase):
                     if len(ids) >= 100:
                         break
             print("Workspaces selected for bulk list_objects_with_sets: " + str(len(ids)))
+            if len(ids) > 0:
+                self.getImpl().list_objects_with_sets(self.getContext(), {'workspaces': [ids[0]]})
+            NarrativeManager.DEBUG = False  #True
             t1 = time.time()
             ret = self.getImpl().list_objects_with_sets(self.getContext(), {'workspaces': ids})[0]["data"]
             print("Objects found: " + str(len(ret)) + ", time=" + str(time.time() - t1))

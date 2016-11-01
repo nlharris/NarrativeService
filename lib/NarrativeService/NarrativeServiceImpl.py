@@ -1,6 +1,7 @@
 # -*- coding: utf-8 -*-
 #BEGIN_HEADER
 from NarrativeService.NarrativeManager import NarrativeManager
+from NarrativeService.DynamicServiceCache import DynamicServiceCache
 #END_HEADER
 
 
@@ -24,6 +25,8 @@ class NarrativeService:
     GIT_COMMIT_HASH = "0110cc90874816c5fb6a1e8027fc97afa9d744e2"
 
     #BEGIN_CLASS_HEADER
+    def _nm(self, ctx):
+        return NarrativeManager(self.config, ctx, self.setAPICache, self.dataPaletteCache)
     #END_CLASS_HEADER
 
     # config contains contents of config file in a hash or None if it couldn't
@@ -34,7 +37,12 @@ class NarrativeService:
         self.workspaceURL = config['workspace-url']
         self.serviceWizardURL = config['service-wizard']
         self.narrativeMethodStoreURL = config['narrative-method-store']
-        self.SetAPI_version = config['setapi-version']
+        self.setAPICache = DynamicServiceCache(self.serviceWizardURL, 
+                                               config['setapi-version'], 
+                                               'SetAPI')
+        self.dataPaletteCache = DynamicServiceCache(self.serviceWizardURL, 
+                                                    config['datapaletteservice-version'], 
+                                                    'DataPaletteService')
         #END_CONSTRUCTOR
         pass
 
@@ -106,9 +114,8 @@ class NarrativeService:
         ws_name = params.get("ws_name")
         workspaces = params.get("workspaces")
         types = params.get("types")
-        nm = NarrativeManager(self.config, ctx)
-        returnVal = nm.list_objects_with_sets(ws_id=ws_id, ws_name=ws_name,
-                                              workspaces=workspaces, types=types)
+        returnVal = self._nm(ctx).list_objects_with_sets(ws_id=ws_id, ws_name=ws_name,
+                                                         workspaces=workspaces, types=types)
         #END list_objects_with_sets
 
         # At some point might do deeper type checking...
@@ -134,8 +141,7 @@ class NarrativeService:
         newName = params['newName']
         workspaceRef = params['workspaceRef']
         workspaceId = params.get('workspaceId', None)
-        returnVal = NarrativeManager(self.config, ctx).copy_narrative(newName, workspaceRef,
-                                                                      workspaceId)
+        returnVal = self._nm(ctx).copy_narrative(newName, workspaceRef, workspaceId)
         #END copy_narrative
 
         # At some point might do deeper type checking...
@@ -217,9 +223,8 @@ class NarrativeService:
         markdown = params.get('markdown')
         copydata = params.get('copydata')
         importData = params.get('importData')
-        returnVal = NarrativeManager(self.config, ctx).create_new_narrative(app, method, appparam,
-                                                                            appData, markdown, 
-                                                                            copydata, importData)
+        returnVal = self._nm(ctx).create_new_narrative(app, method, appparam, appData, markdown,
+                                                       copydata, importData)
         #END create_new_narrative
 
         # At some point might do deeper type checking...
@@ -266,9 +271,7 @@ class NarrativeService:
         target_ws_id = params.get('target_ws_id')
         target_ws_name = params.get('target_ws_name')
         target_name = params.get('target_name')
-        returnVal = NarrativeManager(self.config, ctx).copy_object(ref, target_ws_id, 
-                                                                   target_ws_name, target_name,
-                                                                   None)
+        returnVal = self._nm(ctx).copy_object(ref, target_ws_id, target_ws_name, target_name, None)
         #END copy_object
 
         # At some point might do deeper type checking...
@@ -290,7 +293,7 @@ class NarrativeService:
         # return variables are: returnVal
         #BEGIN list_available_types
         workspaces = params.get("workspaces")
-        returnVal = NarrativeManager(self.config, ctx).list_available_types(workspaces)
+        returnVal = self._nm(ctx).list_available_types(workspaces)
         #END list_available_types
 
         # At some point might do deeper type checking...
