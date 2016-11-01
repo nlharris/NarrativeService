@@ -6,8 +6,6 @@ from NarrativeService.DataPaletteTypes import DataPaletteTypes
 
 from Workspace.WorkspaceClient import Workspace
 from NarrativeMethodStore.NarrativeMethodStoreClient import NarrativeMethodStore
-from SetAPI.SetAPIClient import SetAPI
-from DataPaletteService.DataPaletteServiceClient import DataPaletteService
 from NarrativeService.WorkspaceListObjectsIterator import WorkspaceListObjectsIterator
 
 
@@ -26,15 +24,13 @@ class NarrativeManager:
     
     DATA_PALETTES_TYPES = DataPaletteTypes()
     
-    def __init__(self, config, ctx):
-        self.workspaceURL = config['workspace-url']
-        self.serviceWizardURL = config['service-wizard']
+    def __init__(self, config, ctx, set_api_cache, dps_cache):
         self.narrativeMethodStoreURL = config['narrative-method-store']
-        self.SetAPI_version = config['setapi-version']
-        self.DataPaletteService_version = config['datapaletteservice-version']
+        self.set_api_cache = set_api_cache  # DynamicServiceCache type
+        self.dps_cache = dps_cache          # DynamicServiceCache type
         self.token = ctx["token"]
         self.user_id = ctx["user_id"]
-        self.ws = Workspace(self.workspaceURL, token=self.token)
+        self.ws = Workspace(config['workspace-url'], token=self.token)
 
     def list_objects_with_sets(self, ws_id=None, ws_name=None, workspaces=None, types=None):
         if not workspaces:
@@ -55,8 +51,9 @@ class NarrativeManager:
         if self.DEBUG:
             print("NarrativeManager._list_objects_with_sets: processing sets")
         t1 = time.time()
-        sapi = SetAPI(self.serviceWizardURL, token=self.token, service_ver=self.SetAPI_version)
-        sets = sapi.list_sets({'workspaces': workspaces, 'include_set_item_info': 1})['sets']
+        sets = self.set_api_cache.call_method("list_sets", [{'workspaces': workspaces, 
+                                                             'include_set_item_info': 1}],
+                                              self.token)['sets']
         for set_info in sets:
             # Process
             target_set_items = []
@@ -105,9 +102,8 @@ class NarrativeManager:
         if self.DEBUG:
             print("NarrativeManager._list_objects_with_sets: processing DataPalettes")
         t5 = time.time()
-        dps = DataPaletteService(self.serviceWizardURL, token=self.token, 
-                                 service_ver=self.DataPaletteService_version)
-        dp_ret = dps.list_data({'workspaces': workspaces})
+        dps = self.dps_cache
+        dp_ret = dps.call_method("list_data", [{'workspaces': workspaces}], self.token)
         for item in dp_ret['data']:
             ref = item['ref']
             if ref not in processed_refs and self._check_info_type(item['info'], type_map):
@@ -156,15 +152,17 @@ class NarrativeManager:
         # clone the workspace EXCEPT for currentNarrative object + obejcts of DataPalette types:
         newWsId = self.ws.clone_workspace({'wsi': {'id': workspaceId}, 'workspace': newWsName,
                                            'meta': newWsMeta, 'exclude': excluded_list})[0]
-        dps = DataPaletteService(self.serviceWizardURL, token=self.token, 
-                                 service_ver=self.DataPaletteService_version)
         if dp_detected:
-            dps.copy_palette({'from_workspace': str(workspaceId), 'to_workspace': str(newWsId)})
+            self.dps_cache.call_method("copy_palette", [{'from_workspace': str(workspaceId), 
+                                                         'to_workspace': str(newWsId)}], 
+                                       self.token)
         if len(add_to_palette_list) > 0:
             # There are objects in source workspace that have type under DataPalette handling
             # but these objects are physically stored in source workspace rather that saved
             # in DataPalette object. So they weren't copied by "dps.copy_palette".
-            dps.add_to_palette({'workspace': str(newWsId), 'new_refs': add_to_palette_list})
+            self.dps_cache.call_method("add_to_palette", [{'workspace': str(newWsId), 
+                                                           'new_refs': add_to_palette_list}],
+                                       self.token)
 
         try:
             # update the ref inside the narrative object and the new workspace metadata.
@@ -414,10 +412,10 @@ class NarrativeManager:
             # Copy with DataPaletteService
             if target_name:
                 raise ValueError("'target_name' cannot be defined for DataPalette copy")
-            dps = DataPaletteService(self.serviceWizardURL, token=self.token, 
-                                     service_ver=self.DataPaletteService_version)
             target_ws_name_or_id = self._get_workspace_name_or_id(target_ws_id, target_ws_name)
-            dps.add_to_palette({'workspace': target_ws_name_or_id, 'new_refs': [{'ref': ref}]})
+            self.dps_cache.call_method("add_to_palette", [{'workspace': target_ws_name_or_id, 
+                                                           'new_refs': [{'ref': ref}]}], 
+                                       self.token)
             return {'info': src_info}
         else:
             if not target_name:
