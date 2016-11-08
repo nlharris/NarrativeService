@@ -155,14 +155,14 @@ class NarrativeService(object):
            "lockstat" of type "lock_status" (The lock status of a workspace.
            One of 'unlocked', 'locked', or 'published'.), parameter
            "metadata" of mapping from String to String, parameter "modDateMs"
-           of Long, parameter "objectInfo" of type "ObjectInfo" (Restructured
-           workspace object info 'data' tuple: id: data[0], name: data[1],
-           type: data[2], save_date: data[3], version: data[4], saved_by:
-           data[5], wsid: data[6], ws: data[7], checksum: data[8], size:
-           data[9], metadata: data[10], ref: data[6] + '/' + data[0] + '/' +
-           data[4], obj_id: 'ws.' + data[6] + '.obj.' + data[0], typeModule:
-           type[0], typeName: type[1], typeMajorVersion: type[2],
-           typeMinorVersion: type[3], saveDateMs:
+           of Long, parameter "narrativeInfo" of type "ObjectInfo"
+           (Restructured workspace object info 'data' tuple: id: data[0],
+           name: data[1], type: data[2], save_date: data[3], version:
+           data[4], saved_by: data[5], wsid: data[6], ws: data[7], checksum:
+           data[8], size: data[9], metadata: data[10], ref: data[6] + '/' +
+           data[0] + '/' + data[4], obj_id: 'ws.' + data[6] + '.obj.' +
+           data[0], typeModule: type[0], typeName: type[1], typeMajorVersion:
+           type[2], typeMinorVersion: type[3], saveDateMs:
            ServiceUtils.iso8601ToMillisSinceEpoch(data[3])) -> structure:
            parameter "id" of Long, parameter "name" of String, parameter
            "type" of String, parameter "save_date" of String, parameter

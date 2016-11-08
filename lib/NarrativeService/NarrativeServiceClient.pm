@@ -370,7 +370,7 @@ AppParam is a reference to a list containing 3 items:
 boolean is an int
 CreateNewNarrativeOutput is a reference to a hash where the following keys are defined:
 	workspaceInfo has a value which is a NarrativeService.WorkspaceInfo
-	objectInfo has a value which is a NarrativeService.ObjectInfo
+	narrativeInfo has a value which is a NarrativeService.ObjectInfo
 WorkspaceInfo is a reference to a hash where the following keys are defined:
 	id has a value which is an int
 	name has a value which is a string
@@ -429,7 +429,7 @@ AppParam is a reference to a list containing 3 items:
 boolean is an int
 CreateNewNarrativeOutput is a reference to a hash where the following keys are defined:
 	workspaceInfo has a value which is a NarrativeService.WorkspaceInfo
-	objectInfo has a value which is a NarrativeService.ObjectInfo
+	narrativeInfo has a value which is a NarrativeService.ObjectInfo
 WorkspaceInfo is a reference to a hash where the following keys are defined:
 	id has a value which is an int
 	name has a value which is a string
@@ -1540,7 +1540,7 @@ includeIntroCell has a value which is a NarrativeService.boolean
 <pre>
 a reference to a hash where the following keys are defined:
 workspaceInfo has a value which is a NarrativeService.WorkspaceInfo
-objectInfo has a value which is a NarrativeService.ObjectInfo
+narrativeInfo has a value which is a NarrativeService.ObjectInfo
 
 </pre>
 
@@ -1550,7 +1550,7 @@ objectInfo has a value which is a NarrativeService.ObjectInfo
 
 a reference to a hash where the following keys are defined:
 workspaceInfo has a value which is a NarrativeService.WorkspaceInfo
-objectInfo has a value which is a NarrativeService.ObjectInfo
+narrativeInfo has a value which is a NarrativeService.ObjectInfo
 
 
 =end text

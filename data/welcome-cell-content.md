@@ -2,7 +2,7 @@
 # Welcome to the Narrative Interface!
 
 ## What's a Narrative?
-In KBase, you can customize and execute a series of analysis steps to create shareable, reproducible “Narratives” that include data, analysis steps, results, visualizations and commentary.
+In KBase, you can customize and execute a series of analysis steps to create shareable, reproducible "Narratives" that include data, analysis steps, results, visualizations and commentary.
 
 [learn more...]({{config.resources.docSite.base.url}}/narrative-guide)
 
