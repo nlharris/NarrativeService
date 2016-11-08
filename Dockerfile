@@ -5,8 +5,8 @@ MAINTAINER KBase Developer
 # Insert apt-get instructions here to install
 # any required dependencies for your module.
 
-# RUN apt-get update
-
+RUN apt-get update
+RUN apt-get install -y python-coverage
 # -----------------------------------------
 
 COPY ./ /kb/module

@@ -21,8 +21,8 @@ class NarrativeService:
     # the latter method is running.
     ######################################### noqa
     VERSION = "0.0.1"
-    GIT_URL = "https://github.com/rsutormin/NarrativeService"
-    GIT_COMMIT_HASH = "0110cc90874816c5fb6a1e8027fc97afa9d744e2"
+    GIT_URL = "https://github.com/briehl/NarrativeService"
+    GIT_COMMIT_HASH = "c76438458ba4d47b8f7caf702ce75c23bf67006e"
 
     #BEGIN_CLASS_HEADER
     def _nm(self, ctx):
@@ -37,11 +37,11 @@ class NarrativeService:
         self.workspaceURL = config['workspace-url']
         self.serviceWizardURL = config['service-wizard']
         self.narrativeMethodStoreURL = config['narrative-method-store']
-        self.setAPICache = DynamicServiceCache(self.serviceWizardURL, 
-                                               config['setapi-version'], 
+        self.setAPICache = DynamicServiceCache(self.serviceWizardURL,
+                                               config['setapi-version'],
                                                'SetAPI')
-        self.dataPaletteCache = DynamicServiceCache(self.serviceWizardURL, 
-                                                    config['datapaletteservice-version'], 
+        self.dataPaletteCache = DynamicServiceCache(self.serviceWizardURL,
+                                                    config['datapaletteservice-version'],
                                                     'DataPaletteService')
         #END_CONSTRUCTOR
         pass
@@ -162,13 +162,15 @@ class NarrativeService:
            to appparam) markdown - markdown text for cell of 'markdown' type
            (optional) copydata - packed inport data in format "import(;...)*"
            (alternative to importData) importData - import data in unpacked
-           form (alternative to copydata)) -> structure: parameter "app" of
-           String, parameter "method" of String, parameter "appparam" of
-           String, parameter "appData" of list of type "AppParam" -> tuple of
-           size 3: parameter "step_pos" of Long, parameter "key" of String,
-           parameter "value" of String, parameter "markdown" of String,
-           parameter "copydata" of String, parameter "importData" of list of
-           String
+           form (alternative to copydata) includeIntroCell - if 1, adds an
+           introductory markdown cell at the top (optional, default 0)) ->
+           structure: parameter "app" of String, parameter "method" of
+           String, parameter "appparam" of String, parameter "appData" of
+           list of type "AppParam" -> tuple of size 3: parameter "step_pos"
+           of Long, parameter "key" of String, parameter "value" of String,
+           parameter "markdown" of String, parameter "copydata" of String,
+           parameter "importData" of list of String, parameter
+           "includeIntroCell" of type "boolean" (@range [0,1])
         :returns: instance of type "CreateNewNarrativeOutput" -> structure:
            parameter "workspaceInfo" of type "WorkspaceInfo" (Restructured
            workspace info 'wsInfo' tuple: id: wsInfo[0], name: wsInfo[1],
@@ -223,8 +225,9 @@ class NarrativeService:
         markdown = params.get('markdown')
         copydata = params.get('copydata')
         importData = params.get('importData')
+        includeIntroCell = params.get('includeIntroCell', 0)
         returnVal = self._nm(ctx).create_new_narrative(app, method, appparam, appData, markdown,
-                                                       copydata, importData)
+                                                       copydata, importData, includeIntroCell)
         #END create_new_narrative
 
         # At some point might do deeper type checking...
@@ -286,8 +289,9 @@ class NarrativeService:
         :param params: instance of type "ListAvailableTypesParams"
            (workspaces - list of items where each one is workspace name of
            textual ID.) -> structure: parameter "workspaces" of list of String
-        :returns: instance of type "ListAvailableTypesOutput" -> structure:
-           parameter "types" of list of String
+        :returns: instance of type "ListAvailableTypesOutput" (type_stat -
+           number of objects by type) -> structure: parameter "type_stat" of
+           mapping from String to Long
         """
         # ctx is the context object
         # return variables are: returnVal

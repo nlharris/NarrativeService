@@ -55,7 +55,8 @@ build-test-script:
 	echo 'export KB_AUTH_TOKEN=`cat /kb/module/work/token`' >> $(TEST_DIR)/$(TEST_SCRIPT_NAME)
 	echo 'export PYTHONPATH=$$script_dir/../$(LIB_DIR):$$PATH:$$PYTHONPATH' >> $(TEST_DIR)/$(TEST_SCRIPT_NAME)
 	echo 'cd $$script_dir/../$(TEST_DIR)' >> $(TEST_DIR)/$(TEST_SCRIPT_NAME)
-	echo 'python -u -m unittest discover -p "*_test.py"' >> $(TEST_DIR)/$(TEST_SCRIPT_NAME)
+	# echo 'python -u -m unittest discover -p "*_test.py"' >> $(TEST_DIR)/$(TEST_SCRIPT_NAME)
+	echo 'python -m nose --with-coverage --cover-package=NarrativeService --cover-html --cover-html-dir=/kb/module/work/cover_html .' >> $(TEST_DIR)/$(TEST_SCRIPT_NAME)
 	chmod +x $(TEST_DIR)/$(TEST_SCRIPT_NAME)
 
 test:
@@ -69,3 +70,7 @@ install-clients:
 	kb-sdk install -c https://raw.githubusercontent.com/kbase/workspace_deluxe/master/workspace.spec
 	kb-sdk install -c https://raw.githubusercontent.com/kbase/narrative_method_store/develop/NarrativeMethodStore.spec
 	kb-sdk install -d https://raw.githubusercontent.com/kbaseapps/DataPaletteService/master/DataPaletteService.spec
+
+ref-data:
+	cp -a ./data/* /data/
+	touch /data/__READY__

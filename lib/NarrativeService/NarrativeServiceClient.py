@@ -122,13 +122,15 @@ class NarrativeService(object):
            to appparam) markdown - markdown text for cell of 'markdown' type
            (optional) copydata - packed inport data in format "import(;...)*"
            (alternative to importData) importData - import data in unpacked
-           form (alternative to copydata)) -> structure: parameter "app" of
-           String, parameter "method" of String, parameter "appparam" of
-           String, parameter "appData" of list of type "AppParam" -> tuple of
-           size 3: parameter "step_pos" of Long, parameter "key" of String,
-           parameter "value" of String, parameter "markdown" of String,
-           parameter "copydata" of String, parameter "importData" of list of
-           String
+           form (alternative to copydata) includeIntroCell - if 1, adds an
+           introductory markdown cell at the top (optional, default 0)) ->
+           structure: parameter "app" of String, parameter "method" of
+           String, parameter "appparam" of String, parameter "appData" of
+           list of type "AppParam" -> tuple of size 3: parameter "step_pos"
+           of Long, parameter "key" of String, parameter "value" of String,
+           parameter "markdown" of String, parameter "copydata" of String,
+           parameter "importData" of list of String, parameter
+           "includeIntroCell" of type "boolean" (@range [0,1])
         :returns: instance of type "CreateNewNarrativeOutput" -> structure:
            parameter "workspaceInfo" of type "WorkspaceInfo" (Restructured
            workspace info 'wsInfo' tuple: id: wsInfo[0], name: wsInfo[1],
@@ -216,8 +218,9 @@ class NarrativeService(object):
         :param params: instance of type "ListAvailableTypesParams"
            (workspaces - list of items where each one is workspace name of
            textual ID.) -> structure: parameter "workspaces" of list of String
-        :returns: instance of type "ListAvailableTypesOutput" -> structure:
-           parameter "types" of list of String
+        :returns: instance of type "ListAvailableTypesOutput" (type_stat -
+           number of objects by type) -> structure: parameter "type_stat" of
+           mapping from String to Long
         """
         return self._client.call_method(
             'NarrativeService.list_available_types',

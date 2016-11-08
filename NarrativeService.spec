@@ -4,8 +4,10 @@ A KBase module: NarrativeService
 
 module NarrativeService {
 
+    /* @range [0,1] */
+    typedef int boolean;
 
-    /* 
+    /*
         A time in the format YYYY-MM-DDThh:mm:ssZ, where Z is either the
         character Z (representing the UTC timezone) or the difference
         in time to UTC in the format +/-HHMM, eg:
@@ -16,7 +18,7 @@ module NarrativeService {
     typedef string timestamp;
 
     /* Represents the permissions a user or users have to a workspace:
-        
+
         'a' - administrator. All operations allowed.
         'w' - read/write.
         'r' - read.
@@ -30,7 +32,7 @@ module NarrativeService {
     typedef string lock_status;
 
     /* Information about an object, including user provided metadata.
-        
+
         obj_id objid - the numerical id of the object.
         obj_name name - the name of the object.
         type_string type - the type of the object.
@@ -92,7 +94,7 @@ module NarrativeService {
         returns (ListObjectsWithSetsOutput) authentication required;
 
     /*
-        workspaceId - optional workspace ID, if not specified then 
+        workspaceId - optional workspace ID, if not specified then
             property from workspaceRef object info is used.
     */
     typedef structure {
@@ -187,6 +189,7 @@ module NarrativeService {
         markdown - markdown text for cell of 'markdown' type (optional)
         copydata - packed inport data in format "import(;...)*" (alternative to importData)
         importData - import data in unpacked form (alternative to copydata)
+        includeIntroCell - if 1, adds an introductory markdown cell at the top (optional, default 0)
     */
     typedef structure {
         string app;
@@ -196,13 +199,14 @@ module NarrativeService {
         string markdown;
         string copydata;
         list<string> importData;
+        boolean includeIntroCell;
     } CreateNewNarrativeParams;
-    
+
     typedef structure {
         WorkspaceInfo workspaceInfo;
-        ObjectInfo objectInfo;
+        ObjectInfo narrativeInfo;
     } CreateNewNarrativeOutput;
-    
+
     funcdef create_new_narrative(CreateNewNarrativeParams params)
         returns (CreateNewNarrativeOutput) authentication required;
 
@@ -227,7 +231,7 @@ module NarrativeService {
         ObjectInfo info;
     } CopyObjectOutput;
 
-    funcdef copy_object(CopyObjectParams params) 
+    funcdef copy_object(CopyObjectParams params)
         returns (CopyObjectOutput) authentication required;
 
 
