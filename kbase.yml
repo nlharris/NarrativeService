@@ -15,6 +15,3 @@ owners:
 
 service-config:
     dynamic-service: true
-
-data-version:
-    1.0
