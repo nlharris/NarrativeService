@@ -20,7 +20,7 @@ import com.fasterxml.jackson.annotation.JsonPropertyOrder;
 @Generated("com.googlecode.jsonschema2pojo")
 @JsonPropertyOrder({
     "workspaceInfo",
-    "objectInfo"
+    "narrativeInfo"
 })
 public class CreateNewNarrativeOutput {
 
@@ -68,8 +68,8 @@ public class CreateNewNarrativeOutput {
      * </pre>
      * 
      */
-    @JsonProperty("objectInfo")
-    private ObjectInfo objectInfo;
+    @JsonProperty("narrativeInfo")
+    private ObjectInfo narrativeInfo;
     private Map<String, Object> additionalProperties = new HashMap<String, Object>();
 
     /**
@@ -146,9 +146,9 @@ public class CreateNewNarrativeOutput {
      * </pre>
      * 
      */
-    @JsonProperty("objectInfo")
-    public ObjectInfo getObjectInfo() {
-        return objectInfo;
+    @JsonProperty("narrativeInfo")
+    public ObjectInfo getNarrativeInfo() {
+        return narrativeInfo;
     }
 
     /**
@@ -176,13 +176,13 @@ public class CreateNewNarrativeOutput {
      * </pre>
      * 
      */
-    @JsonProperty("objectInfo")
-    public void setObjectInfo(ObjectInfo objectInfo) {
-        this.objectInfo = objectInfo;
+    @JsonProperty("narrativeInfo")
+    public void setNarrativeInfo(ObjectInfo narrativeInfo) {
+        this.narrativeInfo = narrativeInfo;
     }
 
-    public CreateNewNarrativeOutput withObjectInfo(ObjectInfo objectInfo) {
-        this.objectInfo = objectInfo;
+    public CreateNewNarrativeOutput withNarrativeInfo(ObjectInfo narrativeInfo) {
+        this.narrativeInfo = narrativeInfo;
         return this;
     }
 
@@ -198,7 +198,7 @@ public class CreateNewNarrativeOutput {
 
     @Override
     public String toString() {
-        return ((((((("CreateNewNarrativeOutput"+" [workspaceInfo=")+ workspaceInfo)+", objectInfo=")+ objectInfo)+", additionalProperties=")+ additionalProperties)+"]");
+        return ((((((("CreateNewNarrativeOutput"+" [workspaceInfo=")+ workspaceInfo)+", narrativeInfo=")+ narrativeInfo)+", additionalProperties=")+ additionalProperties)+"]");
     }
 
 }

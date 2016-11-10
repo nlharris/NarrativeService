@@ -24,6 +24,7 @@ import us.kbase.common.service.Tuple3;
  * markdown - markdown text for cell of 'markdown' type (optional)
  * copydata - packed inport data in format "import(;...)*" (alternative to importData)
  * importData - import data in unpacked form (alternative to copydata)
+ * includeIntroCell - if 1, adds an introductory markdown cell at the top (optional, default 0)
  * </pre>
  * 
  */
@@ -36,7 +37,8 @@ import us.kbase.common.service.Tuple3;
     "appData",
     "markdown",
     "copydata",
-    "importData"
+    "importData",
+    "includeIntroCell"
 })
 public class CreateNewNarrativeParams {
 
@@ -54,6 +56,8 @@ public class CreateNewNarrativeParams {
     private java.lang.String copydata;
     @JsonProperty("importData")
     private List<String> importData;
+    @JsonProperty("includeIntroCell")
+    private java.lang.Long includeIntroCell;
     private Map<java.lang.String, Object> additionalProperties = new HashMap<java.lang.String, Object>();
 
     @JsonProperty("app")
@@ -161,6 +165,21 @@ public class CreateNewNarrativeParams {
         return this;
     }
 
+    @JsonProperty("includeIntroCell")
+    public java.lang.Long getIncludeIntroCell() {
+        return includeIntroCell;
+    }
+
+    @JsonProperty("includeIntroCell")
+    public void setIncludeIntroCell(java.lang.Long includeIntroCell) {
+        this.includeIntroCell = includeIntroCell;
+    }
+
+    public CreateNewNarrativeParams withIncludeIntroCell(java.lang.Long includeIntroCell) {
+        this.includeIntroCell = includeIntroCell;
+        return this;
+    }
+
     @JsonAnyGetter
     public Map<java.lang.String, Object> getAdditionalProperties() {
         return this.additionalProperties;
@@ -173,7 +192,7 @@ public class CreateNewNarrativeParams {
 
     @Override
     public java.lang.String toString() {
-        return ((((((((((((((((("CreateNewNarrativeParams"+" [app=")+ app)+", method=")+ method)+", appparam=")+ appparam)+", appData=")+ appData)+", markdown=")+ markdown)+", copydata=")+ copydata)+", importData=")+ importData)+", additionalProperties=")+ additionalProperties)+"]");
+        return ((((((((((((((((((("CreateNewNarrativeParams"+" [app=")+ app)+", method=")+ method)+", appparam=")+ appparam)+", appData=")+ appData)+", markdown=")+ markdown)+", copydata=")+ copydata)+", importData=")+ importData)+", includeIntroCell=")+ includeIntroCell)+", additionalProperties=")+ additionalProperties)+"]");
     }
 
 }

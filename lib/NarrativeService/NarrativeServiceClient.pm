@@ -366,13 +366,15 @@ CreateNewNarrativeParams is a reference to a hash where the following keys are d
 	markdown has a value which is a string
 	copydata has a value which is a string
 	importData has a value which is a reference to a list where each element is a string
+	includeIntroCell has a value which is a NarrativeService.boolean
 AppParam is a reference to a list containing 3 items:
 	0: (step_pos) an int
 	1: (key) a string
 	2: (value) a string
+boolean is an int
 CreateNewNarrativeOutput is a reference to a hash where the following keys are defined:
 	workspaceInfo has a value which is a NarrativeService.WorkspaceInfo
-	objectInfo has a value which is a NarrativeService.ObjectInfo
+	narrativeInfo has a value which is a NarrativeService.ObjectInfo
 WorkspaceInfo is a reference to a hash where the following keys are defined:
 	id has a value which is an int
 	name has a value which is a string
@@ -423,13 +425,15 @@ CreateNewNarrativeParams is a reference to a hash where the following keys are d
 	markdown has a value which is a string
 	copydata has a value which is a string
 	importData has a value which is a reference to a list where each element is a string
+	includeIntroCell has a value which is a NarrativeService.boolean
 AppParam is a reference to a list containing 3 items:
 	0: (step_pos) an int
 	1: (key) a string
 	2: (value) a string
+boolean is an int
 CreateNewNarrativeOutput is a reference to a hash where the following keys are defined:
 	workspaceInfo has a value which is a NarrativeService.WorkspaceInfo
-	objectInfo has a value which is a NarrativeService.ObjectInfo
+	narrativeInfo has a value which is a NarrativeService.ObjectInfo
 WorkspaceInfo is a reference to a hash where the following keys are defined:
 	id has a value which is an int
 	name has a value which is a string
@@ -1489,6 +1493,7 @@ appData - parameters of app/method in unpacked form (alternative to appparam)
 markdown - markdown text for cell of 'markdown' type (optional)
 copydata - packed inport data in format "import(;...)*" (alternative to importData)
 importData - import data in unpacked form (alternative to copydata)
+includeIntroCell - if 1, adds an introductory markdown cell at the top (optional, default 0)
 
 
 =item Definition
@@ -1504,6 +1509,7 @@ appData has a value which is a reference to a list where each element is a Narra
 markdown has a value which is a string
 copydata has a value which is a string
 importData has a value which is a reference to a list where each element is a string
+includeIntroCell has a value which is a NarrativeService.boolean
 
 </pre>
 
@@ -1519,6 +1525,7 @@ appData has a value which is a reference to a list where each element is a Narra
 markdown has a value which is a string
 copydata has a value which is a string
 importData has a value which is a reference to a list where each element is a string
+includeIntroCell has a value which is a NarrativeService.boolean
 
 
 =end text
@@ -1540,7 +1547,7 @@ importData has a value which is a reference to a list where each element is a st
 <pre>
 a reference to a hash where the following keys are defined:
 workspaceInfo has a value which is a NarrativeService.WorkspaceInfo
-objectInfo has a value which is a NarrativeService.ObjectInfo
+narrativeInfo has a value which is a NarrativeService.ObjectInfo
 
 </pre>
 
@@ -1550,7 +1557,7 @@ objectInfo has a value which is a NarrativeService.ObjectInfo
 
 a reference to a hash where the following keys are defined:
 workspaceInfo has a value which is a NarrativeService.WorkspaceInfo
-objectInfo has a value which is a NarrativeService.ObjectInfo
+narrativeInfo has a value which is a NarrativeService.ObjectInfo
 
 
 =end text

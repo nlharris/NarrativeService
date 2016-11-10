@@ -191,6 +191,7 @@ module NarrativeService {
         markdown - markdown text for cell of 'markdown' type (optional)
         copydata - packed inport data in format "import(;...)*" (alternative to importData)
         importData - import data in unpacked form (alternative to copydata)
+        includeIntroCell - if 1, adds an introductory markdown cell at the top (optional, default 0)
     */
     typedef structure {
         string app;
@@ -200,11 +201,12 @@ module NarrativeService {
         string markdown;
         string copydata;
         list<string> importData;
+        boolean includeIntroCell;
     } CreateNewNarrativeParams;
 
     typedef structure {
         WorkspaceInfo workspaceInfo;
-        ObjectInfo objectInfo;
+        ObjectInfo narrativeInfo;
     } CreateNewNarrativeOutput;
 
     funcdef create_new_narrative(CreateNewNarrativeParams params)

@@ -50,8 +50,8 @@ class NarrativeServiceTest(unittest.TestCase):
         cls.serviceWizardURL = cls.cfg['service-wizard']
         cls.wsClient = Workspace(cls.wsURL, token=token)
         cls.serviceImpl = NarrativeService(cls.cfg)
-        cls.SetAPI_version= cls.cfg['setapi-version']
-
+        cls.SetAPI_version = cls.cfg['setapi-version']
+        cls.intro_text_file = cls.cfg['intro-markdown-file']
 
     @classmethod
     def tearDownClass(cls):
@@ -242,6 +242,22 @@ class NarrativeServiceTest(unittest.TestCase):
             self.assertTrue('narrativeInfo' in ret)
         finally:
             new_ws_id = ret['workspaceInfo']['id']
+            ws.delete_workspace({'id': new_ws_id})
+
+    def test_new_narrative_welcome(self):
+        ws = self.getWsClient()
+        narr_info = self.getImpl().create_new_narrative(self.getContext(), {'includeIntroCell': 1})[0]
+        with open(self.intro_text_file) as f:
+            intro_text = f.read()
+
+        try:
+            self.assertTrue('narrativeInfo' in narr_info)
+            narr_obj = ws.get_objects([{'ref': narr_info['narrativeInfo']['ref']}])[0]
+            cells = narr_obj['data']['cells']
+            self.assertTrue(len(cells) > 0)
+            self.assertEqual(str(cells[0]['source']), str(intro_text))
+        finally:
+            new_ws_id = narr_info['workspaceInfo']['id']
             ws.delete_workspace({'id': new_ws_id})
 
     def test_copy_object(self):

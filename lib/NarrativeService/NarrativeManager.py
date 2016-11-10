@@ -31,6 +31,7 @@ class NarrativeManager:
         self.token = ctx["token"]
         self.user_id = ctx["user_id"]
         self.ws = Workspace(config['workspace-url'], token=self.token)
+        self.intro_md_file = config['intro-markdown-file']
 
     def list_objects_with_sets(self, ws_id=None, ws_name=None, workspaces=None,
                                types=None, include_metadata=0):
@@ -204,7 +205,8 @@ class NarrativeManager:
             self.ws.delete_workspace({'id': newWsId})
             raise # continue raising previous exception
 
-    def create_new_narrative(self, app, method, appparam, appData, markdown, copydata, importData):
+    def create_new_narrative(self, app, method, appparam, appData, markdown,
+                             copydata, importData, includeIntroCell):
         if app and method:
             raise ValueError("Must provide no more than one of the app or method params")
 
@@ -229,9 +231,18 @@ class NarrativeManager:
             cells = [{"method": method}]
         elif markdown:
             cells = [{"markdown": markdown}]
-        return self._create_temp_narrative(cells, appData, importData)
+        return self._create_temp_narrative(cells, appData, importData, includeIntroCell)
 
-    def _create_temp_narrative(self, cells, parameters, importData):
+    def _get_intro_markdown(self):
+        """
+        Creates and returns a cell with the introductory text included.
+        """
+        # Load introductory markdown text
+        with open(self.intro_md_file) as intro_file:
+            intro_md = intro_file.read()
+        return intro_md
+
+    def _create_temp_narrative(self, cells, parameters, importData, includeIntroCell):
         # Migration to python of JavaScript class from https://github.com/kbase/kbase-ui/blob/4d31151d13de0278765a69b2b09f3bcf0e832409/src/client/modules/plugins/narrativemanager/modules/narrativeManager.js#L414
         narr_id = int(round(time.time() * 1000))
         workspaceName = self.user_id + ':' + str(narr_id)
@@ -241,7 +252,7 @@ class NarrativeManager:
         ws_info = ws.create_workspace({'workspace': workspaceName, 'description': ''})
         newWorkspaceInfo = ServiceUtils.workspaceInfoToObject(ws_info)
         [narrativeObject, metadataExternal] = self._fetchNarrativeObjects(workspaceName, cells,
-                                                                         parameters)
+                                                                         parameters, includeIntroCell)
         objectInfo = ws.save_objects({'workspace': workspaceName,
                                       'objects': [{'type': 'KBaseNarrative.Narrative',
                                                    'data': narrativeObject,
@@ -255,7 +266,7 @@ class NarrativeManager:
         self._completeNewNarrative(newWorkspaceInfo['id'], objectInfo['id'], importData)
         return {'workspaceInfo': newWorkspaceInfo, 'narrativeInfo': objectInfo}
 
-    def _fetchNarrativeObjects(self, workspaceName, cells, parameters):
+    def _fetchNarrativeObjects(self, workspaceName, cells, parameters, includeIntroCell):
         if not cells:
             cells = []
         # fetchSpecs
@@ -289,7 +300,7 @@ class NarrativeManager:
                     'type': 'KBaseNarrative.Narrative',
                     'description': '',
                     'data_dependencies': []}
-        cellData = self._gatherCellData(cells, specMapping, parameters)
+        cellData = self._gatherCellData(cells, specMapping, parameters, includeIntroCell)
         narrativeObject = {'nbformat_minor': 0,
                            'cells': cellData,
                            'metadata': metadata,
@@ -303,8 +314,14 @@ class NarrativeManager:
                 metadataExternal[key] = json.dumps(value)
         return [narrativeObject, metadataExternal]
 
-    def _gatherCellData(self, cells, specMapping, parameters):
+    def _gatherCellData(self, cells, specMapping, parameters, includeIntroCell):
         cell_data = []
+        if includeIntroCell == 1:
+            cell_data.append({
+                'cell_type': 'markdown',
+                'source': self._get_intro_markdown(),
+                'metadata': {}
+            })
         for cell_pos, cell in enumerate(cells):
             if 'app' in cell:
                 cell_data.append(self._buildAppCell(len(cell_data),
@@ -314,7 +331,7 @@ class NarrativeManager:
                 cell_data.append(self._buildMethodCell(len(cell_data),
                                                       specMapping['methods'][cell['method']],
                                                       parameters))
-            elif 'merkdown' in cell:
+            elif 'markdown' in cell:
                 cell_data.append({'cell_type': 'markdown', 'source': cell['markdown'],
                                   'metadata': {}})
             else:

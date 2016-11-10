@@ -22,7 +22,7 @@ class NarrativeService:
     ######################################### noqa
     VERSION = "0.0.1"
     GIT_URL = "https://github.com/briehl/NarrativeService"
-    GIT_COMMIT_HASH = "c76438458ba4d47b8f7caf702ce75c23bf67006e"
+    GIT_COMMIT_HASH = "4160c20f06ad13594b303bed870832ec5603c5dc"
 
     #BEGIN_CLASS_HEADER
     def _nm(self, ctx):
@@ -167,13 +167,15 @@ class NarrativeService:
            to appparam) markdown - markdown text for cell of 'markdown' type
            (optional) copydata - packed inport data in format "import(;...)*"
            (alternative to importData) importData - import data in unpacked
-           form (alternative to copydata)) -> structure: parameter "app" of
-           String, parameter "method" of String, parameter "appparam" of
-           String, parameter "appData" of list of type "AppParam" -> tuple of
-           size 3: parameter "step_pos" of Long, parameter "key" of String,
-           parameter "value" of String, parameter "markdown" of String,
-           parameter "copydata" of String, parameter "importData" of list of
-           String
+           form (alternative to copydata) includeIntroCell - if 1, adds an
+           introductory markdown cell at the top (optional, default 0)) ->
+           structure: parameter "app" of String, parameter "method" of
+           String, parameter "appparam" of String, parameter "appData" of
+           list of type "AppParam" -> tuple of size 3: parameter "step_pos"
+           of Long, parameter "key" of String, parameter "value" of String,
+           parameter "markdown" of String, parameter "copydata" of String,
+           parameter "importData" of list of String, parameter
+           "includeIntroCell" of type "boolean" (@range [0,1])
         :returns: instance of type "CreateNewNarrativeOutput" -> structure:
            parameter "workspaceInfo" of type "WorkspaceInfo" (Restructured
            workspace info 'wsInfo' tuple: id: wsInfo[0], name: wsInfo[1],
@@ -198,14 +200,14 @@ class NarrativeService:
            "lockstat" of type "lock_status" (The lock status of a workspace.
            One of 'unlocked', 'locked', or 'published'.), parameter
            "metadata" of mapping from String to String, parameter "modDateMs"
-           of Long, parameter "objectInfo" of type "ObjectInfo" (Restructured
-           workspace object info 'data' tuple: id: data[0], name: data[1],
-           type: data[2], save_date: data[3], version: data[4], saved_by:
-           data[5], wsid: data[6], ws: data[7], checksum: data[8], size:
-           data[9], metadata: data[10], ref: data[6] + '/' + data[0] + '/' +
-           data[4], obj_id: 'ws.' + data[6] + '.obj.' + data[0], typeModule:
-           type[0], typeName: type[1], typeMajorVersion: type[2],
-           typeMinorVersion: type[3], saveDateMs:
+           of Long, parameter "narrativeInfo" of type "ObjectInfo"
+           (Restructured workspace object info 'data' tuple: id: data[0],
+           name: data[1], type: data[2], save_date: data[3], version:
+           data[4], saved_by: data[5], wsid: data[6], ws: data[7], checksum:
+           data[8], size: data[9], metadata: data[10], ref: data[6] + '/' +
+           data[0] + '/' + data[4], obj_id: 'ws.' + data[6] + '.obj.' +
+           data[0], typeModule: type[0], typeName: type[1], typeMajorVersion:
+           type[2], typeMinorVersion: type[3], saveDateMs:
            ServiceUtils.iso8601ToMillisSinceEpoch(data[3])) -> structure:
            parameter "id" of Long, parameter "name" of String, parameter
            "type" of String, parameter "save_date" of String, parameter
@@ -228,8 +230,9 @@ class NarrativeService:
         markdown = params.get('markdown')
         copydata = params.get('copydata')
         importData = params.get('importData')
+        includeIntroCell = params.get('includeIntroCell', 0)
         returnVal = self._nm(ctx).create_new_narrative(app, method, appparam, appData, markdown,
-                                                       copydata, importData)
+                                                       copydata, importData, includeIntroCell)
         #END create_new_narrative
 
         # At some point might do deeper type checking...
