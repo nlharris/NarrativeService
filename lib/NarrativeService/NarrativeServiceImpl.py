@@ -21,8 +21,8 @@ class NarrativeService:
     # the latter method is running.
     ######################################### noqa
     VERSION = "0.0.1"
-    GIT_URL = "https://github.com/rsutormin/NarrativeService"
-    GIT_COMMIT_HASH = "0110cc90874816c5fb6a1e8027fc97afa9d744e2"
+    GIT_URL = "https://github.com/briehl/NarrativeService"
+    GIT_COMMIT_HASH = "c76438458ba4d47b8f7caf702ce75c23bf67006e"
 
     #BEGIN_CLASS_HEADER
     def _nm(self, ctx):
@@ -37,11 +37,11 @@ class NarrativeService:
         self.workspaceURL = config['workspace-url']
         self.serviceWizardURL = config['service-wizard']
         self.narrativeMethodStoreURL = config['narrative-method-store']
-        self.setAPICache = DynamicServiceCache(self.serviceWizardURL, 
-                                               config['setapi-version'], 
+        self.setAPICache = DynamicServiceCache(self.serviceWizardURL,
+                                               config['setapi-version'],
                                                'SetAPI')
-        self.dataPaletteCache = DynamicServiceCache(self.serviceWizardURL, 
-                                                    config['datapaletteservice-version'], 
+        self.dataPaletteCache = DynamicServiceCache(self.serviceWizardURL,
+                                                    config['datapaletteservice-version'],
                                                     'DataPaletteService')
         #END_CONSTRUCTOR
         pass
@@ -53,9 +53,12 @@ class NarrativeService:
            (ws_name/ws_id/workspaces - alternative way of defining workspaces
            (in case of 'workspaces' each string could be workspace name or ID
            converted into string). types - optional filter field, limiting
-           output list to set of types.) -> structure: parameter "ws_name" of
-           String, parameter "ws_id" of Long, parameter "workspaces" of list
-           of String, parameter "types" of list of String
+           output list to set of types. includeMetadata - if 1, includes
+           object metadata, if 0, does not. Default 0.) -> structure:
+           parameter "ws_name" of String, parameter "ws_id" of Long,
+           parameter "workspaces" of list of String, parameter "types" of
+           list of String, parameter "includeMetadata" of type "boolean"
+           (@range [0,1])
         :returns: instance of type "ListObjectsWithSetsOutput" -> structure:
            parameter "data" of list of type "ListItem" (object_info -
            workspace info for object (including set object), set_items -
@@ -114,8 +117,10 @@ class NarrativeService:
         ws_name = params.get("ws_name")
         workspaces = params.get("workspaces")
         types = params.get("types")
+        include_metadata = params.get("includeMetadata", 0)
         returnVal = self._nm(ctx).list_objects_with_sets(ws_id=ws_id, ws_name=ws_name,
-                                                         workspaces=workspaces, types=types)
+                                                         workspaces=workspaces, types=types,
+                                                         include_metadata=include_metadata)
         #END list_objects_with_sets
 
         # At some point might do deeper type checking...
@@ -286,8 +291,9 @@ class NarrativeService:
         :param params: instance of type "ListAvailableTypesParams"
            (workspaces - list of items where each one is workspace name of
            textual ID.) -> structure: parameter "workspaces" of list of String
-        :returns: instance of type "ListAvailableTypesOutput" -> structure:
-           parameter "types" of list of String
+        :returns: instance of type "ListAvailableTypesOutput" (type_stat -
+           number of objects by type) -> structure: parameter "type_stat" of
+           mapping from String to Long
         """
         # ctx is the context object
         # return variables are: returnVal

@@ -14,7 +14,7 @@ import com.fasterxml.jackson.annotation.JsonPropertyOrder;
 /**
  * <p>Original spec-file type: CopyNarrativeParams</p>
  * <pre>
- * workspaceId - optional workspace ID, if not specified then 
+ * workspaceId - optional workspace ID, if not specified then
  *     property from workspaceRef object info is used.
  * </pre>
  * 
