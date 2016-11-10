@@ -19,6 +19,7 @@ import com.fasterxml.jackson.annotation.JsonPropertyOrder;
  *     case of 'workspaces' each string could be workspace name or ID
  *     converted into string).
  * types - optional filter field, limiting output list to set of types.
+ * includeMetadata - if 1, includes object metadata, if 0, does not. Default 0.
  * </pre>
  * 
  */
@@ -28,7 +29,8 @@ import com.fasterxml.jackson.annotation.JsonPropertyOrder;
     "ws_name",
     "ws_id",
     "workspaces",
-    "types"
+    "types",
+    "includeMetadata"
 })
 public class ListObjectsWithSetsParams {
 
@@ -40,6 +42,8 @@ public class ListObjectsWithSetsParams {
     private List<String> workspaces;
     @JsonProperty("types")
     private List<String> types;
+    @JsonProperty("includeMetadata")
+    private Long includeMetadata;
     private Map<java.lang.String, Object> additionalProperties = new HashMap<java.lang.String, Object>();
 
     @JsonProperty("ws_name")
@@ -102,6 +106,21 @@ public class ListObjectsWithSetsParams {
         return this;
     }
 
+    @JsonProperty("includeMetadata")
+    public Long getIncludeMetadata() {
+        return includeMetadata;
+    }
+
+    @JsonProperty("includeMetadata")
+    public void setIncludeMetadata(Long includeMetadata) {
+        this.includeMetadata = includeMetadata;
+    }
+
+    public ListObjectsWithSetsParams withIncludeMetadata(Long includeMetadata) {
+        this.includeMetadata = includeMetadata;
+        return this;
+    }
+
     @JsonAnyGetter
     public Map<java.lang.String, Object> getAdditionalProperties() {
         return this.additionalProperties;
@@ -114,7 +133,7 @@ public class ListObjectsWithSetsParams {
 
     @Override
     public java.lang.String toString() {
-        return ((((((((((("ListObjectsWithSetsParams"+" [wsName=")+ wsName)+", wsId=")+ wsId)+", workspaces=")+ workspaces)+", types=")+ types)+", additionalProperties=")+ additionalProperties)+"]");
+        return ((((((((((((("ListObjectsWithSetsParams"+" [wsName=")+ wsName)+", wsId=")+ wsId)+", workspaces=")+ workspaces)+", types=")+ types)+", includeMetadata=")+ includeMetadata)+", additionalProperties=")+ additionalProperties)+"]");
     }
 
 }

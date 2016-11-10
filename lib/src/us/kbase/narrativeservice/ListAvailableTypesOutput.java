@@ -2,7 +2,6 @@
 package us.kbase.narrativeservice;
 
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 import javax.annotation.Generated;
 import com.fasterxml.jackson.annotation.JsonAnyGetter;
@@ -14,32 +13,34 @@ import com.fasterxml.jackson.annotation.JsonPropertyOrder;
 
 /**
  * <p>Original spec-file type: ListAvailableTypesOutput</p>
- * 
+ * <pre>
+ * type_stat - number of objects by type
+ * </pre>
  * 
  */
 @JsonInclude(JsonInclude.Include.NON_NULL)
 @Generated("com.googlecode.jsonschema2pojo")
 @JsonPropertyOrder({
-    "types"
+    "type_stat"
 })
 public class ListAvailableTypesOutput {
 
-    @JsonProperty("types")
-    private List<String> types;
+    @JsonProperty("type_stat")
+    private Map<String, Long> typeStat;
     private Map<java.lang.String, Object> additionalProperties = new HashMap<java.lang.String, Object>();
 
-    @JsonProperty("types")
-    public List<String> getTypes() {
-        return types;
+    @JsonProperty("type_stat")
+    public Map<String, Long> getTypeStat() {
+        return typeStat;
     }
 
-    @JsonProperty("types")
-    public void setTypes(List<String> types) {
-        this.types = types;
+    @JsonProperty("type_stat")
+    public void setTypeStat(Map<String, Long> typeStat) {
+        this.typeStat = typeStat;
     }
 
-    public ListAvailableTypesOutput withTypes(List<String> types) {
-        this.types = types;
+    public ListAvailableTypesOutput withTypeStat(Map<String, Long> typeStat) {
+        this.typeStat = typeStat;
         return this;
     }
 
@@ -55,7 +56,7 @@ public class ListAvailableTypesOutput {
 
     @Override
     public java.lang.String toString() {
-        return ((((("ListAvailableTypesOutput"+" [types=")+ types)+", additionalProperties=")+ additionalProperties)+"]");
+        return ((((("ListAvailableTypesOutput"+" [typeStat=")+ typeStat)+", additionalProperties=")+ additionalProperties)+"]");
     }
 
 }

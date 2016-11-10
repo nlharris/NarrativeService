@@ -82,10 +82,10 @@ class NarrativeServiceTest(unittest.TestCase):
         reads_obj_ref = "KBaseExampleData/rhodobacter.art.q50.SE.reads"
         set_obj_name = "MyReadsSet.1"
         sapi = SetAPI(self.__class__.serviceWizardURL, token=self.getContext()['token'],
-                      service_ver = self.__class__.SetAPI_version)
+                      service_ver=self.__class__.SetAPI_version)
         sapi.save_reads_set_v1({'workspace': self.getWsName(), 'output_object_name': set_obj_name,
                                 'data': {'description': '', 'items': [{'ref': reads_obj_ref}]}})
-        ret = self.getImpl().list_objects_with_sets(self.getContext(), 
+        ret = self.getImpl().list_objects_with_sets(self.getContext(),
                                                     {"ws_name": self.getWsName()})[0]["data"]
         self.assertTrue(len(ret) > 0)
         set_count = 0
@@ -98,17 +98,41 @@ class NarrativeServiceTest(unittest.TestCase):
         self.assertEqual(1, set_count)
         ws_id = self.getWsClient().get_workspace_info({"workspace": self.getWsName()})[0]
         ret2 = self.getImpl().list_objects_with_sets(self.getContext(),
-                                                    {"ws_id": ws_id})[0]["data"]
+                                                     {"ws_id": ws_id})[0]["data"]
         self.assertEqual(len(ret), len(ret2))
         type_filter = "KBaseSets.ReadsSet"
         ret3 = self.getImpl().list_objects_with_sets(self.getContext(),
-                                                    {"types": [type_filter],
+                                                     {"types": [type_filter],
                                                      "workspaces": [str(ws_id)]})[0]["data"]
         self.assertTrue(len(ret3) > 0)
         for item in ret3:
             info = item['object_info']
             obj_type = info[2].split('-')[0]
             self.assertEqual(type_filter, obj_type)
+
+    def test_list_objects_meta(self):
+        ws_name = self.getWsName()
+        reads_obj_ref = "KBaseExampleData/rhodobacter.art.q50.SE.reads"
+        target_name = "TestReads"
+        self.getWsClient().copy_object({'from': {'ref': reads_obj_ref},
+                                        'to': {'workspace': ws_name,
+                                               'name': target_name}})
+
+        ret = self.getImpl().list_objects_with_sets(self.getContext(),
+                                                    {"ws_name": ws_name,
+                                                     "includeMetadata": 0})[0]["data"]
+        for item in ret:
+            if 'set_items' not in item and 'dp_info' not in item:
+                info = item.get("object_info", [])
+                self.assertIsNone(info[10])
+
+        ret = self.getImpl().list_objects_with_sets(self.getContext(),
+                                                    {"ws_name": ws_name,
+                                                     "includeMetadata": 1})[0]["data"]
+        for item in ret:
+            if 'set_items' not in item and 'dp_info' not in item:
+                info = item.get("object_info", [])
+                self.assertIsNotNone(info[10])
 
     def test_copy_narrative(self):
         ws = self.getWsClient()
@@ -120,20 +144,20 @@ class NarrativeServiceTest(unittest.TestCase):
         nar_obj_data['metadata']['ws_name'] = ws_name
         nar_obj_data['metadata']['kbase']['creator'] = user_id
         nar_obj_data['metadata']['kbase']['ws_name'] = ws_name
-        nar_obj_name = "Narrative." + str(int(round(time.time() * 1000))) 
+        nar_obj_name = "Narrative." + str(int(round(time.time() * 1000)))
         nar_obj_type = "KBaseNarrative.Narrative-4.0"
-        job_info = json.dumps({"queue_time": 0, "running": 0, "completed": 0, 
+        job_info = json.dumps({"queue_time": 0, "running": 0, "completed": 0,
                                "run_time": 0, "error": 0})
-        nar_obj_meta = {"description": "", 
-                        "format": "ipynb", 
-                        "creator": user_id, 
-                        "job_info": job_info, 
-                        "data_dependencies": "[]", 
-                        "jupyter.markdown": "1", 
-                        "ws_name": ws_name, 
-                        "type": "KBaseNarrative.Narrative", 
+        nar_obj_meta = {"description": "",
+                        "format": "ipynb",
+                        "creator": user_id,
+                        "job_info": job_info,
+                        "data_dependencies": "[]",
+                        "jupyter.markdown": "1",
+                        "ws_name": ws_name,
+                        "type": "KBaseNarrative.Narrative",
                         "name": "NarrativeCopyTest"}
-        ws.save_objects({'workspace': ws_name, 'objects': 
+        ws.save_objects({'workspace': ws_name, 'objects':
                          [{'type': nar_obj_type,
                            'data': nar_obj_data,
                            'name': nar_obj_name,
@@ -145,7 +169,7 @@ class NarrativeServiceTest(unittest.TestCase):
                                      'to': {'workspace': self.getWsName(),
                                             'name': target_reads_name}})
         copy_nar_name = "NarrativeCopyTest - Copy"
-        ret = self.getImpl().copy_narrative(self.getContext(), 
+        ret = self.getImpl().copy_narrative(self.getContext(),
                                             {'workspaceRef': ws_name + '/' + nar_obj_name,
                                              'newName': copy_nar_name})[0]
         copy_ws_id = ret['newWsId']
@@ -159,7 +183,7 @@ class NarrativeServiceTest(unittest.TestCase):
             # And here is proper new ws_name:
             self.assertNotEqual(ws_name, copy_nar_data['metadata']['ws_name'])
             self.assertEqual(copy_nar_name, copy_nar_data['metadata']['name'])
-            ret = self.getImpl().list_objects_with_sets(self.getContext(), 
+            ret = self.getImpl().list_objects_with_sets(self.getContext(),
                                                         {"ws_id": copy_ws_id})[0]["data"]
             dp_found = False
             for item in ret:
@@ -172,7 +196,7 @@ class NarrativeServiceTest(unittest.TestCase):
                     dp_found = True
                 else:
                     object_type = obj_info[2].split('-')[0]
-                    self.assertTrue(object_type != "KBaseFile.SingleEndLibrary", 
+                    self.assertTrue(object_type != "KBaseFile.SingleEndLibrary",
                                     "Unexpected type: " + object_type)
             self.assertTrue(dp_found)
         finally:
@@ -187,12 +211,12 @@ class NarrativeServiceTest(unittest.TestCase):
         self.getImpl().copy_object(self.getContext(), {'ref': reads_ref,
                                                        'target_ws_name': ws_name})
         copy_nar_name = "NarrativeCopyTest - Copy2"
-        ret = self.getImpl().copy_narrative(self.getContext(), 
+        ret = self.getImpl().copy_narrative(self.getContext(),
                                             {'workspaceRef': ws_name + '/' + nar_obj_name,
                                              'newName': copy_nar_name})[0]
         copy_ws_id = ret['newWsId']
         try:
-            ret = self.getImpl().list_objects_with_sets(self.getContext(), 
+            ret = self.getImpl().list_objects_with_sets(self.getContext(),
                                                         {"ws_id": copy_ws_id})[0]["data"]
             dp_found = False
             for item in ret:
@@ -210,7 +234,7 @@ class NarrativeServiceTest(unittest.TestCase):
     def test_create_new_narrative(self):
         import_ref = "KBaseExampleData/rhodobacter.art.q50.SE.reads"
         ws = self.getWsClient()
-        ret = self.getImpl().create_new_narrative(self.getContext(), 
+        ret = self.getImpl().create_new_narrative(self.getContext(),
                                                   {"method": "AssemblyUtil/import_assembly_fasta_ftp",
                                                    "appparam": "0,param1,value1;0,param2,value2",
                                                    "copydata": import_ref})[0]
@@ -224,11 +248,11 @@ class NarrativeServiceTest(unittest.TestCase):
         # Reads
         example_ws = "KBaseExampleData"
         import_ref = example_ws + "/rhodobacter.art.q50.SE.reads"
-        ret = self.getImpl().copy_object(self.getContext(), {'ref': import_ref, 
+        ret = self.getImpl().copy_object(self.getContext(), {'ref': import_ref,
                                                              'target_ws_name': self.getWsName()})
         self.assertEqual(example_ws, ret[0]['info']['ws'])
         # Let's check that we see reads copy in list_objects_with_sets
-        ret = self.getImpl().list_objects_with_sets(self.getContext(), 
+        ret = self.getImpl().list_objects_with_sets(self.getContext(),
                                                     {"ws_name": self.getWsName()})[0]["data"]
         found = False
         for item in ret:
@@ -240,7 +264,7 @@ class NarrativeServiceTest(unittest.TestCase):
         # Genome
         import_ref = example_ws + "/Rhodobacter_CACIA_14H1"
         target_name = "MyGenome.1"
-        ret = self.getImpl().copy_object(self.getContext(), {'ref': import_ref, 
+        ret = self.getImpl().copy_object(self.getContext(), {'ref': import_ref,
                                                              'target_ws_name': self.getWsName(),
                                                              'target_name': target_name})
         self.assertEqual(target_name, ret[0]['info']['name'])
@@ -256,7 +280,7 @@ class NarrativeServiceTest(unittest.TestCase):
         obj_count = 0
         while min_obj_id <= max_obj_count:
             max_obj_id = min_obj_id + 10000 - 1
-            part = self.getWsClient().list_objects({'workspaces': [ws_name], 
+            part = self.getWsClient().list_objects({'workspaces': [ws_name],
                                                     'minObjectID': min_obj_id,
                                                     'maxObjectID': max_obj_id})
             obj_count += len(part)

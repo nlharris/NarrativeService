@@ -127,6 +127,8 @@ ListObjectsWithSetsParams is a reference to a hash where the following keys are 
 	ws_id has a value which is an int
 	workspaces has a value which is a reference to a list where each element is a string
 	types has a value which is a reference to a list where each element is a string
+	includeMetadata has a value which is a NarrativeService.boolean
+boolean is an int
 ListObjectsWithSetsOutput is a reference to a hash where the following keys are defined:
 	data has a value which is a reference to a list where each element is a NarrativeService.ListItem
 ListItem is a reference to a hash where the following keys are defined:
@@ -163,6 +165,8 @@ ListObjectsWithSetsParams is a reference to a hash where the following keys are 
 	ws_id has a value which is an int
 	workspaces has a value which is a reference to a list where each element is a string
 	types has a value which is a reference to a list where each element is a string
+	includeMetadata has a value which is a NarrativeService.boolean
+boolean is an int
 ListObjectsWithSetsOutput is a reference to a hash where the following keys are defined:
 	data has a value which is a reference to a list where each element is a NarrativeService.ListItem
 ListItem is a reference to a hash where the following keys are defined:
@@ -669,7 +673,7 @@ $return is a NarrativeService.ListAvailableTypesOutput
 ListAvailableTypesParams is a reference to a hash where the following keys are defined:
 	workspaces has a value which is a reference to a list where each element is a string
 ListAvailableTypesOutput is a reference to a hash where the following keys are defined:
-	types has a value which is a reference to a list where each element is a string
+	type_stat has a value which is a reference to a hash where the key is a string and the value is an int
 
 </pre>
 
@@ -682,7 +686,7 @@ $return is a NarrativeService.ListAvailableTypesOutput
 ListAvailableTypesParams is a reference to a hash where the following keys are defined:
 	workspaces has a value which is a reference to a list where each element is a string
 ListAvailableTypesOutput is a reference to a hash where the following keys are defined:
-	types has a value which is a reference to a list where each element is a string
+	type_stat has a value which is a reference to a hash where the key is a string and the value is an int
 
 
 =end text
@@ -830,6 +834,37 @@ sub _validate_version {
 
 
 
+=head2 boolean
+
+=over 4
+
+
+
+=item Description
+
+@range [0,1]
+
+
+=item Definition
+
+=begin html
+
+<pre>
+an int
+</pre>
+
+=end html
+
+=begin text
+
+an int
+
+=end text
+
+=back
+
+
+
 =head2 timestamp
 
 =over 4
@@ -876,10 +911,10 @@ a string
 
 Represents the permissions a user or users have to a workspace:
 
-'a' - administrator. All operations allowed.
-'w' - read/write.
-'r' - read.
-'n' - no permissions.
+        'a' - administrator. All operations allowed.
+        'w' - read/write.
+        'r' - read.
+        'n' - no permissions.
 
 
 =item Definition
@@ -944,18 +979,18 @@ a string
 
 Information about an object, including user provided metadata.
 
-obj_id objid - the numerical id of the object.
-obj_name name - the name of the object.
-type_string type - the type of the object.
-timestamp save_date - the save date of the object.
-obj_ver ver - the version of the object.
-username saved_by - the user that saved or copied the object.
-ws_id wsid - the workspace containing the object.
-ws_name workspace - the workspace containing the object.
-string chsum - the md5 checksum of the object.
-int size - the size of the object in bytes.
-usermeta meta - arbitrary user-supplied metadata about
-    the object.
+        obj_id objid - the numerical id of the object.
+        obj_name name - the name of the object.
+        type_string type - the type of the object.
+        timestamp save_date - the save date of the object.
+        obj_ver ver - the version of the object.
+        username saved_by - the user that saved or copied the object.
+        ws_id wsid - the workspace containing the object.
+        ws_name workspace - the workspace containing the object.
+        string chsum - the md5 checksum of the object.
+        int size - the size of the object in bytes.
+        usermeta meta - arbitrary user-supplied metadata about
+            the object.
 
 
 =item Definition
@@ -1117,6 +1152,7 @@ ws_name/ws_id/workspaces - alternative way of defining workspaces (in
     case of 'workspaces' each string could be workspace name or ID
     converted into string).
 types - optional filter field, limiting output list to set of types.
+includeMetadata - if 1, includes object metadata, if 0, does not. Default 0.
 
 
 =item Definition
@@ -1129,6 +1165,7 @@ ws_name has a value which is a string
 ws_id has a value which is an int
 workspaces has a value which is a reference to a list where each element is a string
 types has a value which is a reference to a list where each element is a string
+includeMetadata has a value which is a NarrativeService.boolean
 
 </pre>
 
@@ -1141,6 +1178,7 @@ ws_name has a value which is a string
 ws_id has a value which is an int
 workspaces has a value which is a reference to a list where each element is a string
 types has a value which is a reference to a list where each element is a string
+includeMetadata has a value which is a NarrativeService.boolean
 
 
 =end text
@@ -1187,7 +1225,7 @@ data has a value which is a reference to a list where each element is a Narrativ
 
 =item Description
 
-workspaceId - optional workspace ID, if not specified then 
+workspaceId - optional workspace ID, if not specified then
     property from workspaceRef object info is used.
 
 
@@ -1641,13 +1679,18 @@ workspaces has a value which is a reference to a list where each element is a st
 
 
 
+=item Description
+
+type_stat - number of objects by type
+
+
 =item Definition
 
 =begin html
 
 <pre>
 a reference to a hash where the following keys are defined:
-types has a value which is a reference to a list where each element is a string
+type_stat has a value which is a reference to a hash where the key is a string and the value is an int
 
 </pre>
 
@@ -1656,7 +1699,7 @@ types has a value which is a reference to a list where each element is a string
 =begin text
 
 a reference to a hash where the following keys are defined:
-types has a value which is a reference to a list where each element is a string
+type_stat has a value which is a reference to a hash where the key is a string and the value is an int
 
 
 =end text
