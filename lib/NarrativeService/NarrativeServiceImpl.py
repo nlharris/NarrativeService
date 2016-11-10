@@ -22,7 +22,7 @@ class NarrativeService:
     ######################################### noqa
     VERSION = "0.0.1"
     GIT_URL = "https://github.com/briehl/NarrativeService"
-    GIT_COMMIT_HASH = "0cdfd5a9a5b84d41fdc05ecd22bae7ec551283ca"
+    GIT_COMMIT_HASH = "4160c20f06ad13594b303bed870832ec5603c5dc"
 
     #BEGIN_CLASS_HEADER
     def _nm(self, ctx):
