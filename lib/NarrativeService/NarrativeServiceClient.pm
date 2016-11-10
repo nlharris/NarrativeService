@@ -127,6 +127,8 @@ ListObjectsWithSetsParams is a reference to a hash where the following keys are 
 	ws_id has a value which is an int
 	workspaces has a value which is a reference to a list where each element is a string
 	types has a value which is a reference to a list where each element is a string
+	includeMetadata has a value which is a NarrativeService.boolean
+boolean is an int
 ListObjectsWithSetsOutput is a reference to a hash where the following keys are defined:
 	data has a value which is a reference to a list where each element is a NarrativeService.ListItem
 ListItem is a reference to a hash where the following keys are defined:
@@ -163,6 +165,8 @@ ListObjectsWithSetsParams is a reference to a hash where the following keys are 
 	ws_id has a value which is an int
 	workspaces has a value which is a reference to a list where each element is a string
 	types has a value which is a reference to a list where each element is a string
+	includeMetadata has a value which is a NarrativeService.boolean
+boolean is an int
 ListObjectsWithSetsOutput is a reference to a hash where the following keys are defined:
 	data has a value which is a reference to a list where each element is a NarrativeService.ListItem
 ListItem is a reference to a hash where the following keys are defined:
@@ -1152,6 +1156,7 @@ ws_name/ws_id/workspaces - alternative way of defining workspaces (in
     case of 'workspaces' each string could be workspace name or ID
     converted into string).
 types - optional filter field, limiting output list to set of types.
+includeMetadata - if 1, includes object metadata, if 0, does not. Default 0.
 
 
 =item Definition
@@ -1164,6 +1169,7 @@ ws_name has a value which is a string
 ws_id has a value which is an int
 workspaces has a value which is a reference to a list where each element is a string
 types has a value which is a reference to a list where each element is a string
+includeMetadata has a value which is a NarrativeService.boolean
 
 </pre>
 
@@ -1176,6 +1182,7 @@ ws_name has a value which is a string
 ws_id has a value which is an int
 workspaces has a value which is a reference to a list where each element is a string
 types has a value which is a reference to a list where each element is a string
+includeMetadata has a value which is a NarrativeService.boolean
 
 
 =end text

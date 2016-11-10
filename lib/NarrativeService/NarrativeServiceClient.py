@@ -39,9 +39,12 @@ class NarrativeService(object):
            (ws_name/ws_id/workspaces - alternative way of defining workspaces
            (in case of 'workspaces' each string could be workspace name or ID
            converted into string). types - optional filter field, limiting
-           output list to set of types.) -> structure: parameter "ws_name" of
-           String, parameter "ws_id" of Long, parameter "workspaces" of list
-           of String, parameter "types" of list of String
+           output list to set of types. includeMetadata - if 1, includes
+           object metadata, if 0, does not. Default 0.) -> structure:
+           parameter "ws_name" of String, parameter "ws_id" of Long,
+           parameter "workspaces" of list of String, parameter "types" of
+           list of String, parameter "includeMetadata" of type "boolean"
+           (@range [0,1])
         :returns: instance of type "ListObjectsWithSetsOutput" -> structure:
            parameter "data" of list of type "ListItem" (object_info -
            workspace info for object (including set object), set_items -

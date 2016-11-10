@@ -33,16 +33,16 @@ class NarrativeManager:
         self.ws = Workspace(config['workspace-url'], token=self.token)
         self.intro_md_file = config['intro-markdown-file']
 
-    def list_objects_with_sets(self, ws_id=None, ws_name=None, workspaces=None, types=None):
+    def list_objects_with_sets(self, ws_id=None, ws_name=None, workspaces=None,
+                               types=None, include_metadata=0):
         if not workspaces:
             if (not ws_id) and (not ws_name):
                 raise ValueError("One and only one of 'ws_id', 'ws_name', 'workspaces' " +
                                  "parameters should be set")
             workspaces = [self._get_workspace_name_or_id(ws_id, ws_name)]
-        return self._list_objects_with_sets(workspaces, types)
+        return self._list_objects_with_sets(workspaces, types, include_metadata)
 
-
-    def _list_objects_with_sets(self, workspaces, types):
+    def _list_objects_with_sets(self, workspaces, types, include_metadata):
         type_map = None
         if types is not None:
             type_map = {key: True for key in types}
@@ -95,7 +95,11 @@ class NarrativeManager:
         if self.DEBUG:
             print("NarrativeManager._list_objects_with_sets: loading workspace objects")
         t3 = time.time()
-        for info in WorkspaceListObjectsIterator(self.ws, ws_info_list=ws_info_list):
+        for info in WorkspaceListObjectsIterator(self.ws,
+                                                 ws_info_list=ws_info_list,
+                                                 list_objects_params={
+                                                    'includeMetadata': include_metadata
+                                                 }):
             item_ref = str(info[6]) + '/' + str(info[0]) + '/' + str(info[4])
             if item_ref not in processed_refs and self._check_info_type(info, type_map):
                 data.append({'object_info': info})

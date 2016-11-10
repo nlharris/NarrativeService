@@ -53,9 +53,12 @@ class NarrativeService:
            (ws_name/ws_id/workspaces - alternative way of defining workspaces
            (in case of 'workspaces' each string could be workspace name or ID
            converted into string). types - optional filter field, limiting
-           output list to set of types.) -> structure: parameter "ws_name" of
-           String, parameter "ws_id" of Long, parameter "workspaces" of list
-           of String, parameter "types" of list of String
+           output list to set of types. includeMetadata - if 1, includes
+           object metadata, if 0, does not. Default 0.) -> structure:
+           parameter "ws_name" of String, parameter "ws_id" of Long,
+           parameter "workspaces" of list of String, parameter "types" of
+           list of String, parameter "includeMetadata" of type "boolean"
+           (@range [0,1])
         :returns: instance of type "ListObjectsWithSetsOutput" -> structure:
            parameter "data" of list of type "ListItem" (object_info -
            workspace info for object (including set object), set_items -
@@ -114,8 +117,10 @@ class NarrativeService:
         ws_name = params.get("ws_name")
         workspaces = params.get("workspaces")
         types = params.get("types")
+        include_metadata = params.get("includeMetadata", 0)
         returnVal = self._nm(ctx).list_objects_with_sets(ws_id=ws_id, ws_name=ws_name,
-                                                         workspaces=workspaces, types=types)
+                                                         workspaces=workspaces, types=types,
+                                                         include_metadata=include_metadata)
         #END list_objects_with_sets
 
         # At some point might do deeper type checking...

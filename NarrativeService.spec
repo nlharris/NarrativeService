@@ -78,12 +78,14 @@ module NarrativeService {
             case of 'workspaces' each string could be workspace name or ID
             converted into string).
         types - optional filter field, limiting output list to set of types.
+        includeMetadata - if 1, includes object metadata, if 0, does not. Default 0.
     */
     typedef structure {
         string ws_name;
         int ws_id;
         list<string> workspaces;
         list<string> types;
+        boolean includeMetadata;
     } ListObjectsWithSetsParams;
 
     typedef structure {
