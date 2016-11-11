@@ -85,8 +85,9 @@ class NarrativeServiceTest(unittest.TestCase):
                       service_ver=self.__class__.SetAPI_version)
         sapi.save_reads_set_v1({'workspace': self.getWsName(), 'output_object_name': set_obj_name,
                                 'data': {'description': '', 'items': [{'ref': reads_obj_ref}]}})
-        ret = self.getImpl().list_objects_with_sets(self.getContext(),
-                                                    {"ws_name": self.getWsName()})[0]["data"]
+        list_ret = self.getImpl().list_objects_with_sets(self.getContext(),
+                                                         {"ws_name": self.getWsName()})[0]
+        ret = list_ret['data']
         self.assertTrue(len(ret) > 0)
         set_count = 0
         for item in ret:
@@ -96,6 +97,7 @@ class NarrativeServiceTest(unittest.TestCase):
                 set_items = item["set_items"]["set_items_info"]
                 self.assertEqual(1, len(set_items))
         self.assertEqual(1, set_count)
+        self.assertIn('data_palette_refs', list_ret)
         ws_id = self.getWsClient().get_workspace_info({"workspace": self.getWsName()})[0]
         ret2 = self.getImpl().list_objects_with_sets(self.getContext(),
                                                      {"ws_id": ws_id})[0]["data"]

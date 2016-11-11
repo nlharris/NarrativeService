@@ -88,8 +88,13 @@ module NarrativeService {
         boolean includeMetadata;
     } ListObjectsWithSetsParams;
 
+    /*
+        data_palette_refs - mapping from workspace Id to reference to DataPalette
+            container existing in given workspace.
+    */
     typedef structure {
         list<ListItem> data;
+        mapping<string ws_text_id, string ws_ref> data_palette_refs;
     } ListObjectsWithSetsOutput;
 
     funcdef list_objects_with_sets(ListObjectsWithSetsParams params)

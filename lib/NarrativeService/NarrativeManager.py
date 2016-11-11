@@ -52,12 +52,15 @@ class NarrativeManager:
         if self.DEBUG:
             print("NarrativeManager._list_objects_with_sets: processing sets")
         t1 = time.time()
-        set_ret = self.set_api_cache.call_method("list_sets", [{'workspaces': workspaces,
-                                                                'include_set_item_info': 1,
-                                                                'include_raw_data_palettes': 1}],
+        set_ret = self.set_api_cache.call_method("list_sets", 
+                                                 [{'workspaces': workspaces,
+                                                   'include_set_item_info': 1,
+                                                   'include_raw_data_palettes': 1,
+                                                   'include_metadata': include_metadata}],
                                                  self.token)
         sets = set_ret['sets']
         dp_data = set_ret.get('raw_data_palettes')
+        dp_refs = set_ret.get('raw_data_palette_refs')
         for set_info in sets:
             # Process
             target_set_items = []
@@ -110,17 +113,20 @@ class NarrativeManager:
         if self.DEBUG:
             print("NarrativeManager._list_objects_with_sets: processing DataPalettes")
         t5 = time.time()
-        if dp_data is None:
+        if dp_data is None or dp_refs is None:
             dps = self.dps_cache
-            dp_ret = dps.call_method("list_data", [{'workspaces': workspaces}], self.token)
+            dp_ret = dps.call_method("list_data", [{'workspaces': workspaces,
+                                                    'include_metadata': include_metadata}],
+                                     self.token)
             dp_data = dp_ret['data']
+            dp_refs = dp_ret['data_palette_refs']
         for item in dp_data:
             ref = item['ref']
             if ref not in processed_refs and self._check_info_type(item['info'], type_map):
                 data.append({'object_info': item['info'], 'dp_info': {}})
         if self.DEBUG:
             print("    (time=" + str(time.time() - t5) + ")")
-        return {"data": data}
+        return {"data": data, 'data_palette_refs': dp_refs}
 
     def _check_info_type(self, info, type_map):
         if type_map is None:
