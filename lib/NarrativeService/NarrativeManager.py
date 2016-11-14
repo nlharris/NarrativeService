@@ -67,9 +67,10 @@ class NarrativeManager:
             for set_item in set_info['items']:
                 target_set_items.append(set_item['info'])
             if self._check_info_type(set_info['info'], type_map):
-                data.append({'object_info': set_info['info'],
-                             'set_items': {'set_items_info': target_set_items}})
-            processed_refs[set_info['ref']] = True
+                data_item = {'object_info': set_info['info'],
+                             'set_items': {'set_items_info': target_set_items}}
+                data.append(data_item)
+            processed_refs[set_info['ref']] = data_item
         if self.DEBUG:
             print("    (time=" + str(time.time() - t1) + ")")
 
@@ -105,8 +106,9 @@ class NarrativeManager:
                                                  }):
             item_ref = str(info[6]) + '/' + str(info[0]) + '/' + str(info[4])
             if item_ref not in processed_refs and self._check_info_type(info, type_map):
-                data.append({'object_info': info})
-                processed_refs[item_ref] = True
+                data_item = {'object_info': info}
+                data.append(data_item)
+                processed_refs[item_ref] = data_item
         if self.DEBUG:
             print("    (time=" + str(time.time() - t3) + ")")
 
@@ -122,8 +124,18 @@ class NarrativeManager:
             dp_refs = dp_ret['data_palette_refs']
         for item in dp_data:
             ref = item['ref']
-            if ref not in processed_refs and self._check_info_type(item['info'], type_map):
-                data.append({'object_info': item['info'], 'dp_info': {}})
+            if self._check_info_type(item['info'], type_map):
+                data_item = None
+                if ref in processed_refs:
+                    data_item = processed_refs[ref]
+                else:
+                    data_item = {'object_info': item['info']}
+                    processed_refs[ref] = data_item
+                    data.append(data_item)
+                dp_info = {}
+                if 'dp_ref' in item:
+                    dp_info['ref'] = item['dp_ref']
+                data_item['dp_info'] = dp_info
         if self.DEBUG:
             print("    (time=" + str(time.time() - t5) + ")")
         return {"data": data, 'data_palette_refs': dp_refs}

@@ -21,8 +21,8 @@ class NarrativeService:
     # the latter method is running.
     ######################################### noqa
     VERSION = "0.0.1"
-    GIT_URL = "https://github.com/briehl/NarrativeService"
-    GIT_COMMIT_HASH = "4160c20f06ad13594b303bed870832ec5603c5dc"
+    GIT_URL = "https://github.com/rsutormin/NarrativeService"
+    GIT_COMMIT_HASH = "ab743b69fc730bbecd4d2ad06152f51b4f9bab67"
 
     #BEGIN_CLASS_HEADER
     def _nm(self, ctx):
@@ -59,7 +59,9 @@ class NarrativeService:
            parameter "workspaces" of list of String, parameter "types" of
            list of String, parameter "includeMetadata" of type "boolean"
            (@range [0,1])
-        :returns: instance of type "ListObjectsWithSetsOutput" -> structure:
+        :returns: instance of type "ListObjectsWithSetsOutput"
+           (data_palette_refs - mapping from workspace Id to reference to
+           DataPalette container existing in given workspace.) -> structure:
            parameter "data" of list of type "ListItem" (object_info -
            workspace info for object (including set object), set_items -
            optional property listing info for items of set object, dp_info -
@@ -107,8 +109,10 @@ class NarrativeService:
            String, parameter "wsid" of Long, parameter "workspace" of String,
            parameter "chsum" of String, parameter "size" of Long, parameter
            "meta" of mapping from String to String, parameter "dp_info" of
-           type "DataPaletteInfo" (This structure is reserved for future
-           use.) -> structure:
+           type "DataPaletteInfo" (ref - reference to DataPalette container
+           pointing to given object.) -> structure: parameter "ref" of
+           String, parameter "data_palette_refs" of mapping from String to
+           String
         """
         # ctx is the context object
         # return variables are: returnVal

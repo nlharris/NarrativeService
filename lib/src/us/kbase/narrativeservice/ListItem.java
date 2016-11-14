@@ -43,7 +43,7 @@ public class ListItem {
     /**
      * <p>Original spec-file type: DataPaletteInfo</p>
      * <pre>
-     * This structure is reserved for future use.
+     * ref - reference to DataPalette container pointing to given object.
      * </pre>
      * 
      */
@@ -94,7 +94,7 @@ public class ListItem {
     /**
      * <p>Original spec-file type: DataPaletteInfo</p>
      * <pre>
-     * This structure is reserved for future use.
+     * ref - reference to DataPalette container pointing to given object.
      * </pre>
      * 
      */
@@ -106,7 +106,7 @@ public class ListItem {
     /**
      * <p>Original spec-file type: DataPaletteInfo</p>
      * <pre>
-     * This structure is reserved for future use.
+     * ref - reference to DataPalette container pointing to given object.
      * </pre>
      * 
      */
