@@ -131,6 +131,7 @@ ListObjectsWithSetsParams is a reference to a hash where the following keys are 
 boolean is an int
 ListObjectsWithSetsOutput is a reference to a hash where the following keys are defined:
 	data has a value which is a reference to a list where each element is a NarrativeService.ListItem
+	data_palette_refs has a value which is a reference to a hash where the key is a string and the value is a string
 ListItem is a reference to a hash where the following keys are defined:
 	object_info has a value which is a NarrativeService.object_info
 	set_items has a value which is a NarrativeService.SetItems
@@ -150,7 +151,8 @@ object_info is a reference to a list containing 11 items:
 timestamp is a string
 SetItems is a reference to a hash where the following keys are defined:
 	set_items_info has a value which is a reference to a list where each element is a NarrativeService.object_info
-DataPaletteInfo is a reference to a hash where the following keys are defined
+DataPaletteInfo is a reference to a hash where the following keys are defined:
+	ref has a value which is a string
 
 </pre>
 
@@ -169,6 +171,7 @@ ListObjectsWithSetsParams is a reference to a hash where the following keys are 
 boolean is an int
 ListObjectsWithSetsOutput is a reference to a hash where the following keys are defined:
 	data has a value which is a reference to a list where each element is a NarrativeService.ListItem
+	data_palette_refs has a value which is a reference to a hash where the key is a string and the value is a string
 ListItem is a reference to a hash where the following keys are defined:
 	object_info has a value which is a NarrativeService.object_info
 	set_items has a value which is a NarrativeService.SetItems
@@ -188,7 +191,8 @@ object_info is a reference to a list containing 11 items:
 timestamp is a string
 SetItems is a reference to a hash where the following keys are defined:
 	set_items_info has a value which is a reference to a list where each element is a NarrativeService.object_info
-DataPaletteInfo is a reference to a hash where the following keys are defined
+DataPaletteInfo is a reference to a hash where the following keys are defined:
+	ref has a value which is a string
 
 
 =end text
@@ -1079,7 +1083,7 @@ set_items_info has a value which is a reference to a list where each element is 
 
 =item Description
 
-This structure is reserved for future use.
+ref - reference to DataPalette container pointing to given object.
 
 
 =item Definition
@@ -1087,14 +1091,18 @@ This structure is reserved for future use.
 =begin html
 
 <pre>
-a reference to a hash where the following keys are defined
+a reference to a hash where the following keys are defined:
+ref has a value which is a string
+
 </pre>
 
 =end html
 
 =begin text
 
-a reference to a hash where the following keys are defined
+a reference to a hash where the following keys are defined:
+ref has a value which is a string
+
 
 =end text
 
@@ -1197,6 +1205,12 @@ includeMetadata has a value which is a NarrativeService.boolean
 
 
 
+=item Description
+
+data_palette_refs - mapping from workspace Id to reference to DataPalette
+    container existing in given workspace.
+
+
 =item Definition
 
 =begin html
@@ -1204,6 +1218,7 @@ includeMetadata has a value which is a NarrativeService.boolean
 <pre>
 a reference to a hash where the following keys are defined:
 data has a value which is a reference to a list where each element is a NarrativeService.ListItem
+data_palette_refs has a value which is a reference to a hash where the key is a string and the value is a string
 
 </pre>
 
@@ -1213,6 +1228,7 @@ data has a value which is a reference to a list where each element is a Narrativ
 
 a reference to a hash where the following keys are defined:
 data has a value which is a reference to a list where each element is a NarrativeService.ListItem
+data_palette_refs has a value which is a reference to a hash where the key is a string and the value is a string
 
 
 =end text

@@ -45,7 +45,9 @@ class NarrativeService(object):
            parameter "workspaces" of list of String, parameter "types" of
            list of String, parameter "includeMetadata" of type "boolean"
            (@range [0,1])
-        :returns: instance of type "ListObjectsWithSetsOutput" -> structure:
+        :returns: instance of type "ListObjectsWithSetsOutput"
+           (data_palette_refs - mapping from workspace Id to reference to
+           DataPalette container existing in given workspace.) -> structure:
            parameter "data" of list of type "ListItem" (object_info -
            workspace info for object (including set object), set_items -
            optional property listing info for items of set object, dp_info -
@@ -93,8 +95,10 @@ class NarrativeService(object):
            String, parameter "wsid" of Long, parameter "workspace" of String,
            parameter "chsum" of String, parameter "size" of Long, parameter
            "meta" of mapping from String to String, parameter "dp_info" of
-           type "DataPaletteInfo" (This structure is reserved for future
-           use.) -> structure:
+           type "DataPaletteInfo" (ref - reference to DataPalette container
+           pointing to given object.) -> structure: parameter "ref" of
+           String, parameter "data_palette_refs" of mapping from String to
+           String
         """
         return self._client.call_method(
             'NarrativeService.list_objects_with_sets',

@@ -56,9 +56,10 @@ module NarrativeService {
     } SetItems;
 
     /*
-        This structure is reserved for future use.
+        ref - reference to DataPalette container pointing to given object.
     */
     typedef structure {
+        string ref;
     } DataPaletteInfo;
 
     /*
