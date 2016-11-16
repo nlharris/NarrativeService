@@ -323,9 +323,9 @@ class NarrativeServiceTest(unittest.TestCase):
         try:
             ids = []
             for ws_info in self.getWsClient().list_workspace_info({'perm': 'r', 'excludeGlobal': 1}):
-                ws_name_parts = ws_info[1].split(':')
-                if len(ws_name_parts) == 2 and ws_name_parts[1].isdigit():
-                    continue
+                #ws_name_parts = ws_info[1].split(':')
+                #if len(ws_name_parts) == 2 and ws_name_parts[1].isdigit():
+                #    continue
                 if ws_info[4] < 1000:
                     ids.append(str(ws_info[0]))
                     if len(ids) >= 100:
