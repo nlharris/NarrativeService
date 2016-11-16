@@ -148,7 +148,7 @@ class NarrativeManager:
 
     def copy_narrative(self, newName, workspaceRef, workspaceId):
         time_ms = int(round(time.time() * 1000))
-        newWsName = self.user_id + ':' + str(time_ms)
+        newWsName = self.user_id + ':narrative_' + str(time_ms)
         # add the 'narrative' field to newWsMeta later.
         newWsMeta = {"is_temporary": "false", "narrative_nice_name": newName}
 
@@ -263,7 +263,7 @@ class NarrativeManager:
     def _create_temp_narrative(self, cells, parameters, importData, includeIntroCell):
         # Migration to python of JavaScript class from https://github.com/kbase/kbase-ui/blob/4d31151d13de0278765a69b2b09f3bcf0e832409/src/client/modules/plugins/narrativemanager/modules/narrativeManager.js#L414
         narr_id = int(round(time.time() * 1000))
-        workspaceName = self.user_id + ':' + str(narr_id)
+        workspaceName = self.user_id + ':narrative_' + str(narr_id)
         narrativeName = "Narrative." + str(narr_id)
 
         ws = self.ws
