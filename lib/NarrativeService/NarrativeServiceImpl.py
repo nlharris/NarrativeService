@@ -22,7 +22,7 @@ class NarrativeService:
     ######################################### noqa
     VERSION = "0.0.1"
     GIT_URL = "https://github.com/rsutormin/NarrativeService"
-    GIT_COMMIT_HASH = "ab743b69fc730bbecd4d2ad06152f51b4f9bab67"
+    GIT_COMMIT_HASH = "90ed223afcf3a5aaa5b9970922433abe22945c2d"
 
     #BEGIN_CLASS_HEADER
     def _nm(self, ctx):
@@ -109,8 +109,10 @@ class NarrativeService:
            String, parameter "wsid" of Long, parameter "workspace" of String,
            parameter "chsum" of String, parameter "size" of Long, parameter
            "meta" of mapping from String to String, parameter "dp_info" of
-           type "DataPaletteInfo" (ref - reference to DataPalette container
-           pointing to given object.) -> structure: parameter "ref" of
+           type "DataPaletteInfo" (ref - reference to any DataPalette
+           container pointing to given object, refs - list of references to
+           all DataPalette containers pointing to given object.) ->
+           structure: parameter "ref" of String, parameter "refs" of list of
            String, parameter "data_palette_refs" of mapping from String to
            String
         """

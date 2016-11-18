@@ -135,6 +135,8 @@ class NarrativeManager:
                 dp_info = {}
                 if 'dp_ref' in item:
                     dp_info['ref'] = item['dp_ref']
+                if 'dp_refs' in item:
+                    dp_info['refs'] = item['dp_refs']
                 data_item['dp_info'] = dp_info
         if self.DEBUG:
             print("    (time=" + str(time.time() - t5) + ")")

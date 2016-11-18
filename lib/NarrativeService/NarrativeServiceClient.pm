@@ -153,6 +153,7 @@ SetItems is a reference to a hash where the following keys are defined:
 	set_items_info has a value which is a reference to a list where each element is a NarrativeService.object_info
 DataPaletteInfo is a reference to a hash where the following keys are defined:
 	ref has a value which is a string
+	refs has a value which is a reference to a list where each element is a string
 
 </pre>
 
@@ -193,6 +194,7 @@ SetItems is a reference to a hash where the following keys are defined:
 	set_items_info has a value which is a reference to a list where each element is a NarrativeService.object_info
 DataPaletteInfo is a reference to a hash where the following keys are defined:
 	ref has a value which is a string
+	refs has a value which is a reference to a list where each element is a string
 
 
 =end text
@@ -1083,7 +1085,9 @@ set_items_info has a value which is a reference to a list where each element is 
 
 =item Description
 
-ref - reference to DataPalette container pointing to given object.
+ref - reference to any DataPalette container pointing to given object,
+refs - list of references to all DataPalette containers pointing to 
+    given object.
 
 
 =item Definition
@@ -1093,6 +1097,7 @@ ref - reference to DataPalette container pointing to given object.
 <pre>
 a reference to a hash where the following keys are defined:
 ref has a value which is a string
+refs has a value which is a reference to a list where each element is a string
 
 </pre>
 
@@ -1102,6 +1107,7 @@ ref has a value which is a string
 
 a reference to a hash where the following keys are defined:
 ref has a value which is a string
+refs has a value which is a reference to a list where each element is a string
 
 
 =end text
