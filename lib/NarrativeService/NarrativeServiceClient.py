@@ -95,8 +95,10 @@ class NarrativeService(object):
            String, parameter "wsid" of Long, parameter "workspace" of String,
            parameter "chsum" of String, parameter "size" of Long, parameter
            "meta" of mapping from String to String, parameter "dp_info" of
-           type "DataPaletteInfo" (ref - reference to DataPalette container
-           pointing to given object.) -> structure: parameter "ref" of
+           type "DataPaletteInfo" (ref - reference to any DataPalette
+           container pointing to given object, refs - list of references to
+           all DataPalette containers pointing to given object.) ->
+           structure: parameter "ref" of String, parameter "refs" of list of
            String, parameter "data_palette_refs" of mapping from String to
            String
         """

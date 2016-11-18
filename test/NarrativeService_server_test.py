@@ -226,6 +226,7 @@ class NarrativeServiceTest(unittest.TestCase):
                 if obj_info[7] == reads_ws_name:
                     self.assertTrue('dp_info' in item)
                     self.assertTrue('ref' in item['dp_info'])
+                    self.assertTrue('refs' in item['dp_info'])
                     self.assertEqual(str(copy_ws_id), item['dp_info']['ref'].split('/')[0])
                     self.assertEqual(reads_obj_name, obj_info[1])
                     dp_found = True
