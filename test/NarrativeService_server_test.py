@@ -19,6 +19,8 @@ from NarrativeService.NarrativeServiceImpl import NarrativeService
 from NarrativeService.NarrativeServiceServer import MethodContext
 from SetAPI.SetAPIClient import SetAPI
 from NarrativeService.WorkspaceListObjectsIterator import WorkspaceListObjectsIterator
+from FakeObjectsForTests.FakeObjectsForTestsClient import FakeObjectsForTests
+from DataPaletteService.DataPaletteServiceClient import DataPaletteService
 
 
 class NarrativeServiceTest(unittest.TestCase):
@@ -51,23 +53,36 @@ class NarrativeServiceTest(unittest.TestCase):
         cls.wsClient = Workspace(cls.wsURL, token=token)
         cls.serviceImpl = NarrativeService(cls.cfg)
         cls.SetAPI_version = cls.cfg['setapi-version']
+        cls.DataPalette_version = cls.cfg['datapaletteservice-version']
         cls.intro_text_file = cls.cfg['intro-markdown-file']
 
     @classmethod
     def tearDownClass(cls):
-        if hasattr(cls, 'wsName'):
-            cls.wsClient.delete_workspace({'workspace': cls.wsName})
-            print('Test workspace was deleted')
+        if hasattr(cls, 'createdWorkspaces'):
+            for wsName in cls.createdWorkspaces:
+                cls.wsClient.delete_workspace({'workspace': wsName})
+                print('Test workspace was deleted')
 
     def getWsClient(self):
         return self.__class__.wsClient
 
-    def getWsName(self):
-        if hasattr(self.__class__, 'wsName'):
-            return self.__class__.wsName
+    def createWs(self):
         suffix = int(time.time() * 1000)
         wsName = "test_NarrativeService_" + str(suffix)
         self.getWsClient().create_workspace({'workspace': wsName})  # noqa
+        createdWorkspaces = None
+        if hasattr(self.__class__, 'createdWorkspaces'):
+            createdWorkspaces = self.__class__.createdWorkspaces
+        else:
+            createdWorkspaces = []
+            self.__class__.createdWorkspaces = createdWorkspaces
+        createdWorkspaces.append(wsName)
+        return wsName
+
+    def getWsName(self):
+        if hasattr(self.__class__, 'wsName'):
+            return self.__class__.wsName
+        wsName = self.createWs()
         self.__class__.wsName = wsName
         return wsName
 
@@ -319,6 +334,30 @@ class NarrativeServiceTest(unittest.TestCase):
                                                         {"workspaces": [ws_name]})[0]['type_stat']
         self.assertTrue("KBaseGenomes.Genome" in type_stat)
         self.assertTrue("KBaseFile.SingleEndLibrary" in type_stat)
+
+    def test_unique_items(self):
+        # Create original workspace with reads object + ReadsSet object
+        ws_name1 = self.createWs()
+        foft = FakeObjectsForTests(os.environ['SDK_CALLBACK_URL'])
+        reads_obj_name = "test.reads.1"
+        foft.create_fake_reads({'ws_name': ws_name1, 'obj_names': [reads_obj_name]})
+        reads_obj_ref = ws_name1 + '/' + reads_obj_name
+        set_obj_name = "test.reads_set.1"
+        sapi = SetAPI(self.__class__.serviceWizardURL, token=self.getContext()['token'],
+                      service_ver=self.__class__.SetAPI_version)
+        sapi.save_reads_set_v1({'workspace': ws_name1, 'output_object_name': set_obj_name,
+                                'data': {'description': '', 'items': [{'ref': reads_obj_ref}]}})
+        set_obj_ref = ws_name1 + '/' + set_obj_name
+        # Create workspace with DataPalette copy of Reads object and copy of ReadsSet
+        ws_name2 = self.createWs()
+        dps = DataPaletteService(self.__class__.serviceWizardURL, token=self.getContext()['token'],
+                                 service_ver=self.__class__.DataPalette_version)
+        dps.add_to_palette({'workspace': ws_name2, 'new_refs': [{'ref': reads_obj_ref},
+                                                                {'ref': set_obj_ref}]})
+        # Check if listing in both these workspaces at the same time gives unique items
+        ret = self.getImpl().list_objects_with_sets(self.getContext(),
+                                                    {"workspaces": [ws_name1, ws_name2]})[0]["data"]
+        self.assertEqual(2, len(ret))
 
     def test_bulk_list(self):
         try:
