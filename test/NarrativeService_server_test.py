@@ -94,14 +94,15 @@ class NarrativeServiceTest(unittest.TestCase):
 
     # NOTE: According to Python unittest naming rules test method names should start from 'test'. # noqa
     def test_list_object_with_sets(self):
+        ws_name1 = self.createWs()
         reads_obj_ref = "KBaseExampleData/rhodobacter.art.q50.SE.reads"
         set_obj_name = "MyReadsSet.1"
         sapi = SetAPI(self.__class__.serviceWizardURL, token=self.getContext()['token'],
                       service_ver=self.__class__.SetAPI_version)
-        sapi.save_reads_set_v1({'workspace': self.getWsName(), 'output_object_name': set_obj_name,
+        sapi.save_reads_set_v1({'workspace': ws_name1, 'output_object_name': set_obj_name,
                                 'data': {'description': '', 'items': [{'ref': reads_obj_ref}]}})
         list_ret = self.getImpl().list_objects_with_sets(self.getContext(),
-                                                         {"ws_name": self.getWsName()})[0]
+                                                         {"ws_name": ws_name1})[0]
         ret = list_ret['data']
         self.assertTrue(len(ret) > 0)
         set_count = 0
@@ -113,7 +114,7 @@ class NarrativeServiceTest(unittest.TestCase):
                 self.assertEqual(1, len(set_items))
         self.assertEqual(1, set_count)
         self.assertIn('data_palette_refs', list_ret)
-        ws_id = self.getWsClient().get_workspace_info({"workspace": self.getWsName()})[0]
+        ws_id = self.getWsClient().get_workspace_info({"workspace": ws_name1})[0]
         ret2 = self.getImpl().list_objects_with_sets(self.getContext(),
                                                      {"ws_id": ws_id})[0]["data"]
         self.assertEqual(len(ret), len(ret2))
@@ -126,6 +127,11 @@ class NarrativeServiceTest(unittest.TestCase):
             info = item['object_info']
             obj_type = info[2].split('-')[0]
             self.assertEqual(type_filter, obj_type)
+        type_filter = "KBaseGenomes.Genome"
+        ret4 = self.getImpl().list_objects_with_sets(self.getContext(),
+                                                     {"types": [type_filter],
+                                                     "workspaces": [str(ws_id)]})[0]["data"]
+        self.assertTrue(len(ret4) == 0)
 
     def test_list_objects_meta(self):
         ws_name = self.getWsName()
