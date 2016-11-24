@@ -70,7 +70,7 @@ class NarrativeManager:
                 data_item = {'object_info': set_info['info'],
                              'set_items': {'set_items_info': target_set_items}}
                 data.append(data_item)
-            processed_refs[set_info['ref']] = data_item
+                processed_refs[set_info['ref']] = data_item
         if self.DEBUG:
             print("    (time=" + str(time.time() - t1) + ")")
 
