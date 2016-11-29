@@ -55,35 +55,51 @@ class NarrativeServiceTest(unittest.TestCase):
         cls.SetAPI_version = cls.cfg['setapi-version']
         cls.DataPalette_version = cls.cfg['datapaletteservice-version']
         cls.intro_text_file = cls.cfg['intro-markdown-file']
+        cls.example_ws_name = cls.createWsStatic()
+        # Reads
+        cls.example_reads_name = "example_reads.1"
+        foft = FakeObjectsForTests(os.environ['SDK_CALLBACK_URL'])
+        info1 = foft.create_fake_reads({'ws_name': cls.example_ws_name, 
+                                        'obj_names': [cls.example_reads_name]})[0]
+        cls.example_reads_ref = str(info1[6]) + '/' + str(info1[0]) + '/' + str(info1[4])
+        # Genome
+        cls.example_genome_name = "example_genome.1"
+        foft = FakeObjectsForTests(os.environ['SDK_CALLBACK_URL'])
+        info2 = foft.create_fake_genomes({'ws_name': cls.example_ws_name, 
+                                          'obj_names': [cls.example_genome_name]})[0]
+        cls.example_genome_ref = str(info2[6]) + '/' + str(info2[0]) + '/' + str(info2[4])
+        # Other objects
+        foft.create_any_objects({'ws_name': cls.example_ws_name,
+                                 'obj_names': ['any_obj_' + str(i) for i in range(0, 30)]})
 
     @classmethod
     def tearDownClass(cls):
         if hasattr(cls, 'createdWorkspaces'):
             for wsName in cls.createdWorkspaces:
-                cls.wsClient.delete_workspace({'workspace': wsName})
-                print('Test workspace was deleted')
+                try:
+                    cls.wsClient.delete_workspace({'workspace': wsName})
+                    print('Test workspace was deleted')
+                except:
+                    print('Error deleting test workspace')
 
     def getWsClient(self):
         return self.__class__.wsClient
 
     def createWs(self):
+        return self.__class__.createWsStatic()
+        
+    @classmethod
+    def createWsStatic(cls):
         suffix = int(time.time() * 1000)
         wsName = "test_NarrativeService_" + str(suffix)
-        self.getWsClient().create_workspace({'workspace': wsName})  # noqa
+        cls.wsClient.create_workspace({'workspace': wsName})  # noqa
         createdWorkspaces = None
-        if hasattr(self.__class__, 'createdWorkspaces'):
-            createdWorkspaces = self.__class__.createdWorkspaces
+        if hasattr(cls, 'createdWorkspaces'):
+            createdWorkspaces = cls.createdWorkspaces
         else:
             createdWorkspaces = []
-            self.__class__.createdWorkspaces = createdWorkspaces
+            cls.createdWorkspaces = createdWorkspaces
         createdWorkspaces.append(wsName)
-        return wsName
-
-    def getWsName(self):
-        if hasattr(self.__class__, 'wsName'):
-            return self.__class__.wsName
-        wsName = self.createWs()
-        self.__class__.wsName = wsName
         return wsName
 
     def getImpl(self):
@@ -95,7 +111,7 @@ class NarrativeServiceTest(unittest.TestCase):
     # NOTE: According to Python unittest naming rules test method names should start from 'test'. # noqa
     def test_list_object_with_sets(self):
         ws_name1 = self.createWs()
-        reads_obj_ref = "KBaseExampleData/rhodobacter.art.q50.SE.reads"
+        reads_obj_ref = self.__class__.example_reads_ref
         set_obj_name = "MyReadsSet.1"
         sapi = SetAPI(self.__class__.serviceWizardURL, token=self.getContext()['token'],
                       service_ver=self.__class__.SetAPI_version)
@@ -134,8 +150,8 @@ class NarrativeServiceTest(unittest.TestCase):
         self.assertTrue(len(ret4) == 0)
 
     def test_list_objects_meta(self):
-        ws_name = self.getWsName()
-        reads_obj_ref = "KBaseExampleData/rhodobacter.art.q50.SE.reads"
+        ws_name = self.createWs()
+        reads_obj_ref = self.__class__.example_reads_ref
         target_name = "TestReads"
         self.getWsClient().copy_object({'from': {'ref': reads_obj_ref},
                                         'to': {'workspace': ws_name,
@@ -162,7 +178,7 @@ class NarrativeServiceTest(unittest.TestCase):
         with open("/kb/module/test/data/narrative1.json", "r") as f1:
             nar_obj_data = json.load(f1)
         user_id = self.getContext()['user_id']
-        ws_name = self.getWsName()
+        ws_name = self.createWs()
         nar_obj_data['metadata']['creator'] = user_id
         nar_obj_data['metadata']['ws_name'] = ws_name
         nar_obj_data['metadata']['kbase']['creator'] = user_id
@@ -186,10 +202,10 @@ class NarrativeServiceTest(unittest.TestCase):
                            'name': nar_obj_name,
                            'meta': nar_obj_meta}]})
         # Adding DP object:
-        reads_ref = "KBaseExampleData/rhodobacter.art.q50.SE.reads"
+        reads_ref = self.__class__.example_reads_ref
         target_reads_name = "MyReads.copy.1"
         reads_info = ws.copy_object({'from': {'ref': reads_ref},
-                                     'to': {'workspace': self.getWsName(),
+                                     'to': {'workspace': ws_name,
                                             'name': target_reads_name}})
         copy_nar_name = "NarrativeCopyTest - Copy"
         ret = self.getImpl().copy_narrative(self.getContext(),
@@ -211,7 +227,7 @@ class NarrativeServiceTest(unittest.TestCase):
             dp_found = False
             for item in ret:
                 obj_info = item["object_info"]
-                if obj_info[7] == self.getWsName():
+                if obj_info[7] == ws_name:
                     self.assertEqual(target_reads_name, obj_info[1])
                     self.assertTrue('dp_info' in item)
                     self.assertEqual(reads_info[6], obj_info[6])
@@ -227,8 +243,8 @@ class NarrativeServiceTest(unittest.TestCase):
             ws.delete_workspace({'id': copy_ws_id})
         #################################################################################
         # Now it's copy with refs in DataPalette
-        reads_ws_name = "KBaseExampleData"
-        reads_obj_name = "rhodobacter.art.q50.SE.reads"
+        reads_ws_name = self.__class__.example_ws_name
+        reads_obj_name = self.__class__.example_reads_name
         reads_ref = reads_ws_name + '/' + reads_obj_name
         # This reads object should appear in Narrative copy as well:
         self.getImpl().copy_object(self.getContext(), {'ref': reads_ref,
@@ -258,7 +274,7 @@ class NarrativeServiceTest(unittest.TestCase):
 
 
     def test_create_new_narrative(self):
-        import_ref = "KBaseExampleData/rhodobacter.art.q50.SE.reads"
+        import_ref = self.__class__.example_reads_ref
         ws = self.getWsClient()
         ret = self.getImpl().create_new_narrative(self.getContext(),
                                                   {"method": "AssemblyUtil/import_assembly_fasta_ftp",
@@ -288,14 +304,15 @@ class NarrativeServiceTest(unittest.TestCase):
 
     def test_copy_object(self):
         # Reads
-        example_ws = "KBaseExampleData"
-        import_ref = example_ws + "/rhodobacter.art.q50.SE.reads"
+        example_ws = self.__class__.example_ws_name
+        ws_name = self.createWs()
+        import_ref = self.__class__.example_reads_ref
         ret = self.getImpl().copy_object(self.getContext(), {'ref': import_ref,
-                                                             'target_ws_name': self.getWsName()})
+                                                             'target_ws_name': ws_name})
         self.assertEqual(example_ws, ret[0]['info']['ws'])
         # Let's check that we see reads copy in list_objects_with_sets
         ret = self.getImpl().list_objects_with_sets(self.getContext(),
-                                                    {"ws_name": self.getWsName()})[0]["data"]
+                                                    {"ws_name": ws_name})[0]["data"]
         found = False
         for item in ret:
             obj_info = item["object_info"]
@@ -304,17 +321,15 @@ class NarrativeServiceTest(unittest.TestCase):
                 found = True
         self.assertTrue(found)
         # Genome
-        import_ref = example_ws + "/Rhodobacter_CACIA_14H1"
+        import_ref = self.__class__.example_genome_ref
         target_name = "MyGenome.1"
         ret = self.getImpl().copy_object(self.getContext(), {'ref': import_ref,
-                                                             'target_ws_name': self.getWsName(),
+                                                             'target_ws_name': ws_name,
                                                              'target_name': target_name})
         self.assertEqual(target_name, ret[0]['info']['name'])
 
     def test_workspace_list_objects_iterator(self):
-        #ws_name = "KBasePublicGenomesV5"
-        #part_size = 10000
-        ws_name = "KBaseExampleData"
+        ws_name = self.__class__.example_ws_name
         part_size = 10
         ws_info = self.getWsClient().get_workspace_info({'workspace': ws_name})
         max_obj_count = ws_info[4]
@@ -335,7 +350,7 @@ class NarrativeServiceTest(unittest.TestCase):
         self.assertEqual(obj_count, obj_count2)
 
     def test_list_available_types(self):
-        ws_name = "KBaseExampleData"
+        ws_name = self.__class__.example_ws_name
         type_stat = self.getImpl().list_available_types(self.getContext(),
                                                         {"workspaces": [ws_name]})[0]['type_stat']
         self.assertTrue("KBaseGenomes.Genome" in type_stat)
