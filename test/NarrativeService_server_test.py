@@ -4,6 +4,7 @@ import os  # noqa: F401
 import json  # noqa: F401
 import time
 import requests
+import StringIO
 
 from os import environ
 from NarrativeService.NarrativeManager import NarrativeManager
@@ -50,12 +51,41 @@ class NarrativeServiceTest(unittest.TestCase):
             cls.cfg[nameval[0]] = nameval[1]
         cls.wsURL = cls.cfg['workspace-url']
         cls.serviceWizardURL = cls.cfg['service-wizard']
-        cls.wsClient = Workspace(cls.wsURL, token=token)
+        cls.wsClient1 = Workspace(cls.wsURL, token=token)
         cls.serviceImpl = NarrativeService(cls.cfg)
         cls.SetAPI_version = cls.cfg['setapi-version']
         cls.DataPalette_version = cls.cfg['datapaletteservice-version']
         cls.intro_text_file = cls.cfg['intro-markdown-file']
-        cls.example_ws_name = cls.createWsStatic()
+        # Second user
+        test_cfg_file = '/kb/module/work/test.cfg'
+        test_cfg_text = "[test]\n"
+        with open(test_cfg_file, "r") as f:
+            test_cfg_text += f.read()
+        config = ConfigParser()
+        config.readfp(StringIO.StringIO(test_cfg_text))
+        test_cfg_dict = dict(config.items("test"))
+        if ('test_user2' not in test_cfg_dict) or ('test_password2' not in test_cfg_dict):
+            raise ValueError("Configuration in <module>/test_local/test.cfg file should " +
+                             "include second user credentials ('test_user2', 'test_password2')")
+        user2 = test_cfg_dict['test_user2']
+        pwd2 = test_cfg_dict['test_password2']
+        token2 = requests.post(
+            'https://kbase.us/services/authorization/Sessions/Login',
+            data='user_id={}&password={}&fields=token'.format(user2, pwd2)).json()['token']
+        cls.ctx2 = MethodContext(None)
+        cls.ctx2.update({'token': token2,
+                         'user_id': user2,
+                         'provenance': [
+                            {'service': 'NarrativeService',
+                             'method': 'please_never_use_it_in_production',
+                             'method_params': []
+                             }],
+                         'authenticated': 1})
+        cls.wsClient2 = Workspace(cls.wsURL, token=token2)
+        cls.wsClients = [cls.wsClient1, cls.wsClient2]
+        cls.createdWorkspaces = [[], []]
+        # Example objects:
+        cls.example_ws_name = cls.createWsStatic(0)
         # Reads
         cls.example_reads_name = "example_reads.1"
         foft = FakeObjectsForTests(os.environ['SDK_CALLBACK_URL'])
@@ -71,35 +101,37 @@ class NarrativeServiceTest(unittest.TestCase):
         # Other objects
         foft.create_any_objects({'ws_name': cls.example_ws_name,
                                  'obj_names': ['any_obj_' + str(i) for i in range(0, 30)]})
+        
 
     @classmethod
     def tearDownClass(cls):
-        if hasattr(cls, 'createdWorkspaces'):
-            for wsName in cls.createdWorkspaces:
+        for user_pos in range(0, 2):
+            for wsName in cls.createdWorkspaces[user_pos]:
                 try:
-                    cls.wsClient.delete_workspace({'workspace': wsName})
+                    cls.wsClients[user_pos].delete_workspace({'workspace': wsName})
                     print('Test workspace was deleted')
                 except:
                     print('Error deleting test workspace')
 
+
     def getWsClient(self):
-        return self.__class__.wsClient
+        return self.__class__.wsClients[0]
+
+    def getWsClient2(self):
+        return self.__class__.wsClients[1]
 
     def createWs(self):
-        return self.__class__.createWsStatic()
-        
+        return self.__class__.createWsStatic(0)
+
+    def createWs2(self):
+        return self.__class__.createWsStatic(1)
+
     @classmethod
-    def createWsStatic(cls):
+    def createWsStatic(cls, user_pos):
         suffix = int(time.time() * 1000)
         wsName = "test_NarrativeService_" + str(suffix)
-        cls.wsClient.create_workspace({'workspace': wsName})  # noqa
-        createdWorkspaces = None
-        if hasattr(cls, 'createdWorkspaces'):
-            createdWorkspaces = cls.createdWorkspaces
-        else:
-            createdWorkspaces = []
-            cls.createdWorkspaces = createdWorkspaces
-        createdWorkspaces.append(wsName)
+        cls.wsClients[user_pos].create_workspace({'workspace': wsName})  # noqa
+        cls.createdWorkspaces[user_pos].append(wsName)
         return wsName
 
     def getImpl(self):
@@ -107,6 +139,9 @@ class NarrativeServiceTest(unittest.TestCase):
 
     def getContext(self):
         return self.__class__.ctx
+
+    def getContext2(self):
+        return self.__class__.ctx2
 
     # NOTE: According to Python unittest naming rules test method names should start from 'test'. # noqa
     def test_list_object_with_sets(self):
@@ -379,6 +414,30 @@ class NarrativeServiceTest(unittest.TestCase):
         ret = self.getImpl().list_objects_with_sets(self.getContext(),
                                                     {"workspaces": [ws_name1, ws_name2]})[0]["data"]
         self.assertEqual(2, len(ret))
+
+    def test_two_users_sharing(self):
+        dps2 = DataPaletteService(self.__class__.serviceWizardURL, token=self.getContext2()['token'],
+                                  service_ver=self.__class__.DataPalette_version)
+        # Let's share this workspace with user2
+        ws_name1 = self.createWs()
+        self.getWsClient().set_permissions({'workspace': ws_name1, 'new_permission': 'r',
+                                            'users': [self.getContext2()['user_id']]})
+        # Injecting reads object (real copy) into workspace1
+        orig_reads_obj_ref = self.__class__.example_reads_ref
+        target_name = "TestReads"
+        self.getWsClient().copy_object({'from': {'ref': orig_reads_obj_ref},
+                                        'to': {'workspace': ws_name1,
+                                               'name': target_name}})
+        copy_reads_obj_ref = ws_name1 + '/' + target_name
+        # Making DP-copy of reads object by user2
+        ws_name2 = self.createWs2()
+        dps2.add_to_palette({'workspace': ws_name2, 'new_refs': [{'ref': copy_reads_obj_ref}]})
+        ret = self.getImpl().list_objects_with_sets(self.getContext2(),
+                                                    {"ws_name": ws_name2,
+                                                     "includeMetadata": 0})[0]["data"]
+        self.assertEqual(1, len(ret))
+        item = ret[0]
+        self.assertTrue('dp_info' in item)
 
     def test_bulk_list(self):
         try:
