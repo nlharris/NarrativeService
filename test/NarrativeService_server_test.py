@@ -497,8 +497,6 @@ class NarrativeServiceTest(unittest.TestCase):
         set_obj_name = "MyReadsSet.1"
         sapi = SetAPI(self.__class__.serviceWizardURL, token=self.getContext2()['token'],
                       service_ver=self.__class__.SetAPI_version)
-        # Next SetAPI operation causes "Unable to parse version portion of object reference" 
-        # error thrown from WorkspaceService:
         sapi.save_reads_set_v1({'workspace': ws_name2, 'output_object_name': set_obj_name,
                                 'data': {'description': '', 'items': [{'ref': reads_ref_path}]}})
         # Let's check that we can list set and see reads object as set item
