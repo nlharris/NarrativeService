@@ -4,7 +4,9 @@ class DataPaletteTypes:
     
     _TYPES = {"KBaseSets.ReadsSet": {}, 
               "KBaseFile.PairedEndLibrary": {},
-              "KBaseFile.SingleEndLibrary": {}
+              "KBaseFile.SingleEndLibrary": {},
+              "KBaseAssembly.SingleEndLibrary": {},
+              "KBaseAssembly.PairedEndLibrary": {}
               }
     
     _KEYS = frozenset([key for key in _TYPES])
