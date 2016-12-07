@@ -182,19 +182,19 @@ class NarrativeManager:
         # clone the workspace EXCEPT for currentNarrative object + obejcts of DataPalette types:
         newWsId = self.ws.clone_workspace({'wsi': {'id': workspaceId}, 'workspace': newWsName,
                                            'meta': newWsMeta, 'exclude': excluded_list})[0]
-        if dp_detected:
-            self.dps_cache.call_method("copy_palette", [{'from_workspace': str(workspaceId),
-                                                         'to_workspace': str(newWsId)}],
-                                       self.token)
-        if len(add_to_palette_list) > 0:
-            # There are objects in source workspace that have type under DataPalette handling
-            # but these objects are physically stored in source workspace rather that saved
-            # in DataPalette object. So they weren't copied by "dps.copy_palette".
-            self.dps_cache.call_method("add_to_palette", [{'workspace': str(newWsId),
-                                                           'new_refs': add_to_palette_list}],
-                                       self.token)
-
         try:
+            if dp_detected:
+                self.dps_cache.call_method("copy_palette", [{'from_workspace': str(workspaceId),
+                                                             'to_workspace': str(newWsId)}],
+                                           self.token)
+            if len(add_to_palette_list) > 0:
+                # There are objects in source workspace that have type under DataPalette handling
+                # but these objects are physically stored in source workspace rather that saved
+                # in DataPalette object. So they weren't copied by "dps.copy_palette".
+                self.dps_cache.call_method("add_to_palette", [{'workspace': str(newWsId),
+                                                               'new_refs': add_to_palette_list}],
+                                           self.token)
+
             # update the ref inside the narrative object and the new workspace metadata.
             newNarMetadata = currentNarrative['info'][10]
             newNarMetadata['name'] = newName

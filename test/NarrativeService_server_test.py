@@ -308,6 +308,87 @@ class NarrativeServiceTest(unittest.TestCase):
             ws.delete_workspace({'id': copy_ws_id})
 
 
+    def test_copy_narrative_two_users(self):
+        # Create workspace with Reads object for user1
+        ws_name1 = self.createWs()
+        orig_reads_ref = self.__class__.example_reads_ref
+        target_reads_name = "MyReads.copy.1"
+        ws1 = self.getWsClient()
+        reads_info = ws1.copy_object({'from': {'ref': orig_reads_ref},
+                                      'to': {'workspace': ws_name1,
+                                             'name': target_reads_name}})
+        # Share this workspace with user2 so that user2 can make DataPalette ref
+        ws1.set_permissions({'workspace': ws_name1, 'new_permission': 'r',
+                             'users': [self.getContext2()['user_id']]})
+        reads_ref = str(reads_info[6]) + '/' + str(reads_info[0]) + '/' + str(reads_info[4])
+        
+        # Create workspace with Narrative for user2
+        ws2 = self.getWsClient2()
+        with open("/kb/module/test/data/narrative1.json", "r") as f1:
+            nar_obj_data = json.load(f1)
+        user_id = self.getContext2()['user_id']
+        ws_name2 = self.createWs2()
+        nar_obj_data['metadata']['creator'] = user_id
+        nar_obj_data['metadata']['ws_name'] = ws_name2
+        nar_obj_data['metadata']['kbase']['creator'] = user_id
+        nar_obj_data['metadata']['kbase']['ws_name'] = ws_name2
+        nar_obj_name = "Narrative." + str(int(round(time.time() * 1000)))
+        nar_obj_type = "KBaseNarrative.Narrative-4.0"
+        job_info = json.dumps({"queue_time": 0, "running": 0, "completed": 0,
+                               "run_time": 0, "error": 0})
+        nar_obj_meta = {"description": "",
+                        "format": "ipynb",
+                        "creator": user_id,
+                        "job_info": job_info,
+                        "data_dependencies": "[]",
+                        "jupyter.markdown": "1",
+                        "ws_name": ws_name2,
+                        "type": "KBaseNarrative.Narrative",
+                        "name": "NarrativeCopyTest"}
+        ws2.save_objects({'workspace': ws_name2, 'objects':
+                         [{'type': nar_obj_type,
+                           'data': nar_obj_data,
+                           'name': nar_obj_name,
+                           'meta': nar_obj_meta}]})
+        # Adding DP object:
+        dps = DataPaletteService(self.__class__.serviceWizardURL, 
+                                  token=self.getContext2()['token'],
+                                  service_ver=self.__class__.DataPalette_version)
+        dps.add_to_palette({'workspace': ws_name2, 'new_refs': [{'ref': reads_ref}]})
+        target_reads_name2 = "MyReads.copy.2"
+        ws2.copy_object({'from': {'ref': reads_ref},
+                         'to': {'workspace': ws_name2,
+                                'name': target_reads_name2}})
+
+        #Un-share ws_name1 with user2
+        ws1.set_permissions({'workspace': ws_name1, 'new_permission': 'n',
+                             'users': [self.getContext2()['user_id']]})
+        try:
+            self.getWsClient2().get_object_info_new({'objects': [{'ref': reads_ref}]})
+            raise ValueError("We shouldn't be able to access reads object")
+        except Exception, e:
+            self.assertTrue("cannot be accessed" in str(e))
+
+        # Copy
+        copy_nar_name = "NarrativeCopyTest - Copy"
+        ret = self.getImpl().copy_narrative(self.getContext2(),
+                                            {'workspaceRef': ws_name2 + '/' + nar_obj_name,
+                                             'newName': copy_nar_name})[0]
+        copy_ws_id = ret['newWsId']
+        try:
+            ret = self.getImpl().list_objects_with_sets(self.getContext2(),
+                                                        {"ws_name": str(copy_ws_id)})[0]["data"]
+            found = False
+            for item in ret:
+                info = item['object_info']
+                if info[1] == target_reads_name and info[7] == ws_name1:
+                    found = True
+            self.assertTrue(found)
+        finally:
+            # Cleaning up new created workspace
+            ws2.delete_workspace({'id': copy_ws_id})
+
+
     def test_create_new_narrative(self):
         import_ref = self.__class__.example_reads_ref
         ws = self.getWsClient()
@@ -362,6 +443,36 @@ class NarrativeServiceTest(unittest.TestCase):
                                                              'target_ws_name': ws_name,
                                                              'target_name': target_name})
         self.assertEqual(target_name, ret[0]['info']['name'])
+
+
+    def test_copy_object_two_users(self):
+        ws_name1 = self.createWs()
+        orig_reads_ref = self.__class__.example_reads_ref
+        # Adding DP object:
+        dps1 = DataPaletteService(self.__class__.serviceWizardURL, 
+                                  token=self.getContext()['token'],
+                                  service_ver=self.__class__.DataPalette_version)
+        dps1.add_to_palette({'workspace': ws_name1, 'new_refs': [{'ref': orig_reads_ref}]})
+        # Share this workspace with user2 so that user2 can make DataPalette ref
+        ws1 = self.getWsClient()
+        ws1.set_permissions({'workspace': ws_name1, 'new_permission': 'r',
+                             'users': [self.getContext2()['user_id']]})
+        # Get ref-path to reads object
+        ret = self.getImpl().list_objects_with_sets(self.getContext(),
+                                                    {"ws_name": ws_name1})[0]['data']
+        reads_ref_path = None
+        for item in ret:
+            if 'dp_info' in item:
+                info = item['object_info']
+                reads_ref_path = (item['dp_info']['ref'] + ';' + 
+                                  str(info[6]) + '/' + str(info[0]) + '/' + str(info[4]))
+        # Adding Reads to DP of second user
+        ws_name2 = self.createWs2()
+        dps2 = DataPaletteService(self.__class__.serviceWizardURL, 
+                                  token=self.getContext2()['token'],
+                                  service_ver=self.__class__.DataPalette_version)
+        dps2.add_to_palette({'workspace': ws_name2, 'new_refs': [{'ref': reads_ref_path}]})
+
 
     def test_workspace_list_objects_iterator(self):
         ws_name = self.__class__.example_ws_name
