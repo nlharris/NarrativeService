@@ -7,7 +7,7 @@ MAINTAINER KBase Developer
 
 RUN apt-get update
 RUN apt-get install -y python-coverage
-RUN pip install --upgrade ndg-httpsclient
+RUN pip install ndg-httpsclient==0.4.2
 # -----------------------------------------
 
 COPY ./ /kb/module
