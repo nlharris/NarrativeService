@@ -1,9 +1,8 @@
-![KBase Logo](/images/kbase-logo-web.png)
 ## Welcome to KBase's Narrative Interface!
 
 **What's a Narrative?** Narratives are shareable, reproducible workflows that can include data, analysis steps, results, visualizations and commentary. [Learn more...]({{config.resources.docSite.base.url}}/narrative-guide)
 
-**Take the Tour:** Choose "Narrative Tour" from "hamburger" menu (three small horizontal lines) on the top left. This new feature walks you through the user interface, pointing out various useful aspects of it.
+**Take the Tour:** Choose "Narrative Tour" from the "Help" menu above. The tour walks you through the user interface, pointing out various useful aspects of it.
 
 **Get Some Data:** Click the Add Data button in the Data Panel to search KBase data or upload your own. Mouse over a data object to add it to your Narrative. [Learn more...]({{config.resources.docSite.base.url}}/narrative-guide/explore-data)
 
@@ -13,6 +12,6 @@
 
 **Find Documentation and Help:** For more information, please see the [Narrative Interface User Guide]({{config.resources.docSite.base.url}}/narrative-guide) or the [tutorials]({{config.resources.docSite.base.url}}/tutorials).
 
-**Questions?** [Contact us]({{config.resources.docSite.base.url}}/contact-us)!
+**Questions? Bug reports?** [Contact us]({{config.resources.docSite.base.url}}/contact-us)!
 
-Ready to begin adding to your Narrative? You can keep this Welcome cell or delete it by selecting "Delete cell" from the "..." menu in the top right corner of this cell.
+> Ready to begin adding to your Narrative? You can keep this Welcome cell or delete it by selecting "Delete cell" from the "..." menu in the top right corner of this cell.
