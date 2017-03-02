@@ -22,6 +22,7 @@ from SetAPI.SetAPIClient import SetAPI
 from NarrativeService.WorkspaceListObjectsIterator import WorkspaceListObjectsIterator
 from FakeObjectsForTests.FakeObjectsForTestsClient import FakeObjectsForTests
 from DataPaletteService.DataPaletteServiceClient import DataPaletteService
+from DataPaletteService.authclient import KBaseAuth as _KBaseAuth
 
 
 class NarrativeServiceTest(unittest.TestCase):
@@ -29,9 +30,16 @@ class NarrativeServiceTest(unittest.TestCase):
     @classmethod
     def setUpClass(cls):
         token = environ.get('KB_AUTH_TOKEN', None)
-        user_id = requests.post(
-            'https://kbase.us/services/authorization/Sessions/Login',
-            data='token={}&fields=user_id'.format(token)).json()['user_id']
+        config_file = environ.get('KB_DEPLOYMENT_CONFIG', None)
+        cls.cfg = {}
+        config = ConfigParser()
+        config.read(config_file)
+        for nameval in config.items('NarrativeService'):
+            cls.cfg[nameval[0]] = nameval[1]
+        authServiceUrl = cls.cfg.get('auth-service-url',
+                "https://kbase.us/services/authorization/Sessions/Login")
+        auth_client = _KBaseAuth(authServiceUrl)
+        user_id = auth_client.get_user(token)
         # WARNING: don't call any logging methods on the context object,
         # it'll result in a NoneType error
         cls.ctx = MethodContext(None)
@@ -43,12 +51,6 @@ class NarrativeServiceTest(unittest.TestCase):
                              'method_params': []
                              }],
                         'authenticated': 1})
-        config_file = environ.get('KB_DEPLOYMENT_CONFIG', None)
-        cls.cfg = {}
-        config = ConfigParser()
-        config.read(config_file)
-        for nameval in config.items('NarrativeService'):
-            cls.cfg[nameval[0]] = nameval[1]
         cls.wsURL = cls.cfg['workspace-url']
         cls.serviceWizardURL = cls.cfg['service-wizard']
         cls.wsClient1 = Workspace(cls.wsURL, token=token)
@@ -64,14 +66,12 @@ class NarrativeServiceTest(unittest.TestCase):
         config = ConfigParser()
         config.readfp(StringIO.StringIO(test_cfg_text))
         test_cfg_dict = dict(config.items("test"))
-        if ('test_user2' not in test_cfg_dict) or ('test_password2' not in test_cfg_dict):
+        if 'test_token2' not in test_cfg_dict:
             raise ValueError("Configuration in <module>/test_local/test.cfg file should " +
-                             "include second user credentials ('test_user2', 'test_password2')")
-        user2 = test_cfg_dict['test_user2']
-        pwd2 = test_cfg_dict['test_password2']
-        token2 = requests.post(
-            'https://kbase.us/services/authorization/Sessions/Login',
-            data='user_id={}&password={}&fields=token'.format(user2, pwd2)).json()['token']
+                             "include second user credentials ('test_token2' key)")
+        token2 = test_cfg_dict['test_token2']
+        user2 = auth_client.get_user(token2)
+        print("Test user2: " + user2)
         cls.ctx2 = MethodContext(None)
         cls.ctx2.update({'token': token2,
                          'user_id': user2,
@@ -101,7 +101,7 @@ class NarrativeServiceTest(unittest.TestCase):
         # Other objects
         foft.create_any_objects({'ws_name': cls.example_ws_name,
                                  'obj_names': ['any_obj_' + str(i) for i in range(0, 30)]})
-        
+
 
     @classmethod
     def tearDownClass(cls):

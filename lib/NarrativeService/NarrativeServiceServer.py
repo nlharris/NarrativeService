@@ -20,7 +20,7 @@ from NarrativeService.authclient import KBaseAuth as _KBaseAuth
 
 DEPLOY = 'KB_DEPLOYMENT_CONFIG'
 SERVICE = 'KB_SERVICE_NAME'
-AUTH = 'auth-server-url'
+AUTH = 'auth-service-url'
 
 # Note that the error fields do not match the 2.0 JSONRPC spec
 
@@ -109,7 +109,11 @@ class JSONRPCServiceCustom(JSONRPCService):
             # Exception was raised inside the method.
             newerr = JSONServerError()
             newerr.trace = traceback.format_exc()
-            newerr.data = e.message
+            if isinstance(e.message, basestring):
+                newerr.data = e.message
+            else:
+                # Some exceptions embed other exceptions as the message
+                newerr.data = repr(e.message)
             raise newerr
         return result
 
@@ -332,23 +336,23 @@ class Application(object):
         self.rpc_service.add(impl_NarrativeService.list_objects_with_sets,
                              name='NarrativeService.list_objects_with_sets',
                              types=[dict])
-        self.method_authentication['NarrativeService.list_objects_with_sets'] = 'required' # noqa
+        self.method_authentication['NarrativeService.list_objects_with_sets'] = 'required'  # noqa
         self.rpc_service.add(impl_NarrativeService.copy_narrative,
                              name='NarrativeService.copy_narrative',
                              types=[dict])
-        self.method_authentication['NarrativeService.copy_narrative'] = 'required' # noqa
+        self.method_authentication['NarrativeService.copy_narrative'] = 'required'  # noqa
         self.rpc_service.add(impl_NarrativeService.create_new_narrative,
                              name='NarrativeService.create_new_narrative',
                              types=[dict])
-        self.method_authentication['NarrativeService.create_new_narrative'] = 'required' # noqa
+        self.method_authentication['NarrativeService.create_new_narrative'] = 'required'  # noqa
         self.rpc_service.add(impl_NarrativeService.copy_object,
                              name='NarrativeService.copy_object',
                              types=[dict])
-        self.method_authentication['NarrativeService.copy_object'] = 'required' # noqa
+        self.method_authentication['NarrativeService.copy_object'] = 'required'  # noqa
         self.rpc_service.add(impl_NarrativeService.list_available_types,
                              name='NarrativeService.list_available_types',
                              types=[dict])
-        self.method_authentication['NarrativeService.list_available_types'] = 'required' # noqa
+        self.method_authentication['NarrativeService.list_available_types'] = 'required'  # noqa
         self.rpc_service.add(impl_NarrativeService.status,
                              name='NarrativeService.status',
                              types=[dict])
