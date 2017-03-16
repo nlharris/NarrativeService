@@ -22,7 +22,7 @@ class NarrativeManager:
 
     DEBUG = False
 
-    DATA_PALETTES_TYPES = DataPaletteTypes()
+    DATA_PALETTES_TYPES = DataPaletteTypes(False)
 
     def __init__(self, config, ctx, set_api_cache, dps_cache):
         self.narrativeMethodStoreURL = config['narrative-method-store']
@@ -32,6 +32,9 @@ class NarrativeManager:
         self.user_id = ctx["user_id"]
         self.ws = Workspace(config['workspace-url'], token=self.token)
         self.intro_md_file = config['intro-markdown-file']
+        # We switch DPs on only for internal Continuous Integration environment for now:
+        if config['kbase-endpoint'].startswith("https://ci.kbase.us/"):
+            self.DATA_PALETTES_TYPES = DataPaletteTypes(True)
 
     def list_objects_with_sets(self, ws_id=None, ws_name=None, workspaces=None,
                                types=None, include_metadata=0):
