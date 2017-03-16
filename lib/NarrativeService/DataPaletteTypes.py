@@ -2,19 +2,18 @@ import copy
 
 class DataPaletteTypes:
 
-    # _TYPES = {"KBaseSets.ReadsSet": {},
-    #           "KBaseFile.PairedEndLibrary": {},
-    #           "KBaseFile.SingleEndLibrary": {},
-    #           "KBaseAssembly.SingleEndLibrary": {},
-    #           "KBaseAssembly.PairedEndLibrary": {}
-    #           }
-
     _TYPES = {}
-
     _KEYS = frozenset([key for key in _TYPES])
 
-    def __init__(self):
-        pass
+    def __init__(self, switchOn):
+        if switchOn:
+            self._TYPES = {"KBaseSets.ReadsSet": {},
+                           "KBaseFile.PairedEndLibrary": {},
+                           "KBaseFile.SingleEndLibrary": {},
+                           "KBaseAssembly.SingleEndLibrary": {},
+                           "KBaseAssembly.PairedEndLibrary": {}
+                           }
+            self._KEYS = frozenset([key for key in self._TYPES])
 
     def get(self, type_name):
         ret = self._TYPES.get(type_name)
