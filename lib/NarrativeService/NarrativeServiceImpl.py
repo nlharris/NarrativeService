@@ -1,7 +1,9 @@
 # -*- coding: utf-8 -*-
 #BEGIN_HEADER
+from Workspace.WorkspaceClient import Workspace
 from NarrativeService.NarrativeManager import NarrativeManager
 from NarrativeService.DynamicServiceCache import DynamicServiceCache
+from NarrativeService.NarrativeListUtils import NarrativeListUtils, NarratorialUtils
 #END_HEADER
 
 
@@ -20,9 +22,9 @@ class NarrativeService:
     # state. A method could easily clobber the state set by another while
     # the latter method is running.
     ######################################### noqa
-    VERSION = "0.0.1"
-    GIT_URL = "https://github.com/rsutormin/NarrativeService"
-    GIT_COMMIT_HASH = "ef419c36065c6969c34b3f0ab63791ace8892177"
+    VERSION = "0.0.3"
+    GIT_URL = "git@github.com:kbaseapps/NarrativeService"
+    GIT_COMMIT_HASH = "868fb02d7d38125c905aab8a13e6267f92b73535"
 
     #BEGIN_CLASS_HEADER
     def _nm(self, ctx):
@@ -43,6 +45,8 @@ class NarrativeService:
         self.dataPaletteCache = DynamicServiceCache(self.serviceWizardURL,
                                                     config['datapaletteservice-version'],
                                                     'DataPaletteService')
+
+        self.narListUtils = NarrativeListUtils(config['narrative-list-cache-size'])
         #END_CONSTRUCTOR
         pass
 
@@ -314,6 +318,198 @@ class NarrativeService:
         # At some point might do deeper type checking...
         if not isinstance(returnVal, dict):
             raise ValueError('Method list_available_types return value ' +
+                             'returnVal is not type dict as required.')
+        # return the results
+        return [returnVal]
+
+    def list_narratorials(self, ctx, params):
+        """
+        :param params: instance of type "ListNarratorialParams" (Listing
+           Narratives / Naratorials (plus Narratorial Management)) ->
+           structure:
+        :returns: instance of type "NarratorialList" -> structure: parameter
+           "narratorials" of list of type "Narratorial" (info for a
+           narratorial) -> structure: parameter "ws" of type "workspace_info"
+           (Information about a workspace. ws_id id - the numerical ID of the
+           workspace. ws_name workspace - name of the workspace. username
+           owner - name of the user who owns (e.g. created) this workspace.
+           timestamp moddate - date when the workspace was last modified. int
+           max_objid - the maximum object ID appearing in this workspace.
+           Since cloning a workspace preserves object IDs, this number may be
+           greater than the number of objects in a newly cloned workspace.
+           permission user_permission - permissions for the authenticated
+           user of this workspace. permission globalread - whether this
+           workspace is globally readable. lock_status lockstat - the status
+           of the workspace lock. usermeta metadata - arbitrary user-supplied
+           metadata about the workspace.) -> tuple of size 9: parameter "id"
+           of Long, parameter "workspace" of String, parameter "owner" of
+           String, parameter "moddate" of String, parameter "max_objid" of
+           Long, parameter "user_permission" of String, parameter
+           "globalread" of String, parameter "lockstat" of String, parameter
+           "metadata" of mapping from String to String, parameter "nar" of
+           type "object_info" (Information about an object, including user
+           provided metadata. obj_id objid - the numerical id of the object.
+           obj_name name - the name of the object. type_string type - the
+           type of the object. timestamp save_date - the save date of the
+           object. obj_ver ver - the version of the object. username saved_by
+           - the user that saved or copied the object. ws_id wsid - the
+           workspace containing the object. ws_name workspace - the workspace
+           containing the object. string chsum - the md5 checksum of the
+           object. int size - the size of the object in bytes. usermeta meta
+           - arbitrary user-supplied metadata about the object.) -> tuple of
+           size 11: parameter "objid" of Long, parameter "name" of String,
+           parameter "type" of String, parameter "save_date" of type
+           "timestamp" (A time in the format YYYY-MM-DDThh:mm:ssZ, where Z is
+           either the character Z (representing the UTC timezone) or the
+           difference in time to UTC in the format +/-HHMM, eg:
+           2012-12-17T23:24:06-0500 (EST time) 2013-04-03T08:56:32+0000 (UTC
+           time) 2013-04-03T08:56:32Z (UTC time)), parameter "version" of
+           Long, parameter "saved_by" of String, parameter "wsid" of Long,
+           parameter "workspace" of String, parameter "chsum" of String,
+           parameter "size" of Long, parameter "meta" of mapping from String
+           to String
+        """
+        # ctx is the context object
+        # return variables are: returnVal
+        #BEGIN list_narratorials
+        ws = Workspace(self.workspaceURL, token=ctx["token"])
+        returnVal = {'narratorials': self.narListUtils.list_narratorials(ws)}
+        #END list_narratorials
+
+        # At some point might do deeper type checking...
+        if not isinstance(returnVal, dict):
+            raise ValueError('Method list_narratorials return value ' +
+                             'returnVal is not type dict as required.')
+        # return the results
+        return [returnVal]
+
+    def list_narratives(self, ctx, params):
+        """
+        :param params: instance of type "ListNarrativeParams" (List
+           narratives type parameter indicates which narratives to return.
+           Supported options are for now 'mine', 'public', or 'shared') ->
+           structure: parameter "type" of String
+        :returns: instance of type "NarrativeList" -> structure: parameter
+           "narratives" of list of type "Narrative" -> structure: parameter
+           "ws" of type "workspace_info" (Information about a workspace.
+           ws_id id - the numerical ID of the workspace. ws_name workspace -
+           name of the workspace. username owner - name of the user who owns
+           (e.g. created) this workspace. timestamp moddate - date when the
+           workspace was last modified. int max_objid - the maximum object ID
+           appearing in this workspace. Since cloning a workspace preserves
+           object IDs, this number may be greater than the number of objects
+           in a newly cloned workspace. permission user_permission -
+           permissions for the authenticated user of this workspace.
+           permission globalread - whether this workspace is globally
+           readable. lock_status lockstat - the status of the workspace lock.
+           usermeta metadata - arbitrary user-supplied metadata about the
+           workspace.) -> tuple of size 9: parameter "id" of Long, parameter
+           "workspace" of String, parameter "owner" of String, parameter
+           "moddate" of String, parameter "max_objid" of Long, parameter
+           "user_permission" of String, parameter "globalread" of String,
+           parameter "lockstat" of String, parameter "metadata" of mapping
+           from String to String, parameter "nar" of type "object_info"
+           (Information about an object, including user provided metadata.
+           obj_id objid - the numerical id of the object. obj_name name - the
+           name of the object. type_string type - the type of the object.
+           timestamp save_date - the save date of the object. obj_ver ver -
+           the version of the object. username saved_by - the user that saved
+           or copied the object. ws_id wsid - the workspace containing the
+           object. ws_name workspace - the workspace containing the object.
+           string chsum - the md5 checksum of the object. int size - the size
+           of the object in bytes. usermeta meta - arbitrary user-supplied
+           metadata about the object.) -> tuple of size 11: parameter "objid"
+           of Long, parameter "name" of String, parameter "type" of String,
+           parameter "save_date" of type "timestamp" (A time in the format
+           YYYY-MM-DDThh:mm:ssZ, where Z is either the character Z
+           (representing the UTC timezone) or the difference in time to UTC
+           in the format +/-HHMM, eg: 2012-12-17T23:24:06-0500 (EST time)
+           2013-04-03T08:56:32+0000 (UTC time) 2013-04-03T08:56:32Z (UTC
+           time)), parameter "version" of Long, parameter "saved_by" of
+           String, parameter "wsid" of Long, parameter "workspace" of String,
+           parameter "chsum" of String, parameter "size" of Long, parameter
+           "meta" of mapping from String to String
+        """
+        # ctx is the context object
+        # return variables are: returnVal
+        #BEGIN list_narratives
+        ws = Workspace(self.workspaceURL, token=ctx["token"])
+        nar_type = 'mine'
+        valid_types = ['mine', 'shared', 'public']
+        if 'type' in params:
+            nar_type = params['type']
+
+        returnVal = {'narratives': []}
+        if nar_type == 'mine':
+            returnVal['narratives'] = self.narListUtils.list_my_narratives(ctx['user_id'], ws)
+        elif nar_type == 'shared':
+            returnVal['narratives'] = self.narListUtils.list_shared_narratives(ctx['user_id'], ws)
+        elif nar_type == 'public':
+            returnVal['narratives'] = self.narListUtils.list_public_narratives(ws)
+        else:
+            raise ValueError('"type" parameter must be set to one of: ' + str(valid_types))
+        #END list_narratives
+
+        # At some point might do deeper type checking...
+        if not isinstance(returnVal, dict):
+            raise ValueError('Method list_narratives return value ' +
+                             'returnVal is not type dict as required.')
+        # return the results
+        return [returnVal]
+
+    def set_narratorial(self, ctx, params):
+        """
+        Allows a user to create a Narratorial given a WS they own. Right now
+        anyone can do this, but we may restrict in the future to users that
+        have a particular role.  Run simply as:
+            ns.set_narratorial({'ws':'MyWsName'}) or,
+            ns.set_narratorial({'ws':'4231'})
+        :param params: instance of type "SetNarratorialParams" (ws field is a
+           string, but properly interpreted whether it is a workspace name or
+           ID) -> structure: parameter "ws" of String, parameter
+           "description" of String
+        :returns: instance of type "SetNarratorialResult" -> structure:
+        """
+        # ctx is the context object
+        # return variables are: returnVal
+        #BEGIN set_narratorial
+        if 'ws' not in params:
+            raise ValueError('"ws" field indicating WS name or id is required.')
+        if 'description' not in params:
+            raise ValueError('"description" field indicating WS name or id is required.')
+        ws = Workspace(self.workspaceURL, token=ctx["token"])
+        nu = NarratorialUtils()
+        nu.set_narratorial(params['ws'], params['description'], ws)
+        returnVal = {}
+        #END set_narratorial
+
+        # At some point might do deeper type checking...
+        if not isinstance(returnVal, dict):
+            raise ValueError('Method set_narratorial return value ' +
+                             'returnVal is not type dict as required.')
+        # return the results
+        return [returnVal]
+
+    def remove_narratorial(self, ctx, params):
+        """
+        :param params: instance of type "RemoveNarratorialParams" ->
+           structure: parameter "ws" of String
+        :returns: instance of type "RemoveNarratorialResult" -> structure:
+        """
+        # ctx is the context object
+        # return variables are: returnVal
+        #BEGIN remove_narratorial
+        if 'ws' not in params:
+            raise ValueError('"ws" field indicating WS name or id is required.')
+        ws = Workspace(self.workspaceURL, token=ctx["token"])
+        nu = NarratorialUtils()
+        nu.remove_narratorial(params['ws'], ws)
+        returnVal = {}
+        #END remove_narratorial
+
+        # At some point might do deeper type checking...
+        if not isinstance(returnVal, dict):
+            raise ValueError('Method remove_narratorial return value ' +
                              'returnVal is not type dict as required.')
         # return the results
         return [returnVal]

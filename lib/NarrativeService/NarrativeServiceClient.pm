@@ -81,20 +81,19 @@ sub new
     # We create an auth token, passing through the arguments that we were (hopefully) given.
 
     {
-	my $token = Bio::KBase::AuthToken->new(@args);
-	
-	if (!$token->error_message)
-	{
-	    $self->{token} = $token->token;
-	    $self->{client}->{token} = $token->token;
+	my %arg_hash2 = @args;
+	if (exists $arg_hash2{"token"}) {
+	    $self->{token} = $arg_hash2{"token"};
+	} elsif (exists $arg_hash2{"user_id"}) {
+	    my $token = Bio::KBase::AuthToken->new(@args);
+	    if (!$token->error_message) {
+	        $self->{token} = $token->token;
+	    }
 	}
-        else
-        {
-	    #
-	    # All methods in this module require authentication. In this case, if we
-	    # don't have a token, we can't continue.
-	    #
-	    die "Authentication failed: " . $token->error_message;
+	
+	if (exists $self->{token})
+	{
+	    $self->{client}->{token} = $self->{token};
 	}
     }
 
@@ -755,6 +754,470 @@ ListAvailableTypesOutput is a reference to a hash where the following keys are d
     }
 }
  
+
+
+=head2 list_narratorials
+
+  $return = $obj->list_narratorials($params)
+
+=over 4
+
+=item Parameter and return types
+
+=begin html
+
+<pre>
+$params is a NarrativeService.ListNarratorialParams
+$return is a NarrativeService.NarratorialList
+ListNarratorialParams is a reference to a hash where the following keys are defined
+NarratorialList is a reference to a hash where the following keys are defined:
+	narratorials has a value which is a reference to a list where each element is a NarrativeService.Narratorial
+Narratorial is a reference to a hash where the following keys are defined:
+	ws has a value which is a NarrativeService.workspace_info
+	nar has a value which is a NarrativeService.object_info
+workspace_info is a reference to a list containing 9 items:
+	0: (id) an int
+	1: (workspace) a string
+	2: (owner) a string
+	3: (moddate) a string
+	4: (max_objid) an int
+	5: (user_permission) a string
+	6: (globalread) a string
+	7: (lockstat) a string
+	8: (metadata) a reference to a hash where the key is a string and the value is a string
+object_info is a reference to a list containing 11 items:
+	0: (objid) an int
+	1: (name) a string
+	2: (type) a string
+	3: (save_date) a NarrativeService.timestamp
+	4: (version) an int
+	5: (saved_by) a string
+	6: (wsid) an int
+	7: (workspace) a string
+	8: (chsum) a string
+	9: (size) an int
+	10: (meta) a reference to a hash where the key is a string and the value is a string
+timestamp is a string
+
+</pre>
+
+=end html
+
+=begin text
+
+$params is a NarrativeService.ListNarratorialParams
+$return is a NarrativeService.NarratorialList
+ListNarratorialParams is a reference to a hash where the following keys are defined
+NarratorialList is a reference to a hash where the following keys are defined:
+	narratorials has a value which is a reference to a list where each element is a NarrativeService.Narratorial
+Narratorial is a reference to a hash where the following keys are defined:
+	ws has a value which is a NarrativeService.workspace_info
+	nar has a value which is a NarrativeService.object_info
+workspace_info is a reference to a list containing 9 items:
+	0: (id) an int
+	1: (workspace) a string
+	2: (owner) a string
+	3: (moddate) a string
+	4: (max_objid) an int
+	5: (user_permission) a string
+	6: (globalread) a string
+	7: (lockstat) a string
+	8: (metadata) a reference to a hash where the key is a string and the value is a string
+object_info is a reference to a list containing 11 items:
+	0: (objid) an int
+	1: (name) a string
+	2: (type) a string
+	3: (save_date) a NarrativeService.timestamp
+	4: (version) an int
+	5: (saved_by) a string
+	6: (wsid) an int
+	7: (workspace) a string
+	8: (chsum) a string
+	9: (size) an int
+	10: (meta) a reference to a hash where the key is a string and the value is a string
+timestamp is a string
+
+
+=end text
+
+=item Description
+
+
+
+=back
+
+=cut
+
+ sub list_narratorials
+{
+    my($self, @args) = @_;
+
+# Authentication: optional
+
+    if ((my $n = @args) != 1)
+    {
+	Bio::KBase::Exceptions::ArgumentValidationError->throw(error =>
+							       "Invalid argument count for function list_narratorials (received $n, expecting 1)");
+    }
+    {
+	my($params) = @args;
+
+	my @_bad_arguments;
+        (ref($params) eq 'HASH') or push(@_bad_arguments, "Invalid type for argument 1 \"params\" (value was \"$params\")");
+        if (@_bad_arguments) {
+	    my $msg = "Invalid arguments passed to list_narratorials:\n" . join("", map { "\t$_\n" } @_bad_arguments);
+	    Bio::KBase::Exceptions::ArgumentValidationError->throw(error => $msg,
+								   method_name => 'list_narratorials');
+	}
+    }
+
+    my $url = $self->{url};
+    my $result = $self->{client}->call($url, $self->{headers}, {
+	    method => "NarrativeService.list_narratorials",
+	    params => \@args,
+    });
+    if ($result) {
+	if ($result->is_error) {
+	    Bio::KBase::Exceptions::JSONRPC->throw(error => $result->error_message,
+					       code => $result->content->{error}->{code},
+					       method_name => 'list_narratorials',
+					       data => $result->content->{error}->{error} # JSON::RPC::ReturnObject only supports JSONRPC 1.1 or 1.O
+					      );
+	} else {
+	    return wantarray ? @{$result->result} : $result->result->[0];
+	}
+    } else {
+        Bio::KBase::Exceptions::HTTP->throw(error => "Error invoking method list_narratorials",
+					    status_line => $self->{client}->status_line,
+					    method_name => 'list_narratorials',
+				       );
+    }
+}
+ 
+
+
+=head2 list_narratives
+
+  $return = $obj->list_narratives($params)
+
+=over 4
+
+=item Parameter and return types
+
+=begin html
+
+<pre>
+$params is a NarrativeService.ListNarrativeParams
+$return is a NarrativeService.NarrativeList
+ListNarrativeParams is a reference to a hash where the following keys are defined:
+	type has a value which is a string
+NarrativeList is a reference to a hash where the following keys are defined:
+	narratives has a value which is a reference to a list where each element is a NarrativeService.Narrative
+Narrative is a reference to a hash where the following keys are defined:
+	ws has a value which is a NarrativeService.workspace_info
+	nar has a value which is a NarrativeService.object_info
+workspace_info is a reference to a list containing 9 items:
+	0: (id) an int
+	1: (workspace) a string
+	2: (owner) a string
+	3: (moddate) a string
+	4: (max_objid) an int
+	5: (user_permission) a string
+	6: (globalread) a string
+	7: (lockstat) a string
+	8: (metadata) a reference to a hash where the key is a string and the value is a string
+object_info is a reference to a list containing 11 items:
+	0: (objid) an int
+	1: (name) a string
+	2: (type) a string
+	3: (save_date) a NarrativeService.timestamp
+	4: (version) an int
+	5: (saved_by) a string
+	6: (wsid) an int
+	7: (workspace) a string
+	8: (chsum) a string
+	9: (size) an int
+	10: (meta) a reference to a hash where the key is a string and the value is a string
+timestamp is a string
+
+</pre>
+
+=end html
+
+=begin text
+
+$params is a NarrativeService.ListNarrativeParams
+$return is a NarrativeService.NarrativeList
+ListNarrativeParams is a reference to a hash where the following keys are defined:
+	type has a value which is a string
+NarrativeList is a reference to a hash where the following keys are defined:
+	narratives has a value which is a reference to a list where each element is a NarrativeService.Narrative
+Narrative is a reference to a hash where the following keys are defined:
+	ws has a value which is a NarrativeService.workspace_info
+	nar has a value which is a NarrativeService.object_info
+workspace_info is a reference to a list containing 9 items:
+	0: (id) an int
+	1: (workspace) a string
+	2: (owner) a string
+	3: (moddate) a string
+	4: (max_objid) an int
+	5: (user_permission) a string
+	6: (globalread) a string
+	7: (lockstat) a string
+	8: (metadata) a reference to a hash where the key is a string and the value is a string
+object_info is a reference to a list containing 11 items:
+	0: (objid) an int
+	1: (name) a string
+	2: (type) a string
+	3: (save_date) a NarrativeService.timestamp
+	4: (version) an int
+	5: (saved_by) a string
+	6: (wsid) an int
+	7: (workspace) a string
+	8: (chsum) a string
+	9: (size) an int
+	10: (meta) a reference to a hash where the key is a string and the value is a string
+timestamp is a string
+
+
+=end text
+
+=item Description
+
+
+
+=back
+
+=cut
+
+ sub list_narratives
+{
+    my($self, @args) = @_;
+
+# Authentication: optional
+
+    if ((my $n = @args) != 1)
+    {
+	Bio::KBase::Exceptions::ArgumentValidationError->throw(error =>
+							       "Invalid argument count for function list_narratives (received $n, expecting 1)");
+    }
+    {
+	my($params) = @args;
+
+	my @_bad_arguments;
+        (ref($params) eq 'HASH') or push(@_bad_arguments, "Invalid type for argument 1 \"params\" (value was \"$params\")");
+        if (@_bad_arguments) {
+	    my $msg = "Invalid arguments passed to list_narratives:\n" . join("", map { "\t$_\n" } @_bad_arguments);
+	    Bio::KBase::Exceptions::ArgumentValidationError->throw(error => $msg,
+								   method_name => 'list_narratives');
+	}
+    }
+
+    my $url = $self->{url};
+    my $result = $self->{client}->call($url, $self->{headers}, {
+	    method => "NarrativeService.list_narratives",
+	    params => \@args,
+    });
+    if ($result) {
+	if ($result->is_error) {
+	    Bio::KBase::Exceptions::JSONRPC->throw(error => $result->error_message,
+					       code => $result->content->{error}->{code},
+					       method_name => 'list_narratives',
+					       data => $result->content->{error}->{error} # JSON::RPC::ReturnObject only supports JSONRPC 1.1 or 1.O
+					      );
+	} else {
+	    return wantarray ? @{$result->result} : $result->result->[0];
+	}
+    } else {
+        Bio::KBase::Exceptions::HTTP->throw(error => "Error invoking method list_narratives",
+					    status_line => $self->{client}->status_line,
+					    method_name => 'list_narratives',
+				       );
+    }
+}
+ 
+
+
+=head2 set_narratorial
+
+  $return = $obj->set_narratorial($params)
+
+=over 4
+
+=item Parameter and return types
+
+=begin html
+
+<pre>
+$params is a NarrativeService.SetNarratorialParams
+$return is a NarrativeService.SetNarratorialResult
+SetNarratorialParams is a reference to a hash where the following keys are defined:
+	ws has a value which is a string
+	description has a value which is a string
+SetNarratorialResult is a reference to a hash where the following keys are defined
+
+</pre>
+
+=end html
+
+=begin text
+
+$params is a NarrativeService.SetNarratorialParams
+$return is a NarrativeService.SetNarratorialResult
+SetNarratorialParams is a reference to a hash where the following keys are defined:
+	ws has a value which is a string
+	description has a value which is a string
+SetNarratorialResult is a reference to a hash where the following keys are defined
+
+
+=end text
+
+=item Description
+
+Allows a user to create a Narratorial given a WS they own. Right now
+anyone can do this, but we may restrict in the future to users that
+have a particular role.  Run simply as:
+    ns.set_narratorial({'ws':'MyWsName'}) or,
+    ns.set_narratorial({'ws':'4231'})
+
+=back
+
+=cut
+
+ sub set_narratorial
+{
+    my($self, @args) = @_;
+
+# Authentication: required
+
+    if ((my $n = @args) != 1)
+    {
+	Bio::KBase::Exceptions::ArgumentValidationError->throw(error =>
+							       "Invalid argument count for function set_narratorial (received $n, expecting 1)");
+    }
+    {
+	my($params) = @args;
+
+	my @_bad_arguments;
+        (ref($params) eq 'HASH') or push(@_bad_arguments, "Invalid type for argument 1 \"params\" (value was \"$params\")");
+        if (@_bad_arguments) {
+	    my $msg = "Invalid arguments passed to set_narratorial:\n" . join("", map { "\t$_\n" } @_bad_arguments);
+	    Bio::KBase::Exceptions::ArgumentValidationError->throw(error => $msg,
+								   method_name => 'set_narratorial');
+	}
+    }
+
+    my $url = $self->{url};
+    my $result = $self->{client}->call($url, $self->{headers}, {
+	    method => "NarrativeService.set_narratorial",
+	    params => \@args,
+    });
+    if ($result) {
+	if ($result->is_error) {
+	    Bio::KBase::Exceptions::JSONRPC->throw(error => $result->error_message,
+					       code => $result->content->{error}->{code},
+					       method_name => 'set_narratorial',
+					       data => $result->content->{error}->{error} # JSON::RPC::ReturnObject only supports JSONRPC 1.1 or 1.O
+					      );
+	} else {
+	    return wantarray ? @{$result->result} : $result->result->[0];
+	}
+    } else {
+        Bio::KBase::Exceptions::HTTP->throw(error => "Error invoking method set_narratorial",
+					    status_line => $self->{client}->status_line,
+					    method_name => 'set_narratorial',
+				       );
+    }
+}
+ 
+
+
+=head2 remove_narratorial
+
+  $return = $obj->remove_narratorial($params)
+
+=over 4
+
+=item Parameter and return types
+
+=begin html
+
+<pre>
+$params is a NarrativeService.RemoveNarratorialParams
+$return is a NarrativeService.RemoveNarratorialResult
+RemoveNarratorialParams is a reference to a hash where the following keys are defined:
+	ws has a value which is a string
+RemoveNarratorialResult is a reference to a hash where the following keys are defined
+
+</pre>
+
+=end html
+
+=begin text
+
+$params is a NarrativeService.RemoveNarratorialParams
+$return is a NarrativeService.RemoveNarratorialResult
+RemoveNarratorialParams is a reference to a hash where the following keys are defined:
+	ws has a value which is a string
+RemoveNarratorialResult is a reference to a hash where the following keys are defined
+
+
+=end text
+
+=item Description
+
+
+
+=back
+
+=cut
+
+ sub remove_narratorial
+{
+    my($self, @args) = @_;
+
+# Authentication: required
+
+    if ((my $n = @args) != 1)
+    {
+	Bio::KBase::Exceptions::ArgumentValidationError->throw(error =>
+							       "Invalid argument count for function remove_narratorial (received $n, expecting 1)");
+    }
+    {
+	my($params) = @args;
+
+	my @_bad_arguments;
+        (ref($params) eq 'HASH') or push(@_bad_arguments, "Invalid type for argument 1 \"params\" (value was \"$params\")");
+        if (@_bad_arguments) {
+	    my $msg = "Invalid arguments passed to remove_narratorial:\n" . join("", map { "\t$_\n" } @_bad_arguments);
+	    Bio::KBase::Exceptions::ArgumentValidationError->throw(error => $msg,
+								   method_name => 'remove_narratorial');
+	}
+    }
+
+    my $url = $self->{url};
+    my $result = $self->{client}->call($url, $self->{headers}, {
+	    method => "NarrativeService.remove_narratorial",
+	    params => \@args,
+    });
+    if ($result) {
+	if ($result->is_error) {
+	    Bio::KBase::Exceptions::JSONRPC->throw(error => $result->error_message,
+					       code => $result->content->{error}->{code},
+					       method_name => 'remove_narratorial',
+					       data => $result->content->{error}->{error} # JSON::RPC::ReturnObject only supports JSONRPC 1.1 or 1.O
+					      );
+	} else {
+	    return wantarray ? @{$result->result} : $result->result->[0];
+	}
+    } else {
+        Bio::KBase::Exceptions::HTTP->throw(error => "Error invoking method remove_narratorial",
+					    status_line => $self->{client}->status_line,
+					    method_name => 'remove_narratorial',
+				       );
+    }
+}
+ 
   
 sub status
 {
@@ -798,16 +1261,16 @@ sub version {
             Bio::KBase::Exceptions::JSONRPC->throw(
                 error => $result->error_message,
                 code => $result->content->{code},
-                method_name => 'list_available_types',
+                method_name => 'remove_narratorial',
             );
         } else {
             return wantarray ? @{$result->result} : $result->result->[0];
         }
     } else {
         Bio::KBase::Exceptions::HTTP->throw(
-            error => "Error invoking method list_available_types",
+            error => "Error invoking method remove_narratorial",
             status_line => $self->{client}->status_line,
-            method_name => 'list_available_types',
+            method_name => 'remove_narratorial',
         );
     }
 }
@@ -1039,6 +1502,71 @@ a reference to a list containing 11 items:
 8: (chsum) a string
 9: (size) an int
 10: (meta) a reference to a hash where the key is a string and the value is a string
+
+
+=end text
+
+=back
+
+
+
+=head2 workspace_info
+
+=over 4
+
+
+
+=item Description
+
+Information about a workspace.
+
+    ws_id id - the numerical ID of the workspace.
+    ws_name workspace - name of the workspace.
+    username owner - name of the user who owns (e.g. created) this workspace.
+    timestamp moddate - date when the workspace was last modified.
+    int max_objid - the maximum object ID appearing in this workspace.
+        Since cloning a workspace preserves object IDs, this number may be
+        greater than the number of objects in a newly cloned workspace.
+    permission user_permission - permissions for the authenticated user of
+        this workspace.
+    permission globalread - whether this workspace is globally readable.
+    lock_status lockstat - the status of the workspace lock.
+    usermeta metadata - arbitrary user-supplied metadata about
+        the workspace.
+
+
+=item Definition
+
+=begin html
+
+<pre>
+a reference to a list containing 9 items:
+0: (id) an int
+1: (workspace) a string
+2: (owner) a string
+3: (moddate) a string
+4: (max_objid) an int
+5: (user_permission) a string
+6: (globalread) a string
+7: (lockstat) a string
+8: (metadata) a reference to a hash where the key is a string and the value is a string
+
+</pre>
+
+=end html
+
+=begin text
+
+a reference to a list containing 9 items:
+0: (id) an int
+1: (workspace) a string
+2: (owner) a string
+3: (moddate) a string
+4: (max_objid) an int
+5: (user_permission) a string
+6: (globalread) a string
+7: (lockstat) a string
+8: (metadata) a reference to a hash where the key is a string and the value is a string
 
 
 =end text
@@ -1730,6 +2258,323 @@ type_stat has a value which is a reference to a hash where the key is a string a
 a reference to a hash where the following keys are defined:
 type_stat has a value which is a reference to a hash where the key is a string and the value is an int
 
+
+=end text
+
+=back
+
+
+
+=head2 ListNarratorialParams
+
+=over 4
+
+
+
+=item Description
+
+Listing Narratives / Naratorials (plus Narratorial Management)
+
+
+=item Definition
+
+=begin html
+
+<pre>
+a reference to a hash where the following keys are defined
+</pre>
+
+=end html
+
+=begin text
+
+a reference to a hash where the following keys are defined
+
+=end text
+
+=back
+
+
+
+=head2 Narratorial
+
+=over 4
+
+
+
+=item Description
+
+info for a narratorial
+
+
+=item Definition
+
+=begin html
+
+<pre>
+a reference to a hash where the following keys are defined:
+ws has a value which is a NarrativeService.workspace_info
+nar has a value which is a NarrativeService.object_info
+
+</pre>
+
+=end html
+
+=begin text
+
+a reference to a hash where the following keys are defined:
+ws has a value which is a NarrativeService.workspace_info
+nar has a value which is a NarrativeService.object_info
+
+
+=end text
+
+=back
+
+
+
+=head2 NarratorialList
+
+=over 4
+
+
+
+=item Definition
+
+=begin html
+
+<pre>
+a reference to a hash where the following keys are defined:
+narratorials has a value which is a reference to a list where each element is a NarrativeService.Narratorial
+
+</pre>
+
+=end html
+
+=begin text
+
+a reference to a hash where the following keys are defined:
+narratorials has a value which is a reference to a list where each element is a NarrativeService.Narratorial
+
+
+=end text
+
+=back
+
+
+
+=head2 Narrative
+
+=over 4
+
+
+
+=item Definition
+
+=begin html
+
+<pre>
+a reference to a hash where the following keys are defined:
+ws has a value which is a NarrativeService.workspace_info
+nar has a value which is a NarrativeService.object_info
+
+</pre>
+
+=end html
+
+=begin text
+
+a reference to a hash where the following keys are defined:
+ws has a value which is a NarrativeService.workspace_info
+nar has a value which is a NarrativeService.object_info
+
+
+=end text
+
+=back
+
+
+
+=head2 NarrativeList
+
+=over 4
+
+
+
+=item Definition
+
+=begin html
+
+<pre>
+a reference to a hash where the following keys are defined:
+narratives has a value which is a reference to a list where each element is a NarrativeService.Narrative
+
+</pre>
+
+=end html
+
+=begin text
+
+a reference to a hash where the following keys are defined:
+narratives has a value which is a reference to a list where each element is a NarrativeService.Narrative
+
+
+=end text
+
+=back
+
+
+
+=head2 ListNarrativeParams
+
+=over 4
+
+
+
+=item Description
+
+List narratives
+type parameter indicates which narratives to return.
+Supported options are for now 'mine', 'public', or 'shared'
+
+
+=item Definition
+
+=begin html
+
+<pre>
+a reference to a hash where the following keys are defined:
+type has a value which is a string
+
+</pre>
+
+=end html
+
+=begin text
+
+a reference to a hash where the following keys are defined:
+type has a value which is a string
+
+
+=end text
+
+=back
+
+
+
+=head2 SetNarratorialParams
+
+=over 4
+
+
+
+=item Description
+
+ws field is a string, but properly interpreted whether it is a workspace
+name or ID
+
+
+=item Definition
+
+=begin html
+
+<pre>
+a reference to a hash where the following keys are defined:
+ws has a value which is a string
+description has a value which is a string
+
+</pre>
+
+=end html
+
+=begin text
+
+a reference to a hash where the following keys are defined:
+ws has a value which is a string
+description has a value which is a string
+
+
+=end text
+
+=back
+
+
+
+=head2 SetNarratorialResult
+
+=over 4
+
+
+
+=item Definition
+
+=begin html
+
+<pre>
+a reference to a hash where the following keys are defined
+</pre>
+
+=end html
+
+=begin text
+
+a reference to a hash where the following keys are defined
+
+=end text
+
+=back
+
+
+
+=head2 RemoveNarratorialParams
+
+=over 4
+
+
+
+=item Definition
+
+=begin html
+
+<pre>
+a reference to a hash where the following keys are defined:
+ws has a value which is a string
+
+</pre>
+
+=end html
+
+=begin text
+
+a reference to a hash where the following keys are defined:
+ws has a value which is a string
+
+
+=end text
+
+=back
+
+
+
+=head2 RemoveNarratorialResult
+
+=over 4
+
+
+
+=item Definition
+
+=begin html
+
+<pre>
+a reference to a hash where the following keys are defined
+</pre>
+
+=end html
+
+=begin text
+
+a reference to a hash where the following keys are defined
 
 =end text
 

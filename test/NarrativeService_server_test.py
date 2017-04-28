@@ -3,7 +3,6 @@ import unittest
 import os  # noqa: F401
 import json  # noqa: F401
 import time
-import requests
 import StringIO
 
 from os import environ
@@ -23,6 +22,15 @@ from NarrativeService.WorkspaceListObjectsIterator import WorkspaceListObjectsIt
 from FakeObjectsForTests.FakeObjectsForTestsClient import FakeObjectsForTests
 from DataPaletteService.DataPaletteServiceClient import DataPaletteService
 from DataPaletteService.authclient import KBaseAuth as _KBaseAuth
+
+
+
+def in_list(wsid, nar_list):
+    ''' Helper function to determine if ws with ID is returned from the Narrative listing functions '''
+    for nt in nar_list:
+        if wsid == nt['ws'][0]:
+            return True
+    return False
 
 
 class NarrativeServiceTest(unittest.TestCase):
@@ -321,7 +329,7 @@ class NarrativeServiceTest(unittest.TestCase):
         ws1.set_permissions({'workspace': ws_name1, 'new_permission': 'r',
                              'users': [self.getContext2()['user_id']]})
         reads_ref = str(reads_info[6]) + '/' + str(reads_info[0]) + '/' + str(reads_info[4])
-        
+
         # Create workspace with Narrative for user2
         ws2 = self.getWsClient2()
         with open("/kb/module/test/data/narrative1.json", "r") as f1:
@@ -692,3 +700,80 @@ class NarrativeServiceTest(unittest.TestCase):
             print("Objects found: " + str(len(ret)) + ", time=" + str(time.time() - t1))
         finally:
             NarrativeManager.DEBUG = False
+
+
+    def test_narratorials(self):
+        ws = self.getWsClient()
+        ret = self.getImpl().create_new_narrative(self.getContext(),
+                                                  {"method": "AssemblyUtil/import_assembly_fasta_ftp",
+                                                   "appparam": "0,param1,value1;0,param2,value2",
+                                                   "copydata": ""})[0]
+        try:
+            self.assertTrue('narrativeInfo' in ret)
+            wsid = ret['workspaceInfo']['id']
+
+            # 1) make sure new narrative is not in the narratorial list
+            nar_list = self.getImpl().list_narratorials(self.getContext(), {})[0]['narratorials']
+            self.assertTrue(not in_list(wsid, nar_list))
+
+            # 2) add it, and make sure it is
+            self.getImpl().set_narratorial(self.getContext(), {'ws': str(wsid), 'description': 'something'})
+            nar_list = self.getImpl().list_narratorials(self.getContext(), {})[0]['narratorials']
+            self.assertTrue(in_list(wsid, nar_list))
+
+            # 3) remove it and make sure it goes away
+            self.getImpl().remove_narratorial(self.getContext(), {'ws': str(wsid)})
+            nar_list = self.getImpl().list_narratorials(self.getContext(), {})[0]['narratorials']
+            self.assertTrue(not in_list(wsid, nar_list))
+
+        finally:
+            new_ws_id = ret['workspaceInfo']['id']
+            ws.delete_workspace({'id': new_ws_id})
+
+
+    def test_list_narratives(self):
+        ws = self.getWsClient()
+        ret = self.getImpl().create_new_narrative(self.getContext(),
+                                                  {"method": "",
+                                                   "appparam": "",
+                                                   "copydata": ""})[0]
+        try:
+            self.assertTrue('narrativeInfo' in ret)
+            wsid = ret['workspaceInfo']['id']
+            nar_list = self.getImpl().list_narratives(self.getContext(), {'type': 'mine'})[0]['narratives']
+            self.assertTrue(in_list(wsid, nar_list))
+            nar_list = self.getImpl().list_narratives(self.getContext(), {'type': 'shared'})[0]['narratives']
+            self.assertTrue(not in_list(wsid, nar_list))
+            nar_list = self.getImpl().list_narratives(self.getContext(), {'type': 'public'})[0]['narratives']
+            self.assertTrue(not in_list(wsid, nar_list))
+
+            # check from User2 perspective, should not be able to see it
+            nar_list = self.getImpl().list_narratives(self.getContext2(), {'type': 'mine'})[0]['narratives']
+            self.assertTrue(not in_list(wsid, nar_list))
+            nar_list = self.getImpl().list_narratives(self.getContext2(), {'type': 'shared'})[0]['narratives']
+            self.assertTrue(not in_list(wsid, nar_list))
+            nar_list = self.getImpl().list_narratives(self.getContext2(), {'type': 'public'})[0]['narratives']
+            self.assertTrue(not in_list(wsid, nar_list))
+
+            # make it public, it should appear in the public list, but not in the shared with me list
+            ws.set_global_permission({'id': wsid, 'new_permission': 'r'})
+            nar_list = self.getImpl().list_narratives(self.getContext2(), {'type': 'mine'})[0]['narratives']
+            self.assertTrue(not in_list(wsid, nar_list))
+            nar_list = self.getImpl().list_narratives(self.getContext2(), {'type': 'shared'})[0]['narratives']
+            self.assertTrue(not in_list(wsid, nar_list))
+            nar_list = self.getImpl().list_narratives(self.getContext2(), {'type': 'public'})[0]['narratives']
+            self.assertTrue(in_list(wsid, nar_list))
+
+
+            # give user2 write access, which should make it visible to user2's shared narrative list
+            ws.set_permissions({'id': wsid, 'users': [self.getContext2()['user_id']], 'new_permission': 'r'})
+            nar_list = self.getImpl().list_narratives(self.getContext2(), {'type': 'mine'})[0]['narratives']
+            self.assertTrue(not in_list(wsid, nar_list))
+            nar_list = self.getImpl().list_narratives(self.getContext2(), {'type': 'shared'})[0]['narratives']
+            self.assertTrue(in_list(wsid, nar_list))
+            nar_list = self.getImpl().list_narratives(self.getContext2(), {'type': 'public'})[0]['narratives']
+            self.assertTrue(in_list(wsid, nar_list))
+
+        finally:
+            new_ws_id = ret['workspaceInfo']['id']
+            ws.delete_workspace({'id': new_ws_id})

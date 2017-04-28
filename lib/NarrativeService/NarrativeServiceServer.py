@@ -353,6 +353,22 @@ class Application(object):
                              name='NarrativeService.list_available_types',
                              types=[dict])
         self.method_authentication['NarrativeService.list_available_types'] = 'required'  # noqa
+        self.rpc_service.add(impl_NarrativeService.list_narratorials,
+                             name='NarrativeService.list_narratorials',
+                             types=[dict])
+        self.method_authentication['NarrativeService.list_narratorials'] = 'optional'  # noqa
+        self.rpc_service.add(impl_NarrativeService.list_narratives,
+                             name='NarrativeService.list_narratives',
+                             types=[dict])
+        self.method_authentication['NarrativeService.list_narratives'] = 'optional'  # noqa
+        self.rpc_service.add(impl_NarrativeService.set_narratorial,
+                             name='NarrativeService.set_narratorial',
+                             types=[dict])
+        self.method_authentication['NarrativeService.set_narratorial'] = 'required'  # noqa
+        self.rpc_service.add(impl_NarrativeService.remove_narratorial,
+                             name='NarrativeService.remove_narratorial',
+                             types=[dict])
+        self.method_authentication['NarrativeService.remove_narratorial'] = 'required'  # noqa
         self.rpc_service.add(impl_NarrativeService.status,
                              name='NarrativeService.status',
                              types=[dict])

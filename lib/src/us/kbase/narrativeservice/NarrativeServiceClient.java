@@ -247,6 +247,79 @@ public class NarrativeServiceClient {
         return res.get(0);
     }
 
+    /**
+     * <p>Original spec-file function name: list_narratorials</p>
+     * <pre>
+     * </pre>
+     * @param   params   instance of type {@link us.kbase.narrativeservice.ListNarratorialParams ListNarratorialParams}
+     * @return   instance of type {@link us.kbase.narrativeservice.NarratorialList NarratorialList}
+     * @throws IOException if an IO exception occurs
+     * @throws JsonClientException if a JSON RPC exception occurs
+     */
+    public NarratorialList listNarratorials(ListNarratorialParams params, RpcContext... jsonRpcContext) throws IOException, JsonClientException {
+        List<Object> args = new ArrayList<Object>();
+        args.add(params);
+        TypeReference<List<NarratorialList>> retType = new TypeReference<List<NarratorialList>>() {};
+        List<NarratorialList> res = caller.jsonrpcCall("NarrativeService.list_narratorials", args, retType, true, false, jsonRpcContext, this.serviceVersion);
+        return res.get(0);
+    }
+
+    /**
+     * <p>Original spec-file function name: list_narratives</p>
+     * <pre>
+     * </pre>
+     * @param   params   instance of type {@link us.kbase.narrativeservice.ListNarrativeParams ListNarrativeParams}
+     * @return   instance of type {@link us.kbase.narrativeservice.NarrativeList NarrativeList}
+     * @throws IOException if an IO exception occurs
+     * @throws JsonClientException if a JSON RPC exception occurs
+     */
+    public NarrativeList listNarratives(ListNarrativeParams params, RpcContext... jsonRpcContext) throws IOException, JsonClientException {
+        List<Object> args = new ArrayList<Object>();
+        args.add(params);
+        TypeReference<List<NarrativeList>> retType = new TypeReference<List<NarrativeList>>() {};
+        List<NarrativeList> res = caller.jsonrpcCall("NarrativeService.list_narratives", args, retType, true, false, jsonRpcContext, this.serviceVersion);
+        return res.get(0);
+    }
+
+    /**
+     * <p>Original spec-file function name: set_narratorial</p>
+     * <pre>
+     * Allows a user to create a Narratorial given a WS they own. Right now
+     * anyone can do this, but we may restrict in the future to users that
+     * have a particular role.  Run simply as:
+     *     ns.set_narratorial({'ws':'MyWsName'}) or,
+     *     ns.set_narratorial({'ws':'4231'})
+     * </pre>
+     * @param   params   instance of type {@link us.kbase.narrativeservice.SetNarratorialParams SetNarratorialParams}
+     * @return   instance of type {@link us.kbase.narrativeservice.SetNarratorialResult SetNarratorialResult}
+     * @throws IOException if an IO exception occurs
+     * @throws JsonClientException if a JSON RPC exception occurs
+     */
+    public SetNarratorialResult setNarratorial(SetNarratorialParams params, RpcContext... jsonRpcContext) throws IOException, JsonClientException {
+        List<Object> args = new ArrayList<Object>();
+        args.add(params);
+        TypeReference<List<SetNarratorialResult>> retType = new TypeReference<List<SetNarratorialResult>>() {};
+        List<SetNarratorialResult> res = caller.jsonrpcCall("NarrativeService.set_narratorial", args, retType, true, true, jsonRpcContext, this.serviceVersion);
+        return res.get(0);
+    }
+
+    /**
+     * <p>Original spec-file function name: remove_narratorial</p>
+     * <pre>
+     * </pre>
+     * @param   params   instance of type {@link us.kbase.narrativeservice.RemoveNarratorialParams RemoveNarratorialParams}
+     * @return   instance of type {@link us.kbase.narrativeservice.RemoveNarratorialResult RemoveNarratorialResult}
+     * @throws IOException if an IO exception occurs
+     * @throws JsonClientException if a JSON RPC exception occurs
+     */
+    public RemoveNarratorialResult removeNarratorial(RemoveNarratorialParams params, RpcContext... jsonRpcContext) throws IOException, JsonClientException {
+        List<Object> args = new ArrayList<Object>();
+        args.add(params);
+        TypeReference<List<RemoveNarratorialResult>> retType = new TypeReference<List<RemoveNarratorialResult>>() {};
+        List<RemoveNarratorialResult> res = caller.jsonrpcCall("NarrativeService.remove_narratorial", args, retType, true, true, jsonRpcContext, this.serviceVersion);
+        return res.get(0);
+    }
+
     public Map<String, Object> status(RpcContext... jsonRpcContext) throws IOException, JsonClientException {
         List<Object> args = new ArrayList<Object>();
         TypeReference<List<Map<String, Object>>> retType = new TypeReference<List<Map<String, Object>>>() {};
