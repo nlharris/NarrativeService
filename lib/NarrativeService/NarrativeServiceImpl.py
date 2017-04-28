@@ -3,7 +3,7 @@
 from Workspace.WorkspaceClient import Workspace
 from NarrativeService.NarrativeManager import NarrativeManager
 from NarrativeService.DynamicServiceCache import DynamicServiceCache
-from NarrativeService.NarrativeListUtils import NarrativeListUtils
+from NarrativeService.NarrativeListUtils import NarrativeListUtils, NarratorialUtils
 #END_HEADER
 
 
@@ -24,7 +24,7 @@ class NarrativeService:
     ######################################### noqa
     VERSION = "0.0.3"
     GIT_URL = "git@github.com:kbaseapps/NarrativeService"
-    GIT_COMMIT_HASH = "01e0b71ddcf0e375e44fe5cc79f56a92e91febc0"
+    GIT_COMMIT_HASH = "868fb02d7d38125c905aab8a13e6267f92b73535"
 
     #BEGIN_CLASS_HEADER
     def _nm(self, ctx):
@@ -373,7 +373,7 @@ class NarrativeService:
         # return variables are: returnVal
         #BEGIN list_narratorials
         ws = Workspace(self.workspaceURL, token=ctx["token"])
-        returnVal = self.narListUtils.list_narratorials(ws)
+        returnVal = {'narratorials': self.narListUtils.list_narratorials(ws)}
         #END list_narratorials
 
         # At some point might do deeper type checking...
@@ -387,8 +387,8 @@ class NarrativeService:
         """
         :param params: instance of type "ListNarrativeParams" (List
            narratives type parameter indicates which narratives to return.
-           Supported options are for now 'mine' or 'public'  TODO: 'shared')
-           -> structure: parameter "type" of String
+           Supported options are for now 'mine', 'public', or 'shared') ->
+           structure: parameter "type" of String
         :returns: instance of type "NarrativeList" -> structure: parameter
            "narratives" of list of type "Narrative" -> structure: parameter
            "ws" of type "workspace_info" (Information about a workspace.
@@ -433,6 +433,21 @@ class NarrativeService:
         # ctx is the context object
         # return variables are: returnVal
         #BEGIN list_narratives
+        ws = Workspace(self.workspaceURL, token=ctx["token"])
+        nar_type = 'mine'
+        valid_types = ['mine', 'shared', 'public']
+        if 'type' in params:
+            nar_type = params['type']
+
+        returnVal = {'narratives': []}
+        if nar_type == 'mine':
+            returnVal['narratives'] = self.narListUtils.list_my_narratives(ctx['user_id'], ws)
+        elif nar_type == 'shared':
+            returnVal['narratives'] = self.narListUtils.list_shared_narratives(ctx['user_id'], ws)
+        elif nar_type == 'public':
+            returnVal['narratives'] = self.narListUtils.list_public_narratives(ws)
+        else:
+            raise ValueError('"type" parameter must be set to one of: ' + str(valid_types))
         #END list_narratives
 
         # At some point might do deeper type checking...
@@ -458,6 +473,13 @@ class NarrativeService:
         # ctx is the context object
         # return variables are: returnVal
         #BEGIN set_narratorial
+        if 'ws' not in params:
+            raise ValueError('"ws" field indicating WS name or id is required.')
+        if 'description' not in params:
+            raise ValueError('"description" field indicating WS name or id is required.')
+        ws = Workspace(self.workspaceURL, token=ctx["token"])
+        nu = NarratorialUtils()
+        nu.set_narratorial(params['ws'], params['description'], ws)
         returnVal = {}
         #END set_narratorial
 
@@ -477,6 +499,12 @@ class NarrativeService:
         # ctx is the context object
         # return variables are: returnVal
         #BEGIN remove_narratorial
+        if 'ws' not in params:
+            raise ValueError('"ws" field indicating WS name or id is required.')
+        ws = Workspace(self.workspaceURL, token=ctx["token"])
+        nu = NarratorialUtils()
+        nu.remove_narratorial(params['ws'], ws)
+        returnVal = {}
         #END remove_narratorial
 
         # At some point might do deeper type checking...

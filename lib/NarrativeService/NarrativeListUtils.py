@@ -12,6 +12,7 @@ import pylru
 #     7 lock_status lockstat
 #     8 usermeta metadata
 
+
 class NarrativeInfoCache(object):
 
     def __init__(self, cache_size):
@@ -115,17 +116,28 @@ class NarrativeListUtils(object):
 
     def list_my_narratives(self, my_user_id, wsClient):
         # get all the workspaces marked as narratorials
-        ws_list = wsClient.list_workspace_info({'owners': ['my_user_id']})
-        ws_global_list = []
-        for ws_info in ws_list:
-            if ws_info[6] == 'r':  # indicates that this ws is globally readable
-                ws_global_list.append(ws_info)
+        ws_list = wsClient.list_workspace_info({'owners': [my_user_id]})
         # build a ws_list lookup table
-        ws_lookup_table = self._build_ws_lookup_table(ws_global_list)
+        ws_lookup_table = self._build_ws_lookup_table(ws_list)
         # based on the WS lookup table, lookup the narratives
         return self.narrativeInfo.get_info_list(ws_lookup_table, wsClient)
 
-    # TODO: missing shared Narratives- unclear what the right option for this is
+
+    def list_shared_narratives(self, my_user_id, wsClient):
+        # get all the workspaces marked as narratorials
+        ws_list = wsClient.list_workspace_info({})
+        ws_shared_list = []
+        for ws_info in ws_list:
+            if ws_info[2] == my_user_id:
+                continue
+            if ws_info[5] == 'n':  # indicates that this ws is globally readable
+                continue
+            ws_shared_list.append(ws_info)
+        # build a ws_list lookup table
+        ws_lookup_table = self._build_ws_lookup_table(ws_shared_list)
+        # based on the WS lookup table, lookup the narratives
+        return self.narrativeInfo.get_info_list(ws_lookup_table, wsClient)
+
 
     def list_narratorials(self, wsClient):
         # get all the workspaces marked as narratorials
@@ -159,7 +171,6 @@ class NarratorialUtils(object):
 
     def set_narratorial(self, wsid, description, wsClient):
         wsi = self._get_workspace_identity(wsid)
-        print('setting nar' + str(wsi))
         wsClient.alter_workspace_metadata({'wsi': wsi, 'new': {'narratorial': '1'}})
         wsClient.alter_workspace_metadata({'wsi': wsi, 'new': {'narratorial_description': description}})
 

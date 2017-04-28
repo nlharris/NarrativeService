@@ -319,7 +319,7 @@ module NarrativeService {
 
     /* List narratives
         type parameter indicates which narratives to return.
-        Supported options are for now 'mine' or 'public'  TODO: 'shared'
+        Supported options are for now 'mine', 'public', or 'shared'
     */
     typedef structure {
         string type;

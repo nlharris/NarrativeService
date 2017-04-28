@@ -290,8 +290,8 @@ class NarrativeService(object):
         """
         :param params: instance of type "ListNarrativeParams" (List
            narratives type parameter indicates which narratives to return.
-           Supported options are for now 'mine' or 'public'  TODO: 'shared')
-           -> structure: parameter "type" of String
+           Supported options are for now 'mine', 'public', or 'shared') ->
+           structure: parameter "type" of String
         :returns: instance of type "NarrativeList" -> structure: parameter
            "narratives" of list of type "Narrative" -> structure: parameter
            "ws" of type "workspace_info" (Information about a workspace.
