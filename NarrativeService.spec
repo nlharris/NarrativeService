@@ -51,6 +51,27 @@ module NarrativeService {
         int wsid, string workspace, string chsum, int size,
         mapping<string, string> meta> object_info;
 
+    /* Information about a workspace.
+    
+        ws_id id - the numerical ID of the workspace.
+        ws_name workspace - name of the workspace.
+        username owner - name of the user who owns (e.g. created) this workspace.
+        timestamp moddate - date when the workspace was last modified.
+        int max_objid - the maximum object ID appearing in this workspace.
+            Since cloning a workspace preserves object IDs, this number may be
+            greater than the number of objects in a newly cloned workspace.
+        permission user_permission - permissions for the authenticated user of
+            this workspace.
+        permission globalread - whether this workspace is globally readable.
+        lock_status lockstat - the status of the workspace lock.
+        usermeta metadata - arbitrary user-supplied metadata about
+            the workspace.
+            
+    */
+    typedef tuple<int id, string workspace, string owner, string moddate,
+        int max_objid, string user_permission, string globalread,
+        string lockstat, mapping<string, string> metadata> workspace_info;
+
     typedef structure {
         list<object_info> set_items_info;
     } SetItems;
@@ -262,4 +283,81 @@ module NarrativeService {
 
     funcdef list_available_types(ListAvailableTypesParams params)
         returns (ListAvailableTypesOutput) authentication required;
+
+
+
+
+    /* ********************************** */
+    /* Listing Narratives / Naratorials (plus Narratorial Management) */
+
+    typedef structure { } ListNarratorialParams;
+
+    /* info for a narratorial */
+    typedef structure {
+        workspace_info ws;
+        object_info nar;
+    } Narratorial;
+
+    typedef structure {
+        list <Narratorial> narratorials;
+    } NarratorialList;
+
+    funcdef list_narratorials(ListNarratorialParams params)
+        returns (NarratorialList) authentication optional;
+
+
+    
+
+    typedef structure {
+        workspace_info ws;
+        object_info nar;
+    } Narrative;
+
+    typedef structure {
+        list <Narrative> narratives;
+    } NarrativeList;
+
+    /* List narratives
+        type parameter indicates which narratives to return.
+        Supported options are for now 'mine' or 'public'  TODO: 'shared'
+    */
+    typedef structure {
+        string type;
+    } ListNarrativeParams;
+
+    funcdef list_narratives(ListNarrativeParams params)
+        returns (NarrativeList) authentication optional;
+
+
+    /*
+        ws field is a string, but properly interpreted whether it is a workspace
+        name or ID
+    */
+    typedef structure {
+        string ws;
+        string description;
+    } SetNarratorialParams;
+
+    typedef structure { } SetNarratorialResult;
+
+    /*
+        Allows a user to create a Narratorial given a WS they own. Right now
+        anyone can do this, but we may restrict in the future to users that
+        have a particular role.  Run simply as:
+            ns.set_narratorial({'ws':'MyWsName'}) or,
+            ns.set_narratorial({'ws':'4231'})
+    */
+    funcdef set_narratorial(SetNarratorialParams params)
+        returns (SetNarratorialResult) authentication required;
+
+    typedef structure {
+        string ws;
+    } RemoveNarratorialParams;
+
+    typedef structure { } RemoveNarratorialResult;
+
+    funcdef remove_narratorial(RemoveNarratorialParams params)
+        returns (RemoveNarratorialResult) authentication required;
+
+
 };
