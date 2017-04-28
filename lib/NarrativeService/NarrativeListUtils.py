@@ -12,7 +12,6 @@ import pylru
 #     7 lock_status lockstat
 #     8 usermeta metadata
 
-
 class NarrativeInfoCache(object):
 
     def __init__(self, cache_size):
@@ -23,7 +22,6 @@ class NarrativeInfoCache(object):
 
     def check_cache_size(self):
         return len(self.cache)
-
 
     def get_info_list(self, ws_lookup_table, wsClient):
         '''
@@ -71,20 +69,24 @@ class NarrativeInfoCache(object):
         for ws_info in ws_list:
             if 'narrative' not in ws_info[8]:
                 continue
+            if not ws_info[8]['narrative'].isdigit() or not int(ws_info[8]['narrative']) > 0:
+                continue
             ref = str(ws_info[0]) + '/' + str(ws_info[8]['narrative'])
             obj_ref_list.append({'ref': ref})
 
         if len(obj_ref_list) == 0:
             return []
 
-        get_obj_params = {'objects': obj_ref_list, 'includeMetadata': 1}
+        # ignore errors
+        get_obj_params = {'objects': obj_ref_list, 'includeMetadata': 1, 'ignoreErrors': 1}
         narrative_list = wsClient.get_object_info3(get_obj_params)['infos']
 
         items = []
         for nar in narrative_list:
-            ws_info = full_ws_lookup_table[nar[6]]
-            items.append({'ws': ws_info, 'nar': nar})
-            self.cache[self._get_cache_key(ws_info)] = nar
+            if nar:
+                ws_info = full_ws_lookup_table[nar[6]]
+                items.append({'ws': ws_info, 'nar': nar})
+                self.cache[self._get_cache_key(ws_info)] = nar
         return items
 
     def _get_cache_key(self, ws_info):
@@ -139,7 +141,8 @@ class NarrativeListUtils(object):
         ws_lookup_table = {}
         for ws_info in ws_list:
             if 'narrative' in ws_info[8]:
-                ws_lookup_table[ws_info[0]] = ws_info
+                if ws_info[8]['narrative'].isdigit() and int(ws_info[8]['narrative']) > 0:
+                    ws_lookup_table[ws_info[0]] = ws_info
         return ws_lookup_table
 
 
@@ -156,6 +159,7 @@ class NarratorialUtils(object):
 
     def set_narratorial(self, wsid, description, wsClient):
         wsi = self._get_workspace_identity(wsid)
+        print('setting nar' + str(wsi))
         wsClient.alter_workspace_metadata({'wsi': wsi, 'new': {'narratorial': '1'}})
         wsClient.alter_workspace_metadata({'wsi': wsi, 'new': {'narratorial_description': description}})
 
