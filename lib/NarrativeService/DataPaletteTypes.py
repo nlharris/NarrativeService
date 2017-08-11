@@ -1,4 +1,6 @@
 import copy
+import os
+
 
 class DataPaletteTypes:
 
@@ -13,6 +15,9 @@ class DataPaletteTypes:
                            "KBaseAssembly.SingleEndLibrary": {},
                            "KBaseAssembly.PairedEndLibrary": {}
                            }
+            if "OVERRIDE_TYPES" in os.environ:
+                for dtype in os.environ["OVERRIDE_TYPES"]:
+                    self._TYPES[dtype] = {}
             self._KEYS = frozenset([key for key in self._TYPES])
 
     def get(self, type_name):
