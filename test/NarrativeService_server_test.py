@@ -38,6 +38,7 @@ class NarrativeServiceTest(unittest.TestCase):
     @classmethod
     def setUpClass(cls):
         token = environ.get('KB_AUTH_TOKEN', None)
+        os.environ['USE_DP'] = "1"
         config_file = environ.get('KB_DEPLOYMENT_CONFIG', None)
         cls.cfg = {}
         config = ConfigParser()
@@ -97,13 +98,13 @@ class NarrativeServiceTest(unittest.TestCase):
         # Reads
         cls.example_reads_name = "example_reads.1"
         foft = FakeObjectsForTests(os.environ['SDK_CALLBACK_URL'])
-        info1 = foft.create_fake_reads({'ws_name': cls.example_ws_name, 
+        info1 = foft.create_fake_reads({'ws_name': cls.example_ws_name,
                                         'obj_names': [cls.example_reads_name]})[0]
         cls.example_reads_ref = str(info1[6]) + '/' + str(info1[0]) + '/' + str(info1[4])
         # Genome
         cls.example_genome_name = "example_genome.1"
         foft = FakeObjectsForTests(os.environ['SDK_CALLBACK_URL'])
-        info2 = foft.create_fake_genomes({'ws_name': cls.example_ws_name, 
+        info2 = foft.create_fake_genomes({'ws_name': cls.example_ws_name,
                                           'obj_names': [cls.example_genome_name]})[0]
         cls.example_genome_ref = str(info2[6]) + '/' + str(info2[0]) + '/' + str(info2[4])
         # Other objects
@@ -359,7 +360,7 @@ class NarrativeServiceTest(unittest.TestCase):
                            'name': nar_obj_name,
                            'meta': nar_obj_meta}]})
         # Adding DP object:
-        dps = DataPaletteService(self.__class__.serviceWizardURL, 
+        dps = DataPaletteService(self.__class__.serviceWizardURL,
                                   token=self.getContext2()['token'],
                                   service_ver=self.__class__.DataPalette_version)
         dps.add_to_palette({'workspace': ws_name2, 'new_refs': [{'ref': reads_ref}]})
@@ -457,7 +458,7 @@ class NarrativeServiceTest(unittest.TestCase):
         ws_name1 = self.createWs()
         orig_reads_ref = self.__class__.example_reads_ref
         # Adding DP object:
-        dps1 = DataPaletteService(self.__class__.serviceWizardURL, 
+        dps1 = DataPaletteService(self.__class__.serviceWizardURL,
                                   token=self.getContext()['token'],
                                   service_ver=self.__class__.DataPalette_version)
         dps1.add_to_palette({'workspace': ws_name1, 'new_refs': [{'ref': orig_reads_ref}]})
@@ -472,11 +473,11 @@ class NarrativeServiceTest(unittest.TestCase):
         for item in ret:
             if 'dp_info' in item:
                 info = item['object_info']
-                reads_ref_path = (item['dp_info']['ref'] + ';' + 
+                reads_ref_path = (item['dp_info']['ref'] + ';' +
                                   str(info[6]) + '/' + str(info[0]) + '/' + str(info[4]))
         # Adding Reads to DP of second user
         ws_name2 = self.createWs2()
-        dps2 = DataPaletteService(self.__class__.serviceWizardURL, 
+        dps2 = DataPaletteService(self.__class__.serviceWizardURL,
                                   token=self.getContext2()['token'],
                                   service_ver=self.__class__.DataPalette_version)
         dps2.add_to_palette({'workspace': ws_name2, 'new_refs': [{'ref': reads_ref_path}]})
@@ -535,7 +536,7 @@ class NarrativeServiceTest(unittest.TestCase):
         self.assertEqual(2, len(ret))
 
     def test_two_users_sharing_dp(self):
-        dps = DataPaletteService(self.__class__.serviceWizardURL, 
+        dps = DataPaletteService(self.__class__.serviceWizardURL,
                                   token=self.getContext2()['token'],
                                   service_ver=self.__class__.DataPalette_version)
         ws_name1 = self.createWs()
@@ -550,7 +551,7 @@ class NarrativeServiceTest(unittest.TestCase):
         ws_name2 = self.createWs2()
         # Check that user2 can't import reads object until workspace is shared
         try:
-            dps.add_to_palette({'workspace': ws_name2, 
+            dps.add_to_palette({'workspace': ws_name2,
                                  'new_refs': [{'ref': copy_reads_obj_ref}]})
             raise ValueError("We shouldn't be able to import reads object to DataPalette")
         except Exception, e:
@@ -560,7 +561,7 @@ class NarrativeServiceTest(unittest.TestCase):
                                             'users': [self.getContext2()['user_id']]})
         # Import reads ref into DataPalette of second workspace
         dps.add_to_palette({'workspace': ws_name2, 'new_refs': [{'ref': copy_reads_obj_ref}]})
-        # Un-share original workspace 
+        # Un-share original workspace
         self.getWsClient().set_permissions({'workspace': ws_name1, 'new_permission': 'n',
                                             'users': [self.getContext2()['user_id']]})
         # Let's check that we can list and access reads object
@@ -589,7 +590,7 @@ class NarrativeServiceTest(unittest.TestCase):
 
 
     def test_two_users_dp_inside_set(self):
-        dps = DataPaletteService(self.__class__.serviceWizardURL, 
+        dps = DataPaletteService(self.__class__.serviceWizardURL,
                                   token=self.getContext2()['token'],
                                   service_ver=self.__class__.DataPalette_version)
         ws_name1 = self.createWs()
@@ -609,7 +610,7 @@ class NarrativeServiceTest(unittest.TestCase):
         dps.add_to_palette({'workspace': ws_name2, 'new_refs': [{'ref': copy_reads_obj_ref}]})
         dp_ref_map = dps.list_data({'workspaces': [ws_name2]})['data_palette_refs']
         reads_ref_path = dp_ref_map.itervalues().next() + ';' + copy_reads_obj_ref
-        # Un-share original workspace 
+        # Un-share original workspace
         self.getWsClient().set_permissions({'workspace': ws_name1, 'new_permission': 'n',
                                             'users': [self.getContext2()['user_id']]})
         # Let's check that user2 can add this reads object to reads set
@@ -655,14 +656,14 @@ class NarrativeServiceTest(unittest.TestCase):
         self.getWsClient().set_permissions({'workspace': ws_name1_2, 'new_permission': 'r',
                                             'users': [self.getContext2()['user_id']]})
         # Import reads set ref into DataPalette of third workspace
-        dps = DataPaletteService(self.__class__.serviceWizardURL, 
+        dps = DataPaletteService(self.__class__.serviceWizardURL,
                                   token=self.getContext2()['token'],
                                   service_ver=self.__class__.DataPalette_version)
         dps.add_to_palette({'workspace': ws_name2, 'new_refs': [{'ref': orig_set_ref}]})
         dp_ref_map = dps.list_data({'workspaces': [ws_name2]})['data_palette_refs']
         set_ref_path = dp_ref_map.itervalues().next() + ';' + orig_set_ref
         reads_ref_path = set_ref_path + ';' + copy_reads_obj_ref
-        # Un-share original workspace 
+        # Un-share original workspace
         self.getWsClient().set_permissions({'workspace': ws_name1_2, 'new_permission': 'n',
                                             'users': [self.getContext2()['user_id']]})
         # Let's check that we can list set and see reads object as set item

@@ -1,6 +1,7 @@
 import time
 import json
 import uuid
+import os
 from NarrativeService.ServiceUtils import ServiceUtils
 from NarrativeService.DataPaletteTypes import DataPaletteTypes
 
@@ -33,8 +34,10 @@ class NarrativeManager:
         self.ws = Workspace(config['workspace-url'], token=self.token)
         self.intro_md_file = config['intro-markdown-file']
         # We switch DPs on only for internal Continuous Integration environment for now:
-        if config['kbase-endpoint'].startswith("https://ci.kbase.us/"):
-            self.DATA_PALETTES_TYPES = DataPaletteTypes(True)
+        if config['kbase-endpoint'].startswith("https://ci.kbase.us/") or \
+           'USE_DP' in os.environ:
+                print "Using Data Palletes"
+                self.DATA_PALETTES_TYPES = DataPaletteTypes(True)
 
     def list_objects_with_sets(self, ws_id=None, ws_name=None, workspaces=None,
                                types=None, include_metadata=0):
@@ -55,7 +58,7 @@ class NarrativeManager:
         if self.DEBUG:
             print("NarrativeManager._list_objects_with_sets: processing sets")
         t1 = time.time()
-        set_ret = self.set_api_cache.call_method("list_sets", 
+        set_ret = self.set_api_cache.call_method("list_sets",
                                                  [{'workspaces': workspaces,
                                                    'include_set_item_info': 1,
                                                    'include_raw_data_palettes': 1,
