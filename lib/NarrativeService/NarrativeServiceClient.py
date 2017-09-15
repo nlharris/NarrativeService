@@ -132,14 +132,17 @@ class NarrativeService(object):
            (optional) copydata - packed inport data in format "import(;...)*"
            (alternative to importData) importData - import data in unpacked
            form (alternative to copydata) includeIntroCell - if 1, adds an
-           introductory markdown cell at the top (optional, default 0)) ->
-           structure: parameter "app" of String, parameter "method" of
-           String, parameter "appparam" of String, parameter "appData" of
-           list of type "AppParam" -> tuple of size 3: parameter "step_pos"
-           of Long, parameter "key" of String, parameter "value" of String,
-           parameter "markdown" of String, parameter "copydata" of String,
-           parameter "importData" of list of String, parameter
-           "includeIntroCell" of type "boolean" (@range [0,1])
+           introductory markdown cell at the top (optional, default 0) title
+           - name of the new narrative (optional, if a string besides
+           'Untitled', this will mark the narrative as not temporary, so it
+           will appear in the dashboard)) -> structure: parameter "app" of
+           String, parameter "method" of String, parameter "appparam" of
+           String, parameter "appData" of list of type "AppParam" -> tuple of
+           size 3: parameter "step_pos" of Long, parameter "key" of String,
+           parameter "value" of String, parameter "markdown" of String,
+           parameter "copydata" of String, parameter "importData" of list of
+           String, parameter "includeIntroCell" of type "boolean" (@range
+           [0,1]), parameter "title" of String
         :returns: instance of type "CreateNewNarrativeOutput" -> structure:
            parameter "workspaceInfo" of type "WorkspaceInfo" (Restructured
            workspace info 'wsInfo' tuple: id: wsInfo[0], name: wsInfo[1],

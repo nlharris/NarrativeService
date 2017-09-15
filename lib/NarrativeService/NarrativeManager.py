@@ -232,7 +232,7 @@ class NarrativeManager:
             raise # continue raising previous exception
 
     def create_new_narrative(self, app, method, appparam, appData, markdown,
-                             copydata, importData, includeIntroCell):
+                             copydata, importData, includeIntroCell, title):
         if app and method:
             raise ValueError("Must provide no more than one of the app or method params")
 
@@ -257,7 +257,11 @@ class NarrativeManager:
             cells = [{"method": method}]
         elif markdown:
             cells = [{"markdown": markdown}]
-        return self._create_temp_narrative(cells, appData, importData, includeIntroCell)
+        narr_info = self._create_temp_narrative(cells, appData, importData, includeIntroCell, title)
+        if title is not None:
+            # update workspace info so it's not temporary
+            pass
+        return narr_info
 
     def _get_intro_markdown(self):
         """
@@ -268,7 +272,7 @@ class NarrativeManager:
             intro_md = intro_file.read()
         return intro_md
 
-    def _create_temp_narrative(self, cells, parameters, importData, includeIntroCell):
+    def _create_temp_narrative(self, cells, parameters, importData, includeIntroCell, title):
         # Migration to python of JavaScript class from https://github.com/kbase/kbase-ui/blob/4d31151d13de0278765a69b2b09f3bcf0e832409/src/client/modules/plugins/narrativemanager/modules/narrativeManager.js#L414
         narr_id = int(round(time.time() * 1000))
         workspaceName = self.user_id + ':narrative_' + str(narr_id)
@@ -276,9 +280,9 @@ class NarrativeManager:
 
         ws = self.ws
         ws_info = ws.create_workspace({'workspace': workspaceName, 'description': ''})
-        newWorkspaceInfo = ServiceUtils.workspaceInfoToObject(ws_info)
-        [narrativeObject, metadataExternal] = self._fetchNarrativeObjects(workspaceName, cells,
-                                                                         parameters, includeIntroCell)
+        [narrativeObject, metadataExternal] = self._fetchNarrativeObjects(
+            workspaceName, cells, parameters, includeIntroCell, title
+        )
         objectInfo = ws.save_objects({'workspace': workspaceName,
                                       'objects': [{'type': 'KBaseNarrative.Narrative',
                                                    'data': narrativeObject,
@@ -289,12 +293,22 @@ class NarrativeManager:
                                                                    'Workspace/Narrative bundle.'}],
                                                    'hidden': 0}]})[0]
         objectInfo = ServiceUtils.objectInfoToObject(objectInfo)
-        self._completeNewNarrative(newWorkspaceInfo['id'], objectInfo['id'], importData)
-        return {'workspaceInfo': newWorkspaceInfo, 'narrativeInfo': objectInfo}
+        is_temporary = 'true'
+        if title is not None and title != 'Untitled':
+            is_temporary = 'false'
+        ws_info = self._completeNewNarrative(ws_info[0], objectInfo['id'],
+                                             importData, is_temporary, title)
+        return {
+            'workspaceInfo': ServiceUtils.workspaceInfoToObject(ws_info),
+            'narrativeInfo': objectInfo
+        }
 
-    def _fetchNarrativeObjects(self, workspaceName, cells, parameters, includeIntroCell):
+    def _fetchNarrativeObjects(self, workspaceName, cells, parameters, includeIntroCell, title):
         if not cells:
             cells = []
+        if not title:
+            title = 'Untitled'
+
         # fetchSpecs
         appSpecIds = []
         methodSpecIds = []
@@ -316,13 +330,14 @@ class NarrativeManager:
                 spec_id = spec['info']['id']
                 specMapping['methods'][spec_id] = spec
         # end of fetchSpecs
+
         metadata = {'job_ids': {'methods': [],
                                 'apps': [],
                                 'job_usage': {'queue_time': 0, 'run_time': 0}},
                     'format': 'ipynb',
                     'creator': self.user_id,
                     'ws_name': workspaceName,
-                    'name': 'Untitled',
+                    'name': title,
                     'type': 'KBaseNarrative.Narrative',
                     'description': '',
                     'data_dependencies': []}
@@ -414,18 +429,29 @@ class NarrativeManager:
         cell['metadata'][self.KB_CELL] = cellInfo;
         return cell
 
-    def _completeNewNarrative(self, workspaceId, objectId, importData):
+    def _completeNewNarrative(self, workspaceId, objectId, importData, is_temporary, title):
+        """
+        'Completes' the new narrative by updating workspace metadata with the required fields and
+        copying in data from the importData list of references.
+        """
+        new_meta = {
+            'narrative': str(objectId),
+            'is_temporary': is_temporary
+        }
+        if is_temporary == 'false' and title is not None:
+            new_meta['narrative_nice_name'] = title
+
         self.ws.alter_workspace_metadata({'wsi': {'id': workspaceId},
-                                          'new': {'narrative': str(objectId),
-                                                  'is_temporary': 'true'}})
+                                          'new': new_meta})
         # copy_to_narrative:
-        if not importData:
-            return
-        objectsToCopy = [{'ref': x} for x in importData]
-        infoList = self.ws.get_object_info_new({'objects': objectsToCopy, 'includeMetadata': 0})
-        for item in infoList:
-            objectInfo = ServiceUtils.objectInfoToObject(item)
-            self.copy_object(objectInfo['ref'], workspaceId, None, None, objectInfo)
+        if importData:
+            objectsToCopy = [{'ref': x} for x in importData]
+            infoList = self.ws.get_object_info_new({'objects': objectsToCopy, 'includeMetadata': 0})
+            for item in infoList:
+                objectInfo = ServiceUtils.objectInfoToObject(item)
+                self.copy_object(objectInfo['ref'], workspaceId, None, None, objectInfo)
+
+        return self.ws.get_workspace_info({'id': workspaceId})
 
     def _safeJSONStringify(self, obj):
         return json.dumps(self._safeJSONStringifyPrepare(obj))

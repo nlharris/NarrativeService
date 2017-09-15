@@ -397,8 +397,7 @@ class NarrativeServiceTest(unittest.TestCase):
             # Cleaning up new created workspace
             ws2.delete_workspace({'id': copy_ws_id})
 
-
-    def test_create_new_narrative(self):
+    def test_create_new_temp_narrative(self):
         import_ref = self.__class__.example_reads_ref
         ws = self.getWsClient()
         ret = self.getImpl().create_new_narrative(self.getContext(),
@@ -406,7 +405,50 @@ class NarrativeServiceTest(unittest.TestCase):
                                                    "appparam": "0,param1,value1;0,param2,value2",
                                                    "copydata": import_ref})[0]
         try:
-            self.assertTrue('narrativeInfo' in ret)
+            self.assertTrue('workspaceInfo' in ret)
+            info = ret['workspaceInfo']
+            self.assertIn('id', info)
+            self.assertIn('name', info)
+            self.assertIn('owner', info)
+            self.assertIn('moddate', info)
+            self.assertIn('object_count', info)
+            self.assertIn('user_permission', info)
+            self.assertIn('globalread', info)
+            self.assertIn('lockstat', info)
+            self.assertIn('metadata', info)
+            self.assertIn('modDateMs', info)
+            ws_meta = info['metadata']
+            self.assertEqual(ws_meta['is_temporary'], 'true')
+            self.assertEqual(ws_meta['narrative'], str(ret['narrativeInfo']['id']))
+            self.assertNotIn('narrative_nice_name', ws_meta)
+        finally:
+            new_ws_id = ret['workspaceInfo']['id']
+            ws.delete_workspace({'id': new_ws_id})
+
+    @unittest.skip
+    def test_create_new_titled_narrative(self):
+        ws = self.getWsClient()
+        title = "My Test Narrative"
+        ret = self.getImpl().create_new_narrative(self.getContext(), {
+            title: title
+        })
+        try:
+            self.assertTrue('workspaceInfo' in ret)
+            info = ret['workspaceInfo']
+            self.assertIn('id', info)
+            self.assertIn('name', info)
+            self.assertIn('owner', info)
+            self.assertIn('moddate', info)
+            self.assertIn('object_count', info)
+            self.assertIn('user_permission', info)
+            self.assertIn('globalread', info)
+            self.assertIn('lockstat', info)
+            self.assertIn('metadata', info)
+            self.assertIn('modDateMs', info)
+            ws_meta = info['metadata']
+            self.assertEqual(ws_meta['is_temporary'], 'false')
+            self.assertEqual(ws_meta['narrative'], str(ret['narrativeInfo']['id']))
+            self.assertEqual(ws_meta['narrative_nice_name'], title)
         finally:
             new_ws_id = ret['workspaceInfo']['id']
             ws.delete_workspace({'id': new_ws_id})
