@@ -44,7 +44,7 @@ public class ListItem {
      * <p>Original spec-file type: DataPaletteInfo</p>
      * <pre>
      * ref - reference to any DataPalette container pointing to given object,
-     * refs - list of references to all DataPalette containers pointing to 
+     * refs - list of references to all DataPalette containers pointing to
      *     given object.
      * </pre>
      * 
@@ -97,7 +97,7 @@ public class ListItem {
      * <p>Original spec-file type: DataPaletteInfo</p>
      * <pre>
      * ref - reference to any DataPalette container pointing to given object,
-     * refs - list of references to all DataPalette containers pointing to 
+     * refs - list of references to all DataPalette containers pointing to
      *     given object.
      * </pre>
      * 
@@ -111,7 +111,7 @@ public class ListItem {
      * <p>Original spec-file type: DataPaletteInfo</p>
      * <pre>
      * ref - reference to any DataPalette container pointing to given object,
-     * refs - list of references to all DataPalette containers pointing to 
+     * refs - list of references to all DataPalette containers pointing to
      *     given object.
      * </pre>
      * 

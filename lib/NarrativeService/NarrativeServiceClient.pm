@@ -372,6 +372,7 @@ CreateNewNarrativeParams is a reference to a hash where the following keys are d
 	copydata has a value which is a string
 	importData has a value which is a reference to a list where each element is a string
 	includeIntroCell has a value which is a NarrativeService.boolean
+	title has a value which is a string
 AppParam is a reference to a list containing 3 items:
 	0: (step_pos) an int
 	1: (key) a string
@@ -431,6 +432,7 @@ CreateNewNarrativeParams is a reference to a hash where the following keys are d
 	copydata has a value which is a string
 	importData has a value which is a reference to a list where each element is a string
 	includeIntroCell has a value which is a NarrativeService.boolean
+	title has a value which is a string
 AppParam is a reference to a list containing 3 items:
 	0: (step_pos) an int
 	1: (key) a string
@@ -1520,19 +1522,19 @@ a reference to a list containing 11 items:
 
 Information about a workspace.
 
-    ws_id id - the numerical ID of the workspace.
-    ws_name workspace - name of the workspace.
-    username owner - name of the user who owns (e.g. created) this workspace.
-    timestamp moddate - date when the workspace was last modified.
-    int max_objid - the maximum object ID appearing in this workspace.
-        Since cloning a workspace preserves object IDs, this number may be
-        greater than the number of objects in a newly cloned workspace.
-    permission user_permission - permissions for the authenticated user of
-        this workspace.
-    permission globalread - whether this workspace is globally readable.
-    lock_status lockstat - the status of the workspace lock.
-    usermeta metadata - arbitrary user-supplied metadata about
-        the workspace.
+        ws_id id - the numerical ID of the workspace.
+        ws_name workspace - name of the workspace.
+        username owner - name of the user who owns (e.g. created) this workspace.
+        timestamp moddate - date when the workspace was last modified.
+        int max_objid - the maximum object ID appearing in this workspace.
+            Since cloning a workspace preserves object IDs, this number may be
+            greater than the number of objects in a newly cloned workspace.
+        permission user_permission - permissions for the authenticated user of
+            this workspace.
+        permission globalread - whether this workspace is globally readable.
+        lock_status lockstat - the status of the workspace lock.
+        usermeta metadata - arbitrary user-supplied metadata about
+            the workspace.
 
 
 =item Definition
@@ -1614,7 +1616,7 @@ set_items_info has a value which is a reference to a list where each element is 
 =item Description
 
 ref - reference to any DataPalette container pointing to given object,
-refs - list of references to all DataPalette containers pointing to 
+refs - list of references to all DataPalette containers pointing to
     given object.
 
 
@@ -2044,6 +2046,8 @@ markdown - markdown text for cell of 'markdown' type (optional)
 copydata - packed inport data in format "import(;...)*" (alternative to importData)
 importData - import data in unpacked form (alternative to copydata)
 includeIntroCell - if 1, adds an introductory markdown cell at the top (optional, default 0)
+title - name of the new narrative (optional, if a string besides 'Untitled', this will
+        mark the narrative as not temporary, so it will appear in the dashboard)
 
 
 =item Definition
@@ -2060,6 +2064,7 @@ markdown has a value which is a string
 copydata has a value which is a string
 importData has a value which is a reference to a list where each element is a string
 includeIntroCell has a value which is a NarrativeService.boolean
+title has a value which is a string
 
 </pre>
 
@@ -2076,6 +2081,7 @@ markdown has a value which is a string
 copydata has a value which is a string
 importData has a value which is a reference to a list where each element is a string
 includeIntroCell has a value which is a NarrativeService.boolean
+title has a value which is a string
 
 
 =end text

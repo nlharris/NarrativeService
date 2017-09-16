@@ -52,7 +52,7 @@ module NarrativeService {
         mapping<string, string> meta> object_info;
 
     /* Information about a workspace.
-    
+
         ws_id id - the numerical ID of the workspace.
         ws_name workspace - name of the workspace.
         username owner - name of the user who owns (e.g. created) this workspace.
@@ -66,7 +66,7 @@ module NarrativeService {
         lock_status lockstat - the status of the workspace lock.
         usermeta metadata - arbitrary user-supplied metadata about
             the workspace.
-            
+
     */
     typedef tuple<int id, string workspace, string owner, string moddate,
         int max_objid, string user_permission, string globalread,
@@ -78,7 +78,7 @@ module NarrativeService {
 
     /*
         ref - reference to any DataPalette container pointing to given object,
-        refs - list of references to all DataPalette containers pointing to 
+        refs - list of references to all DataPalette containers pointing to
             given object.
     */
     typedef structure {
@@ -222,6 +222,8 @@ module NarrativeService {
         copydata - packed inport data in format "import(;...)*" (alternative to importData)
         importData - import data in unpacked form (alternative to copydata)
         includeIntroCell - if 1, adds an introductory markdown cell at the top (optional, default 0)
+        title - name of the new narrative (optional, if a string besides 'Untitled', this will
+                mark the narrative as not temporary, so it will appear in the dashboard)
     */
     typedef structure {
         string app;
@@ -232,6 +234,7 @@ module NarrativeService {
         string copydata;
         list<string> importData;
         boolean includeIntroCell;
+        string title;
     } CreateNewNarrativeParams;
 
     typedef structure {
@@ -306,7 +309,7 @@ module NarrativeService {
         returns (NarratorialList) authentication optional;
 
 
-    
+
 
     typedef structure {
         workspace_info ws;

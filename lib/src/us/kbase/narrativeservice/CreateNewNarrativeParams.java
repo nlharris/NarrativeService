@@ -25,6 +25,8 @@ import us.kbase.common.service.Tuple3;
  * copydata - packed inport data in format "import(;...)*" (alternative to importData)
  * importData - import data in unpacked form (alternative to copydata)
  * includeIntroCell - if 1, adds an introductory markdown cell at the top (optional, default 0)
+ * title - name of the new narrative (optional, if a string besides 'Untitled', this will
+ *         mark the narrative as not temporary, so it will appear in the dashboard)
  * </pre>
  * 
  */
@@ -38,7 +40,8 @@ import us.kbase.common.service.Tuple3;
     "markdown",
     "copydata",
     "importData",
-    "includeIntroCell"
+    "includeIntroCell",
+    "title"
 })
 public class CreateNewNarrativeParams {
 
@@ -58,6 +61,8 @@ public class CreateNewNarrativeParams {
     private List<String> importData;
     @JsonProperty("includeIntroCell")
     private java.lang.Long includeIntroCell;
+    @JsonProperty("title")
+    private java.lang.String title;
     private Map<java.lang.String, Object> additionalProperties = new HashMap<java.lang.String, Object>();
 
     @JsonProperty("app")
@@ -180,6 +185,21 @@ public class CreateNewNarrativeParams {
         return this;
     }
 
+    @JsonProperty("title")
+    public java.lang.String getTitle() {
+        return title;
+    }
+
+    @JsonProperty("title")
+    public void setTitle(java.lang.String title) {
+        this.title = title;
+    }
+
+    public CreateNewNarrativeParams withTitle(java.lang.String title) {
+        this.title = title;
+        return this;
+    }
+
     @JsonAnyGetter
     public Map<java.lang.String, Object> getAdditionalProperties() {
         return this.additionalProperties;
@@ -192,7 +212,7 @@ public class CreateNewNarrativeParams {
 
     @Override
     public java.lang.String toString() {
-        return ((((((((((((((((((("CreateNewNarrativeParams"+" [app=")+ app)+", method=")+ method)+", appparam=")+ appparam)+", appData=")+ appData)+", markdown=")+ markdown)+", copydata=")+ copydata)+", importData=")+ importData)+", includeIntroCell=")+ includeIntroCell)+", additionalProperties=")+ additionalProperties)+"]");
+        return ((((((((((((((((((((("CreateNewNarrativeParams"+" [app=")+ app)+", method=")+ method)+", appparam=")+ appparam)+", appData=")+ appData)+", markdown=")+ markdown)+", copydata=")+ copydata)+", importData=")+ importData)+", includeIntroCell=")+ includeIntroCell)+", title=")+ title)+", additionalProperties=")+ additionalProperties)+"]");
     }
 
 }
